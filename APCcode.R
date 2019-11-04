@@ -39,20 +39,59 @@ write.csv(commonX,"./output/jrnls_to_search.csv")
 
 
 
+########################
+# Narrow down the SCOPUS search results to ONLY the elsevier X journals 
+
+articles_X_df_reduced<-articles_X_df
+str(articles_X_df_reduced)
+articles_X_df_reduced$SO<-as.character(articles_X_df_reduced$SO) # convert from factor to character
+articles_X_df_reduced$SO<-tolower(articles_X_df_reduced$SO) #convert to lower case
+articles_X_df_reduced$SO<-as.factor(articles_X_df_reduced$SO) # convert to factor
+all_X_journals<-all_X_journals %>% rename(SO=journal)
+articles_X_df_reduced<-semi_join(articles_X_df_reduced,all_X_journals,by="SO")  # X journals in the scopus search
+
+
+
+
+
 # their default bibliometric analyses
-results_X <- biblioAnalysis(articles_X_df, sep = ";")
+results_X <- biblioAnalysis(articles_X_df_reduced, sep = ";")
 options(width=100)
 # a summary of their analyses
 summary_X <- summary(object = results_X, k = 10, pause = FALSE)
 # The have some nice plots
-plot(x = results, k = 10, pause = FALSE)
+plot(x = results_X, k = 10, pause = FALSE)
 
 # extract the author countries)
 # These data will be the last column of the resulting df
-AuGeoX <- metaTagExtraction(articles_X_df, Field = "AU_CO", sep = ";")
-AuGeoX$AU_CO # This is it.
-# You need to put each value in its own cell, then convert from wide to long.
-# FInd me to see what I mean. tidyverse has some nice tools to do this.
+AuGeoX <- metaTagExtraction(articles_X_df_reduced, Field = "AU_CO", sep = ";")
+str(AuGeoX)
+
+
+X_articles_geodata<-AuGeoX %>% select(DI,SO,AU_CO)
+X_articles_geodata<-droplevels(X_articles_geodata)
+str(X_articles_geodata)
+foo<- as.data.frame(str_split(X_articles_geodata$AU_CO, ";", simplify = TRUE))
+foo <- foo %>% mutate_all(na_if,"")
+
+foo <- data.frame(lapply(foo, as.character), stringsAsFactors=FALSE) # Need to do this or gather won't work properly
+X_articles_geodata<-cbind(X_articles_geodata,foo)
+rm(foo)
+str(X_articles_geodata)
+X_articles_geodata<-X_articles_geodata %>% gather(author,country,4:29)
+X_articles_geodata$author<-gsub("V","",X_articles_geodata$author)
+X_articles_geodata$author<-as.numeric(X_articles_geodata$author)
+head(X_articles_geodata,10)
+X_articles_geodata<-X_articles_geodata %>% arrange(DI,author)
+X_articles_geodata<-X_articles_geodata[complete.cases(X_articles_geodata), ]
+
+library(countrycode) #convert each country name to the ISO 3 digit standardized country code.
+X_articles_geodata$country_code<-countrycode(X_articles_geodata$country,"country.name", "iso3c", warn = TRUE)
+#By setting "warn=TRUE" it will tell you which ones it couldn't convert. Because of spelling mistakes, etc.
+X_articles_geodata$country_code<-as.factor(X_articles_geodata$country_code)
+summary(X_articles_geodata$country_code)
+write.csv(X_articles_geodata,"./output/X_Journal_author_countries.csv")
+
 
 
 
@@ -63,6 +102,8 @@ AuGeoX$AU_CO # This is it.
 ############################################
 
 library(refsplitr)
+
+
 
 ######################
 # Load the data
@@ -79,6 +120,41 @@ WOS<-read.csv("./output/WOS_references.csv")
 ######################
 # Process the data & disambiaguate the author names
 ######################
+# 
+# Error in authors_clean(WOS) : The following references have no authors
+# (i.e., there are NAs in the AU and AF fields):
+#   
+#   refID = 24013, 24014, 24015, 24016, 30896, 35339, 35340, 35405, 35406, 35407, 42490
+# 
+# Before using authors_clean() you MUST:
+#   
+#   (1) remove these references from the dataframe.
+# 
+# OR
+# 
+# (2) Correct the NAs in the AU and AF fields for these references.
+# They do not have an author, in which case you can use "None", "Anonymous", "Unknown", etc.
+# They may have been written by an Author Consortium (see Column "CA");
+# If so you can replace the NAs in AU and AF with the contents of column CA. 
+WOS_cln<-authors_clean(WOS)
+head(WOS$cln, 20)
+# WOS[24013,]
+# WOS[24014,]
+# WOS[24015,]
+# WOS[24016,]
+# WOS[30896,]
+# WOS[35339,]
+# WOS[35340,]
+# WOS[35405,]
+# WOS[35406,]
+# WOS[35407,]
+# WOS[42490,]
+# WOS[42491,]
+WOS$AU <- with( WOS, ifelse( is.na(AU), CA, AU))
+
+WOS$AF <- with( WOS, ifelse( is.na(AF), CA, AF))
+
+
 WOS_cln<-authors_clean(WOS)
 head(WOS$cln, 20)
 
@@ -88,10 +164,10 @@ head(WOS$cln, 20)
 write.csv(WOS_cln$prelim,"./output/WOS_prelim.csv")
 
 # load to show
-WOS_cln_prelim<-read.csv("./output/WOS_cln_prelim.csv")
+WOS_cln_prelim<-read.csv("./output/WOS_prelim.csv")
 
 # save the names suggested for review as a csv file
-write.csv(WOS_cln$review,"./output/WOS_cln_review.csv")
+write.csv(WOS_cln$review,"./output/WOS_review.csv")
 
 ######################
 # Accept the disambiguation or load / merge your corrections 
@@ -101,8 +177,38 @@ WOS_refined <- authors_refine(WOS_cln$review,WOS_cln$prelim)
 write.csv(WOS_refined,"./output/WOS_refined.csv")
 ######################
 
+head(WOS_refined,10)
+WOS_refined_country<-select(WOS_refined, refID, groupID,author_name,author_order,country)
+head(WOS_refined_country,20)
+write.csv(WOS_refined_country,"./output/WOS_refined_country.csv")
 
-WOS_refined$country
+
+
+# Add the country codes
+WOS_refined_country<-read.csv("./output/WOS_refined_country.csv")
+library(countrycode) #convert each country name to the ISO 3 digit standardized country code.
+WOS_refined_country$country2<-WOS_refined_country$country
+levels(WOS_refined_country$country2)<-c(levels(WOS_refined_country$country2),"UK","central african republic","papua new guinea","federated states of micronesia","netherlands antilles","republic of kosovo")
+WOS_refined_country$country2[WOS_refined_country$country2 == "wales"]  <- "UK"
+WOS_refined_country$country2[WOS_refined_country$country2 == "scotland"]  <- "UK"
+WOS_refined_country$country2[WOS_refined_country$country2 == "england"]  <- "UK"
+WOS_refined_country$country2[WOS_refined_country$country2 == "north ireland"]  <- "UK"
+WOS_refined_country$country2[WOS_refined_country$country2 == "cent afr republ"]  <- "central african republic"
+WOS_refined_country$country2[WOS_refined_country$country2 == "papua n guinea"]  <- "papua new guinea"
+WOS_refined_country$country2[WOS_refined_country$country2 == "micronesia"]  <- "federated states of micronesia"
+WOS_refined_country$country2[WOS_refined_country$country2 == "neth antilles"]  <- "netherlands antilles"
+WOS_refined_country$country2[WOS_refined_country$country2 == "kosovo"]  <- "republic of kosovo"
+
+WOS_refined_country$country_code<-countrycode(WOS_refined_country$country2,"country.name", "iso3c", warn = TRUE)
+#By setting "warn=TRUE" it will tell you which ones it couldn't convert. Because of spelling mistakes, etc.
+# note that a few are missing because they are not recognized.
+
+WOS_refined_country$country_code<-as.factor(WOS_refined_country$country_code)
+summary(WOS_refined_country$country_code)
+write.csv(X_articles_geodata,"./output/X_Journal_author_countries.csv")
+
+
+
 
 ######################
 
@@ -144,152 +250,3 @@ plot_net_address$plot
 
 
 
-
-
-
-
-
-
-library(bibliometrix)
-D <- readFiles('./data/DrBruna.bib')
-scopus2df(D)
-convert2df(D)
-
-M <- convert2df(D, dbsource = "scopus", format = "plaintext")
-
-
-D <- readFiles('./data/pubmed1.txt')
-D <- readFiles('./data/pmc_result.txt')
-M <- convert2df(D, dbsource = "pubmed", format = "plaintext")
-
-
-library(revtools)
-data <- read_bibliography('./data/pubmed1.txt')
-
-library(RISmed)
-search_query <- EUtilsSummary('Analytica Chimica Acta:X', type='esearch', db='pubmed')
-summary(search_query)
-QueryId(search_query)
-records<- EUtilsGet(search_query)
-class(records)
-pubmed_data <- data.frame('Address'=C1(records),'Abstract'=AbstractText(records))
-head(pubmed_data,1)
-
-
-search_topic <- 'copd'
-search_query <- EUtilsSummary(search_topic, retmax=100, mindate=2012, maxdate=2012)
-summary(search_query)
-QueryId(search_query)
-records<- EUtilsGet(search_query)
-class(records)
-pubmed_data <- data.frame('Title'=ArticleTitle(records),'Abstract'=AbstractText(records))
-head(pubmed_data,1)
-
-
-
-
-install.packages("easyPubMed")
-library(easyPubMed)
-new_query <- 'Bladder[TIAB] AND Northwestern[AD] AND Chicago[AD] AND "2018"[PDAT]' 
-out.A <- batch_pubmed_download(pubmed_query_string = new_query, 
-                               format = "xml", 
-                               batch_size = 20,
-                               dest_file_prefix = "easyPM_example",
-                               encoding = "ASCII")
-print(out.A) 
-
-
-my_PM_list <- articles_to_list(pubmed_data = my_abstracts_xml)
-class(my_PM_list[1])
-
-
-
-
-
-
-
-
-
-
-###########################################################################
-# Michael L. Bernauer
-# mlbernauer@gmail.com
-# 12/14/2014
-# Module for parsing PubMed Medline files.
-# Files should be downloaded to your
-# computer and loaded into R by passing the
-# file path into the medline function.
-# The function returns a list containing
-# each Medline entry.
-#
-# USAGE:
-# source('medline.R')
-# medline_records <- medline("/home/user/Downloads/pubmed_results.txt")
-#
-# USAGE:
-# query <- "\"unversity of new mexico\"[AD] AND \"pharmacy\"[AD]"
-# entrez_results < entrez_fetcher(query, "pubmed", "medline")
-#
-# Results can be parsed with the medline function
-# medline_results <- medline_parser(entrez_results)
-############################################################################
-
-library(RCurl)
-library(XML)
-
-medline_parser = function(file_name){
-  if(file.exists(file_name)){
-    lines <- readLines(file_name)
-  }
-  else {
-    lines <- strsplit(file_name, "\n")[[1]]
-  }
-  medline_records <- list()
-  key <- 0
-  record <- 0
-  for(line in lines){
-    header <- sub(" {1,20}", "", substring(line, 1, 4))
-    value <- sub("^.{6}", "", line)
-    if(header == "" & value == ""){
-      next
-    }
-    else if(header == "PMID"){
-      record = record + 1
-      medline_records[[record]] <- list()
-      medline_records[[record]][header] <- value
-    }
-    else if(header == "" & value != ""){
-      medline_records[[record]][key] <- paste(medline_records[[record]][key], value)
-    }
-    else{
-      key <- header
-      if(is.null(medline_records[[record]][key][[1]])){
-        medline_records[[record]][key] <- value
-      }
-      else { 
-        medline_records[[record]][key] <- paste(medline_records[[record]][key], value, sep=";")
-      }
-    }
-  }
-  return(medline_records)
-}
-
-# Function for retrieving PubMed search results to be parsed with
-# medlineParser
-entrez_fetcher = function(query_string, db="pubmed", type="medline"){
-  base <- "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
-  query <- gsub(" ", "+", query_string)
-  query <- paste("esearch.fcgi?db=", db, "&term=", query, "&usehistory=y", sep="")
-  url <- paste(base, query, sep="")
-  url_result <- getURL(url)
-  
-  xml_data <- xmlToList(xmlParse(url_result))
-  web <- xml_data["WebEnv"][[1]]
-  key <- xml_data["QueryKey"][[1]]
-  
-  # Assemble Efetch URL
-  fetch <- paste(base, "efetch.fcgi?db=", db, "&query_key=", key,
-                 "&WebEnv=", web, "&rettype=", type, "&retmode=text", sep="")
-  data <- getURL(fetch)
-  return(data)
-}
