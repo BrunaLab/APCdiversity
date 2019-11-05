@@ -269,6 +269,9 @@ ALLDATA$country_code<-as.factor(ALLDATA$country_code)
 ALLDATA$jrnl_type<-as.factor(ALLDATA$jrnl_type)
 write.csv(ALLDATA,"./output/AuthorGeoAllJournals.csv")
 
+save(ALLDATA,file="./output/ALLDATA.RData")
+load(file="./output/ALLDATA.RData")
+head(ALLDATA,10)
 ##################################################################
 # THIS IS TO GEOREF THE LOCATIONS FOR MAPPING
 ##################################################################
