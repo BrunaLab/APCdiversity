@@ -1,20 +1,25 @@
 library(tidyverse)
+
+################################################################
+# THIS IS FOR THE X JOURNALS, WHCIH WERE DOWNLOADED FROM SCOPUS
+################################################################
 library(bibliometrix)
-# read in the file
+# read in the data 
 articles_X <- readFiles('./data/DrBruna.bib')
-# process the articles
+# process the data and convert to dataframe with bibliometrix
 articles_X_df <- convert2df(articles_X, dbsource = "scopus", format = "bibtex")
 str(articles_X_df)
-
 # save as a csv file
 write.csv(articles_X_df,"./output/scopusX.csv")
 
-#What sources are in the scopus file?
-# read in the list of X journals published by Elsevier
+################################################################
+# NARROW THE RESULTS TO X JOURNALS (turns out other journals snuck into the search)
+################################################################
+# To find out what X journals are in the scopus results,
+# first, load the complete list of X journals published by Elsevier
 all_X_journals<-read.csv("./data/elsevier_x_journals.csv")
-str(all_X_journals)
-all_X_journals$journal<-as.character(all_X_journals$journal) # convert from factor to character
-all_X_journals$journal<-tolower(all_X_journals$journal) #convert to lower case
+all_X_journals$journal<-as.character(all_X_journals$journal) # convert journal name from factor to character
+all_X_journals$journal<-tolower(all_X_journals$journal) # convert to lower case
 all_X_journals$journal<-as.factor(all_X_journals$journal) # convert to factor
 summary(all_X_journals)
 # which journals are in the scopus search results?
@@ -30,18 +35,16 @@ articles_X_journals<-as.data.frame(articles_X_journals)
 names(articles_X_journals)[1]<-"journal"
 write.csv(articles_X_journals,"./output/scopusX_journals_returned.csv")
 
-
 # Which ones from the X list are in the SCOPUS Seearch?
 commonX<- semi_join(articles_X_journals,all_X_journals,by="journal")  # X journals in the scopus search
 commonX$no_apc<-commonX$journal
 NotReturnedScopus<-anti_join(all_X_journals,articles_X_journals,by="journal")  
+write.csv(NotReturnedScopus,"./output/Xjrnls_not_in_Scopus_Search.csv")
 write.csv(commonX,"./output/jrnls_to_search.csv")
 
-
-
 ########################
-# Narrow down the SCOPUS search results to ONLY the elsevier X journals 
-
+# Use this list to narrow down the SCOPUS 
+# search results to include ONLY elsevier X journals. 
 articles_X_df_reduced<-articles_X_df
 str(articles_X_df_reduced)
 articles_X_df_reduced$SO<-as.character(articles_X_df_reduced$SO) # convert from factor to character
@@ -50,11 +53,10 @@ articles_X_df_reduced$SO<-as.factor(articles_X_df_reduced$SO) # convert to facto
 all_X_journals<-all_X_journals %>% rename(SO=journal)
 articles_X_df_reduced<-semi_join(articles_X_df_reduced,all_X_journals,by="SO")  # X journals in the scopus search
 
+# remove all the intermediate dataframes from the environment
+rm(commonX,articles_X_df,articles_X_journals,NotReturnedScopus)
 
-
-
-
-# their default bibliometric analyses
+# Now carry ourt bibliometrix default analyses on the "X journals only" df
 results_X <- biblioAnalysis(articles_X_df_reduced, sep = ";")
 options(width=100)
 # a summary of their analyses
@@ -62,49 +64,54 @@ summary_X <- summary(object = results_X, k = 10, pause = FALSE)
 # The have some nice plots
 plot(x = results_X, k = 10, pause = FALSE)
 
-# extract the author countries)
-# These data will be the last column of the resulting df
+# We need to extract the countries for each author
+# These data will be the last column of the processed df
 AuGeoX <- metaTagExtraction(articles_X_df_reduced, Field = "AU_CO", sep = ";")
 str(AuGeoX)
 
-
-X_articles_geodata<-AuGeoX %>% select(DI,SO,AU_CO)
+# TO STREAMLINE, select only the doi of the article, the journal, the year published, and the information on author country
+# note that all author countries are in a single column
+X_articles_geodata<-AuGeoX %>% select(DI,SO,PY,AU_CO)
 X_articles_geodata<-droplevels(X_articles_geodata)
 str(X_articles_geodata)
-foo<- as.data.frame(str_split(X_articles_geodata$AU_CO, ";", simplify = TRUE))
-foo <- foo %>% mutate_all(na_if,"")
 
-foo <- data.frame(lapply(foo, as.character), stringsAsFactors=FALSE) # Need to do this or gather won't work properly
-X_articles_geodata<-cbind(X_articles_geodata,foo)
-rm(foo)
+# this splits up the author countrries - currently in a single column - into multiple columns (each country in its own column)
+tempDF<- as.data.frame(str_split(X_articles_geodata$AU_CO, ";", simplify = TRUE))
+tempDF <- tempDF %>% mutate_all(na_if,"")  #replace the blanks with NA
+
+tempDF <- data.frame(lapply(tempDF, as.character), stringsAsFactors=FALSE) # Need to do this or gather won't work properly
+X_articles_geodata<-cbind(X_articles_geodata,tempDF)
+rm(tempDF)
 str(X_articles_geodata)
-X_articles_geodata<-X_articles_geodata %>% gather(author,country,4:29)
-X_articles_geodata$author<-gsub("V","",X_articles_geodata$author)
+X_articles_geodata<-X_articles_geodata %>% gather(author,country,5:30)
+X_articles_geodata$author<-gsub("V","",X_articles_geodata$author) # remove the V, now have the author order
 X_articles_geodata$author<-as.numeric(X_articles_geodata$author)
 head(X_articles_geodata,10)
 X_articles_geodata<-X_articles_geodata %>% arrange(DI,author)
 X_articles_geodata<-X_articles_geodata[complete.cases(X_articles_geodata), ]
+head(X_articles_geodata,10)
+X_articles_geodata$DI<-as.factor(X_articles_geodata$DI)
+X_articles_geodata$AU_CO<-NULL #delete the column with all countries in a single cell
 
-library(countrycode) #convert each country name to the ISO 3 digit standardized country code.
+# You can add the ISO three digit code for each country using library(countrycode)
+library(countrycode) 
 X_articles_geodata$country_code<-countrycode(X_articles_geodata$country,"country.name", "iso3c", warn = TRUE)
 #By setting "warn=TRUE" it will tell you which ones it couldn't convert. Because of spelling mistakes, etc.
 X_articles_geodata$country_code<-as.factor(X_articles_geodata$country_code)
 summary(X_articles_geodata$country_code)
+head(X_articles_geodata,10)
+summary(X_articles_geodata)
+X_articles_geodata$jrnl_type<-"OA"
 write.csv(X_articles_geodata,"./output/X_Journal_author_countries.csv")
 
 
 
-
-
-
-############################################
-# Articles from non-APC journals from WOS
+################################################################
+# NOW DO THE SAME FOR ARTICLES FROM NON-X JOURNALS 
+# These data came from Web of Science)
 ############################################
 
 library(refsplitr)
-
-
-
 ######################
 # Load the data
 ######################
@@ -116,11 +123,11 @@ write.csv(WOS,"./output/WOS_references.csv")
 # load the csv as an object
 WOS<-read.csv("./output/WOS_references.csv")
 
-
 ######################
 # Process the data & disambiaguate the author names
 ######################
-# 
+# When I first did this, it came back with some errors because some of the references had no authors
+
 # Error in authors_clean(WOS) : The following references have no authors
 # (i.e., there are NAs in the AU and AF fields):
 #   
@@ -136,6 +143,8 @@ WOS<-read.csv("./output/WOS_references.csv")
 # They do not have an author, in which case you can use "None", "Anonymous", "Unknown", etc.
 # They may have been written by an Author Consortium (see Column "CA");
 # If so you can replace the NAs in AU and AF with the contents of column CA. 
+
+# So I cleaned the errors as per refsplitr vignette by replaceing author name with consortium name
 WOS_cln<-authors_clean(WOS)
 head(WOS$cln, 20)
 # WOS[24013,]
@@ -154,16 +163,16 @@ WOS$AU <- with( WOS, ifelse( is.na(AU), CA, AU))
 
 WOS$AF <- with( WOS, ifelse( is.na(AF), CA, AF))
 
-
+##########################################################
+# DISAMBIGUATE THE AUTHOR NAMES AND PARSE OUT ADDRESSES
+##########################################################
 WOS_cln<-authors_clean(WOS)
 head(WOS$cln, 20)
 
-
-######################
-# save the preliminary disambiguation as a csv file
+# Now save the preliminary disambiguation as a csv file
 write.csv(WOS_cln$prelim,"./output/WOS_prelim.csv")
 
-# load to show
+# load to show (and avoid having to run every time)
 WOS_cln_prelim<-read.csv("./output/WOS_prelim.csv")
 
 # save the names suggested for review as a csv file
@@ -182,12 +191,18 @@ WOS_refined_country<-select(WOS_refined, refID, groupID,author_name,author_order
 head(WOS_refined_country,20)
 write.csv(WOS_refined_country,"./output/WOS_refined_country.csv")
 
+####################################################
+# GEOREFERENCING AUTHORS
+####################################################
 
 
-# Add the country codes
+# READ IN THE SAVED DISAMBIGUATED FILE
 WOS_refined_country<-read.csv("./output/WOS_refined_country.csv")
+
+# ADD IN THE COUNTRY CODES
 library(countrycode) #convert each country name to the ISO 3 digit standardized country code.
 WOS_refined_country$country2<-WOS_refined_country$country
+# a few changes need to be made because countrycode doesn't recognize them as is
 levels(WOS_refined_country$country2)<-c(levels(WOS_refined_country$country2),"UK","central african republic","papua new guinea","federated states of micronesia","netherlands antilles","republic of kosovo")
 WOS_refined_country$country2[WOS_refined_country$country2 == "wales"]  <- "UK"
 WOS_refined_country$country2[WOS_refined_country$country2 == "scotland"]  <- "UK"
@@ -205,15 +220,58 @@ WOS_refined_country$country_code<-countrycode(WOS_refined_country$country2,"coun
 
 WOS_refined_country$country_code<-as.factor(WOS_refined_country$country_code)
 summary(WOS_refined_country$country_code)
-write.csv(X_articles_geodata,"./output/X_Journal_author_countries.csv")
+
+head(WOS_refined_country,10)
+str(WOS_refined_country)
+
+paywall_Journal_author_countries<-WOS_refined_country
+
+paywall_Journal_author_countries$X<-NULL
+paywall_Journal_author_countries$groupID<-NULL
+paywall_Journal_author_countries$author_name<-NULL
+paywall_Journal_author_countries$country<-NULL
+paywall_Journal_author_countries<-paywall_Journal_author_countries %>% rename("country"="country2")
+paywall_Journal_author_countries<-paywall_Journal_author_countries %>% rename("author"="author_order")
 
 
+head(paywall_Journal_author_countries,10)
+head(X_articles_geodata,10)
+str(paywall_Journal_author_countries)
+str(WOS)
+# Need to add in the doi, so, py so it matches the X journal output
+# take WOS df and select the columns you need to insert
+slim_WOS<-WOS %>% select(DI,SO,PY,refID)
+# use left join to insert them
+paywall_Journal_author_countries<-left_join(paywall_Journal_author_countries,slim_WOS,by="refID")
+paywall_Journal_author_countries$SO<-tolower(paywall_Journal_author_countries$SO) # convert the journal name to lower case to match
+paywall_Journal_author_countries$country<-toupper(paywall_Journal_author_countries$country) # convert the journal name to lower case to match
+head(paywall_Journal_author_countries,10)
+
+paywall_Journal_author_countries<-paywall_Journal_author_countries %>% 
+  select(refID,DI,SO,PY,author,country,country_code) %>% 
+  arrange(refID,author)
+paywall_Journal_author_countries$jrnl_type<-"paywall"
+paywall_Journal_author_countries$refID<-NULL
+paywall_Journal_author_countries$SO<-as.factor(paywall_Journal_author_countries$SO)
+write.csv(paywall_Journal_author_countries,"./output/paywall_Journal_author_countries.csv")
 
 
 ######################
+str(X_articles_geodata)
+str(paywall_Journal_author_countries)
+ALLDATA<-bind_rows(X_articles_geodata,paywall_Journal_author_countries)
+head(ALLDATA,10)
+str(ALLDATA)
+ALLDATA$DI<-as.factor(ALLDATA$DI)
+ALLDATA$SO<-as.factor(ALLDATA$SO)
+ALLDATA$country<-as.factor(ALLDATA$country)
+ALLDATA$country_code<-as.factor(ALLDATA$country_code)
+ALLDATA$jrnl_type<-as.factor(ALLDATA$jrnl_type)
+write.csv(ALLDATA,"./output/AuthorGeoAllJournals.csv")
 
-
-######################
+##################################################################
+# THIS IS TO GEOREF THE LOCATIONS FOR MAPPING
+##################################################################
 # Georeference the author locations
 WOS_georef <-authors_georef(data=WOS_refined, 
                                 address_column = "address")
