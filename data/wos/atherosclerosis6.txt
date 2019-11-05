@@ -1,0 +1,378 @@
+﻿FN Clarivate Analytics Web of Science
+VR 1.0
+PT J
+AU Kakisis, JD
+AF Kakisis, John D.
+TI Saffron: From Greek mythology to contemporary anti-atherosclerotic
+   medicine
+SO ATHEROSCLEROSIS
+LA English
+DT Editorial Material
+DE Atherosclerosis; Inflammation; Saffron; Crocetin; Crocus sativus
+ID VIRGIN OLIVE OIL; RED WINE; INFLAMMATORY BIOMARKERS; ATHEROSCLEROTIC
+   PLAQUE; CONSUMPTION; EXPRESSION
+C1 [Kakisis, John D.] Univ Athens, Sch Med, Attikon Hosp, Dept Vasc Surg, Athens, Greece.
+RP Kakisis, JD (reprint author), Univ Athens, Sch Med, Attikon Hosp, Dept Vasc Surg, Athens, Greece.
+EM kakisis@med.uoa.gr
+NR 20
+TC 0
+Z9 0
+U1 0
+U2 9
+PU ELSEVIER IRELAND LTD
+PI CLARE
+PA ELSEVIER HOUSE, BROOKVALE PLAZA, EAST PARK SHANNON, CO, CLARE, 00000,
+   IRELAND
+SN 0021-9150
+EI 1879-1484
+J9 ATHEROSCLEROSIS
+JI Atherosclerosis
+PD JAN
+PY 2018
+VL 268
+BP 193
+EP 195
+DI 10.1016/j.atherosclerosis.2017.11.021
+PG 3
+WC Cardiac & Cardiovascular Systems; Peripheral Vascular Disease
+SC Cardiovascular System & Cardiology
+GA FR5IF
+UT WOS:000419099500028
+PM 29198557
+DA 2019-10-28
+ER
+
+PT J
+AU Xu, YX
+   Redon, V
+   Yu, HJ
+   Querbes, W
+   Pirruccello, J
+   Liebow, A
+   Deik, A
+   Trindade, K
+   Wang, X
+   Musunuru, K
+   Clish, CB
+   Cowan, C
+   Fizgerald, K
+   Rader, D
+   Kathiresan, S
+AF Xu, Yu-Xin
+   Redon, Valeska
+   Yu, Haojie
+   Querbes, William
+   Pirruccello, James
+   Liebow, Abigail
+   Deik, Amy
+   Trindade, Kevin
+   Wang, Xiao
+   Musunuru, Kiran
+   Clish, Clary B.
+   Cowan, Chad
+   Fizgerald, Kevin
+   Rader, Daniel
+   Kathiresan, Sekar
+TI Role of angiopoietin-like 3 (ANGPTL3) in regulating plasma level of
+   low-density lipoprotein cholesterol
+SO ATHEROSCLEROSIS
+LA English
+DT Article
+DE Angiopoietin-like protein 3; ANGPTL3; Lipoprotein; LDL receptor; LDLR;
+   Low-density lipoprotein; LDL; High-density lipoprotein; HDL;
+   Triglycerides; Cholesterol
+ID ESTER TRANSFER PROTEIN; CORONARY-ARTERY-DISEASE; ENDOTHELIAL LIPASE;
+   APOLIPOPROTEIN-B; LIPID-METABOLISM; TRANSGENIC MICE; IN-VIVO;
+   INACTIVATION; INHIBITION; RISK
+AB Background and aims: Angiopoietin-like 3 (ANGPTL3) has emerged as a key regulator of lipoprotein metabolism in humans. Homozygous loss of ANGPTL3 function causes familial combined hypolipidemia characterized by low plasma levels of triglycerides (TG), high-density lipoprotein cholesterol (HDL-C), and low-density lipoprotein cholesterol (LDL-C). While known effects of ANGPTL3 in inhibiting lipoprotein lipase and endothelial lipase contribute to the low TG and HDL-C, respectively, the basis of low LDL-C remains unclear. Our aim was to explore the role of ANGPTL3 in modulating plasma LDL-C.
+   Methods: We performed RNAi-mediated gene silencing of ANGPTL3 in five mouse models and in human hepatoma cells. We validated results by deleting ANGPTL3 gene using the CRISPR/Cas9 genome editing system.
+   Results: RNAi-mediated Angptl3 silencing in mouse livers resulted in very low TG, HDL-C and LDL-C, a pattern similar to the human phenotype. The effect was observed in wild-type and obese mice, while in hCETP/apolipoprotein (Apo) B-100 double transgenic mice, the silencing decreased LDL-C and TG, but not HDL-C. In a humanized mouse model (Apobec1(-/-) carrying human ApoB-100 transgene) deficient in the LDL receptor (LDLR), Angptl3 silencing had minimum effect on LDL-C, suggesting the effect being linked to LDLR. This observation is supported by an additive effect on LDL-C between ANGPTL3 and PCSK9 siRNAs. ANGPTL3 gene deletion induced cellular long-chain TG and ApoB-100 accumulation with elevated LDLR and LDLR-related protein (LRP) 1 expression. Consistent with this, ANGPTL3 deficiency by gene deletion or silencing reduced nascent ApoB-100 secretion and increased LDL/VLDL uptake.
+   Conclusions: Reduced secretion and increased uptake of ApoB-containing lipoproteins may contribute to the low LDL-C observed in mice and humans with genetic ANGPTL3 deficiency. (C) 2017 Elsevier B.V. All rights reserved.
+C1 [Xu, Yu-Xin; Pirruccello, James; Kathiresan, Sekar] Massachusetts Gen Hosp, Ctr Genom Med, Simches 5-830,185 Cambridge St, Boston, MA 02114 USA.
+   [Redon, Valeska; Trindade, Kevin; Rader, Daniel] Univ Penn, Perelman Sch Med, Inst Translat Med & Therapeut, 11-125 Translat Res Ctr,3400 Civ Ctr Blvd,Bldg 421, Philadelphia, PA 19104 USA.
+   [Yu, Haojie; Cowan, Chad] Harvard Univ, Harvard Stem Cell Inst, Dept Stem Cell & Regenerat Biol, Cambridge, MA 02138 USA.
+   [Querbes, William; Liebow, Abigail; Fizgerald, Kevin] Alnylam Pharmaceut, 300 Third St,3rd Floor, Cambridge, MA 02142 USA.
+   [Deik, Amy; Clish, Clary B.] Broad Inst Harvard & MIT, Cambridge, MA 02142 USA.
+   [Wang, Xiao; Musunuru, Kiran] Univ Penn, Perelman Sch Med, Cardiovasc Inst, Dept Med, Philadelphia, PA 19104 USA.
+   [Cowan, Chad] Massachusetts Gen Hosp, Ctr Regenerat Med, Boston, MA 02114 USA.
+   [Pirruccello, James] Massachusetts Gen Hosp, Dept Med, Boston, MA 02114 USA.
+RP Kathiresan, S (reprint author), Massachusetts Gen Hosp, Ctr Genom Med, Simches 5-830,185 Cambridge St, Boston, MA 02114 USA.; Kathiresan, S (reprint author), Massachusetts Gen Hosp, Cardiovasc Res Ctr, Simches 5-830,185 Cambridge St, Boston, MA 02114 USA.
+EM skathiresan1@partners.org
+RI Clish, Clary/AAB-7124-2019
+OI Clish, Clary/0000-0001-8259-9245
+FU National Heart, Lung, and Blood InstituteUnited States Department of
+   Health & Human ServicesNational Institutes of Health (NIH) - USANIH
+   National Heart Lung & Blood Institute (NHLBI) [R37-HL055323,
+   RC2-HL101864, R33-HL120781]; Ofer and Shelly Nemirovsky Research Scholar
+   award from the Massachusetts General Hospital (MGH); Howard Goodman
+   Fellowship from MGH; Donovan Family Foundation; Foundation LeducqLeducq
+   Foundation [12-CDA-04]; American Heart Association SDG grantAmerican
+   Heart Association [11SDG7670007]
+FX This work was supported in part by the National Heart, Lung, and Blood
+   Institute (R37-HL055323 and RC2-HL101864 to DJR; R33-HL120781 to SK and
+   CC). SK is supported by the Ofer and Shelly Nemirovsky Research Scholar
+   award from the Massachusetts General Hospital (MGH), the Howard Goodman
+   Fellowship from MGH, the Donovan Family Foundation and a grant from
+   Foundation Leducq (12-CDA-04). YXX was in part supported by American
+   Heart Association SDG grant (11SDG7670007) (2011-2015).
+NR 35
+TC 18
+Z9 19
+U1 1
+U2 11
+PU ELSEVIER IRELAND LTD
+PI CLARE
+PA ELSEVIER HOUSE, BROOKVALE PLAZA, EAST PARK SHANNON, CO, CLARE, 00000,
+   IRELAND
+SN 0021-9150
+EI 1879-1484
+J9 ATHEROSCLEROSIS
+JI Atherosclerosis
+PD JAN
+PY 2018
+VL 268
+BP 196
+EP 206
+DI 10.1016/j.atherosclerosis.2017.08.031
+PG 11
+WC Cardiac & Cardiovascular Systems; Peripheral Vascular Disease
+SC Cardiovascular System & Cardiology
+GA FR5IF
+UT WOS:000419099500029
+PM 29183623
+OA Green Accepted
+DA 2019-10-28
+ER
+
+PT J
+AU Wang, SB
+   Mitchell, P
+   Liew, G
+   Wong, TY
+   Phan, K
+   Thiagalingam, A
+   Joachim, N
+   Burlutsky, G
+   Gopinath, B
+AF Wang, Sarah B.
+   Mitchell, Paul
+   Liew, Gerald
+   Wong, Tien Yin
+   Phan, Kevin
+   Thiagalingam, Aravinda
+   Joachim, Nichole
+   Burlutsky, George
+   Gopinath, Bamini
+TI A spectrum of retinal vasculature measures and coronary artery disease
+SO ATHEROSCLEROSIS
+LA English
+DT Article
+DE Fractal dimension; Retinal microvasculature; Retinal vessel calibre;
+   Coronary artery disease; Gensini score; Extent score; Australian heart
+   eye study
+ID JOINT NATIONAL COMMITTEE; FRACTAL ANALYSIS; HEART-DISEASE; MICROVASCULAR
+   STRUCTURE; ATHEROSCLEROSIS RISK; ANGINA-PECTORIS; VESSEL DIAMETER;
+   BLOOD-PRESSURE; IMAGE-ANALYSIS; 7TH REPORT
+AB Background and aims: We aimed to comprehensively describe a spectrum of retinal vessel measures including fractal dimension (D-f) and their associations with indices of coronary artery disease (CAD) extent and severity, as well as hypertension and diabetes.
+   Methods: The Australian Heart Eye Study (AHES) is an observational study that surveyed 1680 participants presenting to a tertiary referral hospital for the evaluation of potential CAD by coronary angiography. A range of newer retinal vessel geometric measures (D-f, curvature tortuosity, and branching angle) were quantified from retinal photographs using semi-automated software, the Singapore 'I' Vessel Assessment (SIVA) tool. A combined retinal score was constructed, aiming to assess the joint effect of multiple retinal vessel parameters on CAD, comprising of those variables that were most strongly significant in multivariate analysis - D-f, arteriolar curvature tortuosity, and retinal arteriolar calibre. CAD was objectively quantified using a range of measures obtained from coronary angiography.
+   Results: A total of 1187 participants had complete data on retinal vessel measurements and coronary vessel evaluation. Retinal vascular D-f and curvature tortuosity decreased with increasing age; women had significantly lower D-f than men (p<0.003). Straighter retinal vessels were associated with CAD extent and Gensini scores in multivariable analysis (p<0.02). Accounting for media opacity by sub-group analysis in pseudophakic patients, the combined retinal score was associated with stenosis greater than 50% in any coronary artery segment (vessel score) and obstructive coronary stenosis in all three main coronary arteries (segment score) (p = 0.01). Lower Df and narrower arteriolar branching angle were associated with CAD vessel score (p<0.03). In sex-stratified multivariate analyses, straighter arterioles were associated with greater odds of CAD in men, and narrower venular branching angle was associated with CAD in women.
+   Conclusions: A range of retinal vessel measures were associated with CAD extent and severity. A sparser retinal microvascular network (smaller D-f) was associated with older age and female gender. After accounting for the impact of media opacity, retinal vessel measures were associated with more diffuse and severe CAD. (c) 2017 Elsevier B.V. All rights reserved.
+C1 [Wang, Sarah B.; Mitchell, Paul; Liew, Gerald; Joachim, Nichole; Burlutsky, George; Gopinath, Bamini] Univ Sydney, Westmead Inst Med Res, Ctr Vis Res, Hawkesbury Rd, Westmead, NSW 2145, Australia.
+   [Phan, Kevin; Thiagalingam, Aravinda] Univ Sydney, Westmead Inst Med Res, Ctr Heart Res, Westmead, NSW, Australia.
+   [Wong, Tien Yin] Singapore Natl Eye Ctr, Singapore Eye Res Inst, Singapore, Singapore.
+RP Gopinath, B (reprint author), Univ Sydney, Westmead Inst Med Res, Ctr Vis Res, Hawkesbury Rd, Westmead, NSW 2145, Australia.
+EM bamini.gopinath@sydney.edu.au
+RI Gopinath, Bamini/K-4286-2019
+OI Gopinath, Bamini/0000-0003-3573-359X
+NR 77
+TC 2
+Z9 2
+U1 1
+U2 7
+PU ELSEVIER IRELAND LTD
+PI CLARE
+PA ELSEVIER HOUSE, BROOKVALE PLAZA, EAST PARK SHANNON, CO, CLARE, 00000,
+   IRELAND
+SN 0021-9150
+EI 1879-1484
+J9 ATHEROSCLEROSIS
+JI Atherosclerosis
+PD JAN
+PY 2018
+VL 268
+BP 215
+EP 224
+DI 10.1016/j.atherosclerosis.2017.10.008
+PG 10
+WC Cardiac & Cardiovascular Systems; Peripheral Vascular Disease
+SC Cardiovascular System & Cardiology
+GA FR5IF
+UT WOS:000419099500031
+PM 29050745
+DA 2019-10-28
+ER
+
+PT J
+AU Ashrafi-Asgarabad, A
+   Safiri, S
+AF Ashrafi-Asgarabad, Ahad
+   Safiri, Saeid
+TI Prognostic value of lipoprotein-associated phospholipase A2 mass for
+   all-cause mortality and vascular events within one year after acute
+   ischemic stroke: Methodological issues
+SO ATHEROSCLEROSIS
+LA English
+DT Letter
+DE Lp-PLA2 mass; All-cause mortality; Vascular events; Acute ischemic
+   stroke; Prognosis; Methodology
+C1 [Ashrafi-Asgarabad, Ahad] Shahid Beheshti Univ Med Sci, Sch Publ Hlth, Dept Epidemiol, Tehran, Iran.
+   [Ashrafi-Asgarabad, Ahad] Bam Univ Med Sci, Dept Epidemiol, Bam, Iran.
+   [Safiri, Saeid] Maragheh Univ Med Sci, Sch Nursing & Midwifery, Dept Publ Hlth, Managerial Epidemiol Res Ctr, Maragheh, Iran.
+   [Safiri, Saeid] Univ Tehran Med Sci, Sch Publ Hlth, Dept Epidemiol & Biostat, Tehran, Iran.
+RP Safiri, S (reprint author), Maragheh Univ Med Sci, Sch Nursing & Midwifery, Dept Publ Hlth, Managerial Epidemiol Res Ctr, Maragheh, Iran.
+EM saeidsafiri@gmail.com
+NR 5
+TC 2
+Z9 2
+U1 0
+U2 5
+PU ELSEVIER IRELAND LTD
+PI CLARE
+PA ELSEVIER HOUSE, BROOKVALE PLAZA, EAST PARK SHANNON, CO, CLARE, 00000,
+   IRELAND
+SN 0021-9150
+EI 1879-1484
+J9 ATHEROSCLEROSIS
+JI Atherosclerosis
+PD JAN
+PY 2018
+VL 268
+BP 231
+EP 232
+DI 10.1016/j.atherosclerosis.2017.10.021
+PG 2
+WC Cardiac & Cardiovascular Systems; Peripheral Vascular Disease
+SC Cardiovascular System & Cardiology
+GA FR5IF
+UT WOS:000419099500033
+PM 29102657
+DA 2019-10-28
+ER
+
+PT J
+AU Zhong, CK
+   Han, LY
+   Zhang, YH
+AF Zhong, Chongke
+   Han, Liyuan
+   Zhang, Yonghong
+TI Reply to: "Prognostic value of lipoprotein-associated phospholipase A2
+   mass for all-cause mortality and vascular events within one year after
+   acute ischemic stroke: Methodological issues"
+SO ATHEROSCLEROSIS
+LA English
+DT Letter
+DE Lp-PLA2 mass; Mortality; Acute ischemic stroke; Prognosis
+ID GLOMERULAR-FILTRATION-RATE; OUTCOMES
+C1 [Zhong, Chongke; Han, Liyuan; Zhang, Yonghong] Soochow Univ, Med Coll, Sch Publ Hlth, Dept Epidemiol, 199 Renai Rd, Suzhou 215123, Jiangsu, Peoples R China.
+   [Zhong, Chongke; Han, Liyuan; Zhang, Yonghong] Soochow Univ, Med Coll, Jiangsu Key Lab Prevent & Translat Med Geriatr Di, 199 Renai Rd, Suzhou 215123, Jiangsu, Peoples R China.
+   [Zhong, Chongke; Han, Liyuan; Zhang, Yonghong] Tulane Univ, Sch Publ Hlth & Trop Med, Dept Epidemiol, New Orleans, LA 70118 USA.
+   [Han, Liyuan] Ningbo Univ, Sch Med, Zhejiang Prov Key Lab Pathophysiol, Dept Prevent Med, Ningbo, Zhejiang, Peoples R China.
+RP Zhang, YH (reprint author), Soochow Univ, Med Coll, Sch Publ Hlth, Dept Epidemiol, 199 Renai Rd, Suzhou 215123, Jiangsu, Peoples R China.; Zhang, YH (reprint author), Soochow Univ, Med Coll, Jiangsu Key Lab Prevent & Translat Med Geriatr Di, 199 Renai Rd, Suzhou 215123, Jiangsu, Peoples R China.
+EM yhzhang@suda.edu.cn
+FU National Natural Science Foundation of ChinaNational Natural Science
+   Foundation of China [81320108026]; China Postdoctoral Science
+   FoundationChina Postdoctoral Science Foundation [156458]; Jiangsu
+   Postdoctoral Science FoundationChina Postdoctoral Science Foundation
+   [1601121B]; Natural Science Foundation of Zhejiang ProvinceNatural
+   Science Foundation of Zhejiang Province [LY17H260002]; National Natural
+   Science Foundation of Ningbo [2017A610219]; Priority Academic Program
+   Development of Jiangsu Higher Education Institutions, China; Tulane
+   University in New Orleans, Louisiana; Collins C. Diboll Private
+   Foundation in New Orleans, Louisiana
+FX This study was supported by the National Natural Science Foundation of
+   China (grants: 81320108026), China Postdoctoral Science Foundation
+   funded project (156458), Jiangsu Postdoctoral Science Foundation funded
+   project (1601121B), Natural Science Foundation of Zhejiang Province
+   (LY17H260002), National Natural Science Foundation of Ningbo
+   (2017A610219) and a Project of the Priority Academic Program Development
+   of Jiangsu Higher Education Institutions, China; Tulane University and
+   Collins C. Diboll Private Foundation, both in New Orleans, Louisiana.
+NR 5
+TC 0
+Z9 0
+U1 0
+U2 4
+PU ELSEVIER IRELAND LTD
+PI CLARE
+PA ELSEVIER HOUSE, BROOKVALE PLAZA, EAST PARK SHANNON, CO, CLARE, 00000,
+   IRELAND
+SN 0021-9150
+EI 1879-1484
+J9 ATHEROSCLEROSIS
+JI Atherosclerosis
+PD JAN
+PY 2018
+VL 268
+BP 233
+EP 234
+DI 10.1016/j.atherosclerosis.2017.11.013
+PG 2
+WC Cardiac & Cardiovascular Systems; Peripheral Vascular Disease
+SC Cardiovascular System & Cardiology
+GA FR5IF
+UT WOS:000419099500034
+PM 29174392
+DA 2019-10-28
+ER
+
+PT J
+AU Tang, ZH
+   Liu, LS
+   Zheng, XL
+   Jiang, ZS
+AF Tang, Zhi-Han
+   Liu, Lu-Shan
+   Zheng, Xi-Long
+   Jiang, Zhi-Sheng
+TI Reply to: "PCSK9 antagonists and inflammation"
+SO ATHEROSCLEROSIS
+LA English
+DT Letter
+DE PCSK9; Inflammation; PCSK9 inhibitors; Atherosclerotic cardiovascular
+   disease
+ID HIGH CARDIOVASCULAR RISK; ATHEROSCLEROSIS; EXPRESSION; CHOLESTEROL;
+   ALIROCUMAB; FIBRINOGEN; RESISTIN; EFFICACY; SAFETY
+C1 [Tang, Zhi-Han; Liu, Lu-Shan; Jiang, Zhi-Sheng] Univ South China, Inst Cardiovasc Dis, Key Lab Arteriosclerol Hunan Prov, Hengyang 421001, Hunan, Peoples R China.
+   [Zheng, Xi-Long] Univ Calgary, Libin Cardiovasc Inst Alberta, Dept Biochem & Mol Biol, Hlth Sci Ctr, 3330 Hosp Dr NW, Calgary, AB T2N 4N1, Canada.
+RP Jiang, ZS (reprint author), Univ South China, Inst Cardiovasc Dis, Key Lab Arteriosclerol Hunan Prov, Hengyang 421001, Hunan, Peoples R China.
+EM zsjiang2005@163.com
+NR 23
+TC 0
+Z9 0
+U1 0
+U2 0
+PU ELSEVIER IRELAND LTD
+PI CLARE
+PA ELSEVIER HOUSE, BROOKVALE PLAZA, EAST PARK SHANNON, CO, CLARE, 00000,
+   IRELAND
+SN 0021-9150
+EI 1879-1484
+J9 ATHEROSCLEROSIS
+JI Atherosclerosis
+PD JAN
+PY 2018
+VL 268
+BP 237
+EP 238
+DI 10.1016/j.atherosclerosis.2017.11.014
+PG 2
+WC Cardiac & Cardiovascular Systems; Peripheral Vascular Disease
+SC Cardiovascular System & Cardiology
+GA FR5IF
+UT WOS:000419099500036
+PM 29174393
+DA 2019-10-28
+ER
+
+EF
