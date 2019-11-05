@@ -1,9 +1,11 @@
+# the libraries
 library(tidyverse)
+library(bibliometrix)
 
 ################################################################
 # THIS IS FOR THE X JOURNALS, WHCIH WERE DOWNLOADED FROM SCOPUS
 ################################################################
-library(bibliometrix)
+
 # read in the data 
 articles_X <- readFiles('./data/DrBruna.bib')
 # process the data and convert to dataframe with bibliometrix
@@ -111,7 +113,9 @@ write.csv(X_articles_geodata,"./output/X_Journal_author_countries.csv")
 # These data came from Web of Science)
 ############################################
 
-library(refsplitr)
+#install.packages("refsplitr")
+library(refsplitr) #this package is not available for latest R version?
+
 ######################
 # Load the data
 ######################
