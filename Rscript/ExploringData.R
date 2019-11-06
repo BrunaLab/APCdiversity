@@ -27,5 +27,6 @@ summary_table2<-AllData %>%
   filter(Year==2019) %>% 
   group_by(JrnlType, Journal) %>% 
   summarize(n=n_distinct(DOI))
+ 
 
 
