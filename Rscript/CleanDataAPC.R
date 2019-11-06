@@ -276,6 +276,16 @@ write.csv(ALLDATA,"./output/AuthorGeoAllJournals.csv")
 save(ALLDATA,file="./output/ALLDATA.RData")
 load(file="./output/ALLDATA.RData")
 head(ALLDATA,10)
+str(ALLDATA)
+
+
+
+
+
+
+
+
+
 ##################################################################
 # THIS IS TO GEOREF THE LOCATIONS FOR MAPPING
 ##################################################################
