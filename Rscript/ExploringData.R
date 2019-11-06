@@ -19,16 +19,20 @@ AllData <- ALLDATA %>%
 
 
 # group 
-summary_table <- AllData %>% 
+NumbAuthors <- AllData %>% # number of authors per journal 
   filter(Year==2019) %>% 
   group_by(Journal,Year) %>% 
   summarize(n=n_distinct(DOI))
 
-summary_table2<-AllData %>% 
+NumbArticles <-AllData %>% #number of papers per journal
   filter(Year==2019) %>% 
   group_by(JrnlType, Journal) %>% 
   summarize(n=n_distinct(DOI))
- 
+
+NumbArtOA <- NumbArticles %>%
+  filter(JrnlType == "OA")
+NumbArtPW <- NumbArticles %>%
+  filter(JrnlType == "paywall")
 
 #Data subsets
 
