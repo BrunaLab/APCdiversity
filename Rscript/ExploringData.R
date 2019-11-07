@@ -32,6 +32,7 @@ head(AllData)
 AllData <- AllData %>%
   separate(Journal, c("Journal", "X"), ":")
 
+
 # group 
 NumbAuthors <- AllData %>% # number of authors per journal 
   filter(Year==2019) %>% 
@@ -41,7 +42,7 @@ NumbAuthors <- AllData %>% # number of authors per journal
 NumbArticles <-AllData %>% #number of papers per journal
   filter(Year==2019) %>% 
   group_by(JrnlType, Journal) %>% 
-  summarize(JrnlType, n=n_distinct(DOI))
+  summarize(n=n_distinct(DOI))
 
 NumbArtOA <- NumbArticles %>%
   filter(JrnlType == "OA")
