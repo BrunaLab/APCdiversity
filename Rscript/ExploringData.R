@@ -2,21 +2,29 @@
 #This script is to start to clean and explore the data 
 #
 
-# data
-load(file="./output/ALLDATA.RData")
-head(ALLDATA,10)
-str(ALLDATA)
-
 # libraries
 library(tidyverse)
 library(dplyr)
 library(ggplot2)
 
+# data
+load(file="./output/ALLDATA.RData")
+head(ALLDATA,10)
+str(ALLDATA)
+CountryData <- read.csv("data/CLASS.csv", header = TRUE)
+CountryData <- CountryData[-1,]
+
 head(ALLDATA)
+
 AllData <- ALLDATA %>%
   select(DOI = DI, Journal = SO, Year = PY, AuthorNum = author,
-         Country = country, CountryCode = country_code, JrnlType = jrnl_type)
+         Country = country, Code = country_code, JrnlType = jrnl_type)
 
+CountryData <- CountryData %>%
+  select(Code,Region, IncomeGroup = Income.group)
+
+#this code merges the country data to include income category and geo region
+AllData <- merge(AllData, CountryData, by="Code", all.x=TRUE) # merge 
 
 # group 
 NumbAuthors <- AllData %>% # number of authors per journal 
