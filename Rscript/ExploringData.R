@@ -87,18 +87,23 @@ LastAuthOA <- LastAuth %>%
 LastAuthPW <- LastAuth %>%
   filter(JrnlType == "PW")
 
+
+#
 ##################################################
 #SUBSET Paywall Journals by the number found in Open Access Journals
 ##################################################
+#
 SamplePW <- FirstAuthPW %>% #subset the paywall journals First Author Data 
   filter(DOI != "NA") %>%
   group_by(Journal)%>%
   sample_n(30) # this code only grabs 30 from each journal, which is a random number SIMILAR to the 
 #numbers of articles in the open access journals
 
-##
-#CountryRichness
-##
+
+################
+#CountryRichness OVERALL
+################
+
 # total country richness between the two journal types for FIRST authors
 # this does not control for sample size
 TotalRichFirst <- FirstAuthors %>% 
