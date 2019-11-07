@@ -26,6 +26,12 @@ CountryData <- CountryData %>%
 #this code merges the country data to include income category and geo region
 AllData <- merge(AllData, CountryData, by="Code", all.x=TRUE) # merge 
 
+head(AllData)
+
+#scrap the "x" in the journal names, as this data is included in the JrnlType column
+AllData <- AllData %>%
+  separate(Journal, c("Journal", "X"), ":")
+
 # group 
 NumbAuthors <- AllData %>% # number of authors per journal 
   filter(Year==2019) %>% 
@@ -35,7 +41,7 @@ NumbAuthors <- AllData %>% # number of authors per journal
 NumbArticles <-AllData %>% #number of papers per journal
   filter(Year==2019) %>% 
   group_by(JrnlType, Journal) %>% 
-  summarize(n=n_distinct(DOI))
+  summarize(JrnlType, n=n_distinct(DOI))
 
 NumbArtOA <- NumbArticles %>%
   filter(JrnlType == "OA")
