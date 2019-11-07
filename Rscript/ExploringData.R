@@ -35,8 +35,10 @@ AllData <- AllData %>%
   separate(Journal, c("Journal", NA), " open")%>%
   filter(Journal != "biochimie")
 
-
+###################
 # group and Subsets
+####################
+
 NumbAuthors <- AllData %>% # number of authors per journal 
   filter(Year==2019) %>% 
   group_by(JrnlType, Journal,Year) %>% 
@@ -59,37 +61,39 @@ OpenAccessAll <- AllData %>% #use the numbers of articles here to select those f
 PayWallAll <- AllData %>% 
   filter(JrnlType == "paywall")
 
+
 test <- cbind(NumbArtOA, NumbArtPW)
 
 #Data subsets by author
-# first author
-FirstAuthors <- AllData %>%
+# first author subsets
+FirstAuth <- AllData %>%
   filter(AuthorNum == 1)
 
-FirstAuthorsOA <- FirstAuthors %>%
+FirstAuthOA <- FirstAuth %>%
   filter(JrnlType == "OA")
-FirstAuthorsPW <- FirstAuthors %>%
+FirstAuthPW <- FirstAuth %>%
   filter(JrnlType == "paywall")
 
-#last author
-LastAuthors <- AllData %>%
+#last author subsets
+LastAuth <- AllData %>%
   group_by(DOI) %>%
   arrange(AuthorNum) %>%
   slice(n()) %>%
   ungroup
 
-LastAuthorsOA <- LastAuthors %>%
+LastAuthOA <- LastAuth %>%
   filter(JrnlType == "OA")
 
-LastAuthorsPW <- LastAuthors %>%
+LastAuthPW <- LastAuth %>%
   filter(JrnlType == "PW")
 
-##
+##################################################
 #SUBSET Paywall Journals by the number found in Open Access Journals
-##
-SamplePW <- PayWallAll %>%
-  group_by(DOI)%>%
-  sample_n(as.number(NumbArtOA$n))
+##################################################
+SamplePW <- FirstAuthPW %>%
+  filter(DOI != "NA") %>%
+  group_by(Journal)%>%
+  sample_n(30)
 
 ##
 #CountryRichness
