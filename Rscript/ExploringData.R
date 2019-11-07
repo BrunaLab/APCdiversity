@@ -1,6 +1,10 @@
-#
-#This script is to start to clean and explore the data 
-#
+####################################################
+# This script is to start to clean and explore the data 
+# ultimately I think we need to get to a site by species type matrix in which each site is a journal and 
+# the sampling effort (number of articles) is the same for each mirror/sister journals
+# in a site by species matrix, country is the species, income or region is like taxon or functional group
+# maybe?
+####################################################
 
 # libraries
 library(tidyverse)
