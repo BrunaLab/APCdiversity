@@ -87,7 +87,9 @@ LastAuthorsPW <- LastAuthors %>%
 ##
 #SUBSET Paywall Journals by the number found in Open Access Journals
 ##
-
+SamplePW <- PayWallAll %>%
+  group_by(DOI)%>%
+  sample_n(as.number(NumbArtOA$n))
 
 ##
 #CountryRichness
