@@ -31,13 +31,12 @@ head(AllData)
 #scrap the "x" in the journal names, as this data is included in the JrnlType column
 AllData <- AllData %>%
   separate(Journal, c("Journal", NA), ":") %>%
-  separate(Journal, c("Journal", NA), " x")
+  separate(Journal, c("Journal", NA), " x") %>%
+  separate(Journal, c("Journal", NA), " open")%>%
+  filter(Journal != "biochimie")
 
 
-# group
-OpenAccess <- AllData %>%
-
-
+# group and Subsets
 NumbAuthors <- AllData %>% # number of authors per journal 
   filter(Year==2019) %>% 
   group_by(JrnlType, Journal,Year) %>% 
@@ -48,22 +47,46 @@ NumbArticles <- AllData %>% #number of papers per journal
   group_by(JrnlType, Journal) %>% 
   summarize(n=n_distinct(DOI))
 
-NumbArtOA <- NumbArticles %>%
+NumbArtOA <- NumbArticles %>% #number of articles that are Open Access
   filter(JrnlType == "OA")
-NumbArtPW <- NumbArticles %>%
+
+NumbArtPW <- NumbArticles %>% #number of articles that are paywall
   filter(JrnlType == "paywall")
 
-#Data subsets
+OpenAccessAll <- AllData %>% #use the numbers of articles here to select those from paywal journals
+  filter(JrnlType == "OA")
 
+PayWallAll <- AllData %>% 
+  filter(JrnlType == "paywall")
+
+test <- cbind(NumbArtOA, NumbArtPW)
+
+#Data subsets by author
 # first author
 FirstAuthors <- AllData %>%
-  filter(AuthorNum ==1)
+  filter(AuthorNum == 1)
+
+FirstAuthorsOA <- FirstAuthors %>%
+  filter(JrnlType == "OA")
+FirstAuthorsPW <- FirstAuthors %>%
+  filter(JrnlType == "paywall")
+
 #last author
 LastAuthors <- AllData %>%
   group_by(DOI) %>%
   arrange(AuthorNum) %>%
   slice(n()) %>%
   ungroup
+
+LastAuthorsOA <- LastAuthors %>%
+  filter(JrnlType == "OA")
+
+LastAuthorsPW <- LastAuthors %>%
+  filter(JrnlType == "PW")
+
+##
+#SUBSET Paywall Journals by the number found in Open Access Journals
+##
 
 
 ##
