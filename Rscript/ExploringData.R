@@ -30,16 +30,20 @@ head(AllData)
 
 #scrap the "x" in the journal names, as this data is included in the JrnlType column
 AllData <- AllData %>%
-  separate(Journal, c("Journal", "X"), ":")
+  separate(Journal, c("Journal", NA), ":") %>%
+  separate(Journal, c("Journal", NA), " x")
 
 
-# group 
+# group
+OpenAccess <- AllData %>%
+
+
 NumbAuthors <- AllData %>% # number of authors per journal 
   filter(Year==2019) %>% 
-  group_by(Journal,Year) %>% 
+  group_by(JrnlType, Journal,Year) %>% 
   summarize(n=n_distinct(DOI))
 
-NumbArticles <-AllData %>% #number of papers per journal
+NumbArticles <- AllData %>% #number of papers per journal
   filter(Year==2019) %>% 
   group_by(JrnlType, Journal) %>% 
   summarize(n=n_distinct(DOI))
