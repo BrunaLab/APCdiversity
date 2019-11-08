@@ -102,6 +102,7 @@ SamplePW <- FirstAuthPW %>% #subset the paywall journals First Author Data
   group_by(Journal)%>%
   sample_n(30) # this code only grabs 30 from each journal, which is a random number SIMILAR to the 
 #numbers of articles in the open access journals
+# Number of articles to pull should be from NumbArtOA dataframe
 
 
 ################
