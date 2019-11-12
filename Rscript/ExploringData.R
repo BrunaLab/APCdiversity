@@ -120,7 +120,7 @@ sum(NumbArtOA$n) #using this to double check the sample size
 # as we probably can't get a good diversity estimate from such a small number of articles.
 
 SamplePW2 <- FirstAuthPW %>% #subset the paywall journals First Author Data 
-  filter(DOI != "NA") %>%
+  #filter(DOI != "NA") %>%
   group_by(Journal)%>%
   sample_n(c(14,6,47,9,29,21,9,5,10,10,9,31,16,32,6,8,6,30,28,32,9,17,32,2,8,1,14,33,14,18,36)) # this code only grabs 30 from each journal, which is a random number SIMILAR to the 
 #numbers of articles in the open access journals
