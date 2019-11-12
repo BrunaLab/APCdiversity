@@ -126,6 +126,7 @@ SamplePW2 <- FirstAuthPW %>% #subset the paywall journals First Author Data
 #numbers of articles in the open access journals
 # Number of articles to pull should be from NumbArtOA dataframe
 
+# demo commit
 
 ################
 #CountryRichness OVERALL
