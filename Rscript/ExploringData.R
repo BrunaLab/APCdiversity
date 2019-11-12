@@ -38,7 +38,8 @@ AllData <- AllData %>%
   separate(Journal, c("Journal", NA), ":") %>%
   separate(Journal, c("Journal", NA), " x") %>%
   separate(Journal, c("Journal", NA), " open")%>%
-  filter(Journal != "biochimie")
+  filter(Journal != "biochimie") %>%
+  filter(Year != 2018)
 
 ###################
 # group and Subsets
