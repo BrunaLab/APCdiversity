@@ -126,7 +126,20 @@ SamplePW2 <- FirstAuthPW %>% #subset the paywall journals First Author Data
 #numbers of articles in the open access journals
 # Number of articles to pull should be from NumbArtOA dataframe
 
-# demo commit
+
+
+#NEXT STEPS:
+# once we figure out the correct smapling from paywall hournals we next
+# need to make TWO site (journal) by species () matrices. One with Paywall
+# One for Open Access
+
+
+
+
+
+
+
+
 
 ################
 #CountryRichness OVERALL
@@ -134,11 +147,19 @@ SamplePW2 <- FirstAuthPW %>% #subset the paywall journals First Author Data
 
 # total country richness between the two journal types for FIRST authors
 # this does not control for sample size
-TotalRichFirst <- FirstAuthors %>% 
+TotalRichFirst <- FirstAuth %>% 
   group_by(JrnlType) %>%
   summarise(Rich = n_distinct(Country))
 # same as above for last authors
-TotalRichLast <- LastAuthors %>% 
+TotalRichLast <- LastAuth %>% 
+  group_by(JrnlType) %>%
+  summarise(Rich = n_distinct(Country))
+
+
+RichnessOA <- FirstAuthOA %>%
+  summarise(Rich = n_distinct(Country))
+
+RichnessPW <- SamplePW2 %>%
   group_by(JrnlType) %>%
   summarise(Rich = n_distinct(Country))
 
