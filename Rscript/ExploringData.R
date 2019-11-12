@@ -107,7 +107,7 @@ SamplePW1 <- strata(FirstAuthPWAlphab, "Journal",
             size = c(14,6,47,9,29,21,9,5,10,10,9,31,16,32,6,8,6,30,28,32,9,17,32,2,8,1,14,33,14,18,36),
             method = "srswor")
 
-
+#line 110
 sum(NumbArtOA$n) #using this to double check the sample size
 # the code above!
 # for each strata of journal, I took the number of articles available in the OA mirror 
