@@ -40,6 +40,9 @@ AllData <- AllData %>%
   separate(Journal, c("Journal", NA), " open")%>%
   filter(Journal != "biochimie") %>%
   filter(Year != 2018)
+#small revison. replace '&' with 'and'
+AllData[AllData$Journal=="biosensors & bioelectronics", "Journal"] <- "biosensors and bioelectronics"
+list(AllData$Journal)
 
 ###################
 # group and Subsets
@@ -98,16 +101,19 @@ LastAuthPW <- LastAuth %>%
 ##################################################
 #SUBSET Paywall Journals by the number found in Open Access Journals
 ##################################################
-#
+
+###################################################################################################
+#############################################################################################
+# I think we can delete this chunk of code
+
 #this is a way to randomly sample from each Paywall journal to 
 #match the number of articles in its OA mirror journal --CKG
 
 FirstAuthPWAlphab<-FirstAuthPW[order(FirstAuthPW$Journal),]#sort the paywall article df alphabetically by journal title
+
 SamplePW1 <- strata(FirstAuthPWAlphab, "Journal", 
             size = c(14,6,47,9,29,21,9,5,10,10,9,31,16,32,6,8,6,30,28,32,9,17,32,2,8,1,14,33,14,18,36),
             method = "srswor")
-
-#line 110
 sum(NumbArtOA$n) #using this to double check the sample size
 # the code above!
 # for each strata of journal, I took the number of articles available in the OA mirror 
@@ -128,6 +134,7 @@ SamplePW2 <- FirstAuthPW %>% #subset the paywall journals First Author Data
 
 
 
+
 #NEXT STEPS:
 # once we figure out the correct smapling from paywall hournals we next
 # need to make TWO site (journal) by species () matrices. One with Paywall
@@ -140,6 +147,20 @@ SamplePW2 <- FirstAuthPW %>% #subset the paywall journals First Author Data
 
 
 
+
+head(SamplePW2)
+#############################################################################################
+###################################################################################################
+
+NumbArtOA2 <- NumbArtOA[-1]   # remove "JnrlType" column from the NumbartOA dataframe
+
+#this subsets PW journals (FirstauthPW df) by the number of Aricles per journal in OA sources (the numbartoa df). can change this to lastauth as well
+testsubsample<-FirstAuthPW %>% 
+  nest(-Journal) %>% 
+  left_join(NumbArtOA2, by = "Journal") %>%
+  mutate(Sample = map2(data, n, sample_n)) %>% 
+  unnest(Sample)
+>>>>>>> 7bf2df0ce9cc2af010084e7a76a2dd4c45904029
 
 ################
 #CountryRichness OVERALL
