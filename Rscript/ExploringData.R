@@ -154,16 +154,15 @@ head(SamplePW2)
 NumbArtOA2 <- NumbArtOA[-1]   # remove "JnrlType" column from the NumbartOA dataframe
 
 #this subsets PW journals (FirstauthPW df) by the number of Aricles per journal in OA sources (the numbartoa df). can change this to lastauth as well
-SamplePW3<-FirstAuthPW %>% 
-  filter(Country != "NA") %>% #remove any article that has no country listed
-  group_by(Journal)
-  nest() %>% 
-  ungroup()
-  mutate(n = c(14,6,47,9,29,21,9,5,10,10,9,31,16,32,6,8,6,30,28,32,9,17,32,2,8,1,14,33,14,18,36)) 
-  mutate(samp = map2(data, n, sample_n)) %>%
-    select(-data) %>%
-    unnest(samp)
-  
+
+SamplePW3 <- FirstAuthPW %>% 
+  filter(Country != "NA" & Journal != "NA" & JrnlType != "NA") %>% #remove any article that has no country listed
+  nest(data = c(Code, DOI, Year, AuthorNum, Country, JrnlType, Region, IncomeGroup)) %>% 
+  left_join(NumbArtOA2, by = "Journal") %>%
+  mutate(Sample = map2(data, n, sample_n)) %>% 
+  unnest(Sample)%>%
+  select(Code, DOI, Journal, Year, AuthorNum, Country, JrnlType, Region,
+         IncomeGroup)
 ?mutate
 
 FirstAuthAll <- rbind(SamplePW3, FirstAuthOA) #put randomly sampled PW articles into 
