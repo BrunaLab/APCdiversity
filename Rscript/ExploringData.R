@@ -11,6 +11,8 @@ library(tidyverse)
 library(dplyr)
 library(ggplot2)
 library(sampling)
+library(reshape)
+library(vegan)
 
 # data
 load(file="./output/ALLDATA.RData")
@@ -97,9 +99,9 @@ LastAuthPW <- LastAuth %>%
   filter(JrnlType == "PW")
 
 
-#
+
 ##################################################
-#SUBSET Paywall Journals by the number found in Open Access Journals
+#SUBSET and bootstrap Paywall Journals by the number found in Open Access Journals
 ##################################################
 
 ###################################################################################################
@@ -115,6 +117,7 @@ SamplePW1 <- strata(FirstAuthPWAlphab, "Journal",
             size = c(14,6,47,9,29,21,9,5,10,10,9,31,16,32,6,8,6,30,28,32,9,17,32,2,8,1,14,33,14,18,36),
             method = "srswor")
 sum(NumbArtOA$n) #using this to double check the sample size
+
 # the code above!
 # for each strata of journal, I took the number of articles available in the OA mirror 
 # journals, and randomly sampled articles in PW journals based on those numbers. 
@@ -142,25 +145,102 @@ SamplePW2 <- FirstAuthPW %>% #subset the paywall journals First Author Data
 
 
 
-
-
-
-
-
-
 head(SamplePW2)
+
 #############################################################################################
 ###################################################################################################
 
 NumbArtOA2 <- NumbArtOA[-1]   # remove "JnrlType" column from the NumbartOA dataframe
 
 #this subsets PW journals (FirstauthPW df) by the number of Aricles per journal in OA sources (the numbartoa df). can change this to lastauth as well
-testsubsample<-FirstAuthPW %>% 
+SamplePW3<-FirstAuthPW %>% 
+  filter(Country != "NA") %>% #remove any article that has no country listed
   nest(-Journal) %>% 
   left_join(NumbArtOA2, by = "Journal") %>%
   mutate(Sample = map2(data, n, sample_n)) %>% 
   unnest(Sample)
->>>>>>> 7bf2df0ce9cc2af010084e7a76a2dd4c45904029
+
+SiteBySpecPW <- SamplePW3 %>%
+  group_by(Journal, Country)%>%
+  tally()
+
+SiteBySpecPW <- cast(SiteBySpecPW, Journal ~ Country, value = 'n')
+SiteBySpecPW[is.na(SiteBySpecPW)] <- 0
+Countries <- names(SiteBySpecPW[,2:57]) #check this to be sure this 
+
+####
+#Add diversity metrics
+country_counts <- SiteBySpecPW[,Countries] #final site by species matrix
+row.names(country_counts) <- SiteBySpecPW$Journal #add rownames for journals
+
+#simpson diversity index
+DivSimpson <-diversity(country_counts, index = "simpson")
+
+#abundance
+abund <-rowSums(country_counts)
+
+#richness
+rich <- rowSums(country_counts > 0)
+
+DivMetrics <- cbind(rich, abund, DivSimpson)
+
+#sum(abund)# double check we have the same number of articles still
+#sum(SiteBySpecPW) #check against this
+
+
+#############################################################################################
+# FOR LOOP
+###################################################################################################
+n_distinct(SamplePW3$Journal) #number of journals in PW
+n_distinct(FirstAuthOA$Journal) #number of jourals in OA, they are the same!
+
+
+richness <- matrix(31,1000) #empty matrix for richness
+SimpsonDiversity <- matrix(31,1000) #empty matrix for diversity
+
+for (i in 1:1000){ #do loop 100 times
+  NumbArtOA2 <- NumbArtOA[-1]   # remove "JnrlType" column from the NumbartOA dataframe
+  
+  #this subsets PW journals (FirstauthPW df) by the number of Aricles per journal in OA sources (the numbartoa df). can change this to lastauth as well
+  SamplePW3<-FirstAuthPW %>% 
+    filter(Country != "NA") %>% #remove any article that has no country listed
+    nest(-Journal) %>% 
+    left_join(NumbArtOA2, by = "Journal") %>%
+    mutate(Sample = map2(data, n, sample_n)) %>% 
+    unnest(Sample)
+  
+  SiteBySpecPW <- SamplePW3 %>%
+    group_by(Journal, Country)%>%
+    tally()
+  
+  SiteBySpecPW <- cast(SiteBySpecPW, Journal ~ Country, value = 'n')
+  SiteBySpecPW[is.na(SiteBySpecPW)] <- 0
+  Countries <- names(SiteBySpecPW[,2:57]) #check this to be sure this 
+  
+  ####
+  #Add diversity metrics
+  country_counts <- SiteBySpecPW[,Countries] #final site by species matrix
+  row.names(country_counts) <- SiteBySpecPW$Journal #add rownames for journals
+  
+  #simpson diversity index
+  DivSimpson<-diversity(country_counts, index = "simpson")
+  
+  #abundance
+  abund <-rowSums(country_counts)
+  
+  #richness
+  rich <- rowSums(country_counts > 0)
+  
+  richness[,i] = rich
+  divers
+}
+
+
+
+
+
+
+#>>>>>>> 7bf2df0ce9cc2af010084e7a76a2dd4c45904029
 
 ################
 #CountryRichness OVERALL
