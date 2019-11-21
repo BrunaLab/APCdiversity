@@ -174,6 +174,7 @@ SimpsonDiversity <- matrix(nrow = 62, ncol = 1000) #empty matrix for diversity
 for (i in 1:1000){ #do loop 100 times
   NumbArtOA2 <- NumbArtOA[-1]   # remove "JnrlType" column from the NumbartOA dataframe
   
+  #SUBSET
   #this subsets PW journals (FirstauthPW df) by the number of Aricles per journal in OA sources (the numbartoa df). can change this to lastauth as well
   SamplePW3 <- FirstAuthPW %>% 
     filter(Country != "NA" & Journal != "NA" & JrnlType != "NA") %>% #remove any article that has no country listed
@@ -183,11 +184,11 @@ for (i in 1:1000){ #do loop 100 times
     unnest(Sample)%>%
     select(Code, DOI, Journal, Year, AuthorNum, Country, JrnlType, Region,
            IncomeGroup)
-  
+  #ADD OA DATA
   FirstAuthAll <- rbind(SamplePW3, FirstAuthOA) #put randomly sampled PW articles into 
   #the same data frame wiht our OA articles
   FirstAuthAll$JournalAndType <- paste(FirstAuthAll$Journal, FirstAuthAll$JrnlType)
-  
+  #TURN IT INTO SITE BY SPECIES (JRNL BY COUNTRY)
   SiteBySpec <- FirstAuthAll %>%
     group_by(JournalAndType, Country)%>%
     tally()
@@ -210,6 +211,7 @@ for (i in 1:1000){ #do loop 100 times
   richness[,i] = rich
   SimpsonDiversity[,i] = DivSimpson
 }
+
 ###################################################
 
 #now manipulate the 62 x 1000 matrix of itterations
