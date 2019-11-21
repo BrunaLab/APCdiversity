@@ -100,14 +100,13 @@ LastAuthPW <- LastAuth %>%
   filter(JrnlType == "PW")
 
 
-
 ##################################################
 #SUBSET and bootstrap Paywall Journals by the number found in Open Access Journals
 ##################################################
 
-#############################################################################################
-###################################################################################################
-
+#######################
+#CODE FOR FOR LOOP, BEFORE PUTTING IT IN THE FOR LOOP
+#########################
 NumbArtOA2 <- NumbArtOA[-1]   # remove "JnrlType" column from the NumbartOA dataframe
 
 #this subsets PW journals (FirstauthPW df) by the number of Aricles per journal in OA sources (the numbartoa df). can change this to lastauth as well
@@ -160,7 +159,15 @@ DivMetrics <- cbind(rich, abund, DivSimpson)
 n_distinct(SamplePW3$Journal) #number of journals in PW
 n_distinct(FirstAuthOA$Journal) #number of jourals in OA, they are the same!
 
+#############
+#THE FOR LOOP TO MAKE FIRST AUTHOR RICHNESS AND DIVERSITY OF COUNTRY 
+#ITTERATIONS
+#
+#BEWARE... THIS LOOP TOOK 21 MINS TO RUN ON MY COMPUTER!!!!
+#
+#############
 
+# MAKE EMPTY MATRICES FOR THE FOR LOOP TO FILL
 richness <- matrix(nrow = 62, ncol = 1000) #empty matrix for richness
 SimpsonDiversity <- matrix(nrow = 62, ncol = 1000) #empty matrix for diversity
 
@@ -203,21 +210,45 @@ for (i in 1:1000){ #do loop 100 times
   richness[,i] = rich
   SimpsonDiversity[,i] = DivSimpson
 }
-
+###################################################
 
 #now manipulate the 62 x 1000 matrix of itterations
 #richness
+
 richness <- as.data.frame(richness) #make it a data frame
 richness$MeanRich <- rowMeans(richness) #add a mean column from the 1000 itterations
+write.csv(richness, "CleanData/FirstRich1000itters.csv", row.names = TRUE)
+
 FirstAuthRich <- richness %>% #just grab the mean column
   select(MeanRich)
 FirstAuthRich$JournalAndType <- SiteBySpec$JournalAndType #add journals in
 #now for diversity
 FirstAuthSimpDiv <- as.data.frame(SimpsonDiversity) 
   FirstAuthSimpDiv$MeanDiveristy <- rowMeans(FirstAuthSimpDiv)
-FirstAuthSimpDiv <- FirstAuthSimpDiv %>%
+write.csv(FirstAuthDiv, "CleanData/FirstDiv1000itter.csv", row.names = TRUE)
+  FirstAuthSimpDiv <- FirstAuthSimpDiv %>%
   select(MeanDiveristy)
 FirstAuthSimpDiv$JournalAndType <- SiteBySpec$JournalAndType
+
+#make a richness and diversity data frame for each journal
+FirstAuthDiv <- merge(FirstAuthSimpDiv, FirstAuthRich, by = "JournalAndType") 
+#re-grab journal types to paste onto the diersity dataframe
+AllData$JournalAndType <- paste(AllData$Journal, AllData$JrnlType) 
+JournalTypes <- AllData %>%
+  select(JournalAndType, JrnlType)%>%
+  distinct()
+
+FirstAuthDiv <- merge(FirstAuthDiv, JournalTypes, by = "JournalAndType") #merge for final first author dataframe
+write.csv(FirstAuthDiv, "CleanData/FirstAuthDiv.csv", row.names = FALSE)
+
+
+
+
+
+
+
+
+
 
 
 ################
