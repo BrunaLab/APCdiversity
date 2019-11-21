@@ -104,7 +104,7 @@ LastAuthPW <- LastAuth %>%
 #SUBSET and bootstrap Paywall Journals by the number found in Open Access Journals
 ##################################################
 
-#Calculate the diversity indices for OA journals!
+#Calculate the diversity indices for OA JOURNALS by each JOURNAL!
 SiteBySpec1 <- FirstAuthOA %>%
   group_by(Journal, Country)%>%
   tally()
@@ -131,8 +131,20 @@ DivMetricsOA <- as.data.frame(cbind(richOA, abundOA, DivSimpsonOA))
 DivMetricsOA$Journal <- SiteBySpec1$Journal
 DivMetricsOA$EffectSpecNumOA <- 1/(1-DivMetricsOA$DivSimpsonOA)
 
-write.csv(DivMetricsOA, "CleanData/FirstDivMetricsOA.csv", row.names = FALSE)
+write.csv(DivMetricsOA, "CleanData/FirstMetricsOAJrnls.csv", row.names = FALSE)
 sum(abundOA)
+
+
+#Calculate the diversity indices for ENTIRE OA COMMUNITY OF PAPERS
+SiteBySpec2 <- FirstAuthOA %>%
+  group_by(Country)%>%
+  tally()
+SiteBySpec2 <- SiteBySpec2 %>%
+  spread(Country, n)
+OADiversity <- diversity(SiteBySpec2, index = "simpson")
+OAEffectNum <- 1/(1-OADiversity)
+
+?spread
 
 #sum(abund)# double check we have the same number of articles still
 #sum(SiteBySpec) #check against this
