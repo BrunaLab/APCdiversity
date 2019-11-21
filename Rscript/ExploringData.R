@@ -294,6 +294,8 @@ SamplePW1 <- strata(FirstAuthPWAlphab, "Journal",
                     method = "srswor")
 sum(NumbArtOA$n) #using this to double check the sample size
 
+summary(c(14,6,47,9,29,21,9,5,10,10,9,31,16,32,6,8,6,30,28,32,9,17,32,2,8,1,14,33,14,18,36))
+
 # the code above!
 # for each strata of journal, I took the number of articles available in the OA mirror 
 # journals, and randomly sampled articles in PW journals based on those numbers. 
@@ -310,6 +312,10 @@ SamplePW2 <- FirstAuthPW %>% #subset the paywall journals First Author Data
   sample_n(c(14,6,47,9,29,21,9,5,10,10,9,31,16,32,6,8,6,30,28,32,9,17,32,2,8,1,14,33,14,18,36)) # this code only grabs 30 from each journal, which is a random number SIMILAR to the 
 #numbers of articles in the open access journals
 # Number of articles to pull should be from NumbArtOA dataframe
+SamplePW4 <- FirstAuthOA %>% #subset the paywall journals First Author Data 
+  #filter(DOI != "NA") %>%
+  group_by(Journal)%>%
+  sample_n(17, replace = TRUE) # this code only grabs 30 from each journal, which is a random number SIMILAR to the 
 
 
 
