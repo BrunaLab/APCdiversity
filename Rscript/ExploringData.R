@@ -97,7 +97,7 @@ LastAuthOA <- LastAuth %>%
   filter(JrnlType == "OA")
 
 LastAuthPW <- LastAuth %>%
-  filter(JrnlType == "PW")
+  filter(JrnlType == "paywall")
 
 
 ##################################################
@@ -174,6 +174,7 @@ write.csv(DivMetrics, "CleanData/FirstDivMetricsByJrnl.csv", row.names = FALSE)
 #DIVERSITY AND RICHNESS USING ENTIRE POOL FROM EACH JRNL TYPE
 #################
 #Calculate the diversity indices for ENTIRE OA COMMUNITY OF PAPERS
+# First Authors
 SiteBySpecOA <- FirstAuthOA %>%
   group_by(Country)%>%
   tally()
@@ -196,6 +197,33 @@ PWRichness <- length(SiteBySpecPW)
 DivMetricsFullPools <- as.data.frame(cbind(OADiversity, OARichness, PWDiversity, PWRichness))
 write.csv(DivMetricsFullPools, "CleanData/DivMetricsFullPools.csv", row.names = FALSE)
 
+# Calculate the diversity indices for ENTIRE OA COMMUNITY OF PAPERS 
+# LAST AUTHOR
+SiteBySpecOA <- LastAuthOA %>%
+  group_by(Country)%>%
+  tally()
+SiteBySpecOA <- SiteBySpecOA %>%
+  spread(Country, n)
+OADiversity <- diversity(SiteBySpecOA, index = "invsimpson")
+OARichness <- length(SiteBySpecOA)
+
+#DIversity for the entire Community of PW papers
+SiteBySpecPW <- LastAuthPW %>%
+  filter(Country != "NA")
+  
+SiteBySpecPW <- SiteBySpecPW %>%
+  group_by(Country) %>%
+  tally()
+
+SiteBySpecPW <- SiteBySpecPW %>%
+  spread(Country, n)
+PWDiversity <- diversity(SiteBySpecPW, index = "invsimpson")
+PWRichness <- length(SiteBySpecPW)
+
+DivMetricsFullPoolsLast <- as.data.frame(cbind(OADiversity, OARichness, PWDiversity, PWRichness))
+write.csv(DivMetricsFullPoolsLast, "CleanData/DivMetricsFullPoolLast.csv", row.names = FALSE)
+
+
 #sum(abund)# double check we have the same number of articles still
 #sum(SiteBySpec) #check against this
 
@@ -216,9 +244,11 @@ n_distinct(FirstAuthOA$Journal) #number of jourals in OA, they are the same!
 
 #For Loop to calculate over all simpsons diveristy (true diversity)
 #using similar randomly sampled chunks of the over all pool
+# USING FIRST AUTHOR
 SimpsDiversitySubs <- matrix(nrow = 1, ncol = 1000) #empty matrix for diversity
 
 for (i in 1:1000){
+  NumbArtOA2 <- NumbArtOA[-1]  
   SamplePW3 <- FirstAuthPW %>% 
     filter(Country != "NA" & Journal != "NA" & JrnlType != "NA") %>% #remove any article that has no country listed
     nest(data = c(Code, DOI, Year, AuthorNum, Country, JrnlType, Region, IncomeGroup)) %>% 
@@ -242,6 +272,41 @@ for (i in 1:1000){
 
 SimpsDivSubsPW <- as.data.frame(SimpsDiversitySubs)
 write.csv(SimpsDivSubsPW, "CleanData/ProporSampsSimpsDivPW.csv", row.names = FALSE)
+
+
+#For Loop to calculate over all simpsons diveristy (true diversity)
+#using similar randomly sampled chunks of the over all pool
+# USING LAST AUTHOR
+SimpsDivSubsLast <- matrix(nrow = 1, ncol = 1000) #empty matrix for diversity
+
+for (i in 1:1000){
+  NumbArtOA2 <- NumbArtOA[-1]  
+  SamplePW3 <- LastAuthPW %>% 
+    filter(Country != "NA" & Journal != "NA" & JrnlType != "NA") %>% #remove any article that has no country listed
+    nest(data = c(Code, DOI, Year, AuthorNum, Country, JrnlType, Region, IncomeGroup)) %>% 
+    left_join(NumbArtOA2, by = "Journal") %>%
+    mutate(Sample = map2(data, n, sample_n)) %>% 
+    unnest(Sample)%>%
+    select(Code, DOI, Journal, Year, AuthorNum, Country, JrnlType, Region,
+           IncomeGroup)
+  
+  SiteBySpecPW2 <- SamplePW3 %>%
+    group_by(Country)%>%
+    tally()
+  
+  SiteBySpecPW2 <- SiteBySpecPW2 %>%
+    spread(Country, n)
+  
+  PWDiversitySub <- diversity(SiteBySpecPW2, index = "invsimpson")
+  SimpsDivSubsLast[,i] = PWDiversitySub
+  
+}
+
+SimpsDivSubsPW <- as.data.frame(SimpsDivSubsLast)
+write.csv(SimpsDivSubsPW, "CleanData/ProporSampsSimpsDivPWLast.csv", row.names = FALSE)
+
+
+
 
 #FOR LOOP FOR making ricness and diversity matrices by journal with sampling
 ?diversity

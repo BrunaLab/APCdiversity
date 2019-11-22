@@ -12,6 +12,8 @@ DivMetricsFullPools <- read.csv("CleanData/DivMetricsFullPools.csv", header = TR
 FirstDivMetricsByJrnl <- read.csv("CleanData/FirstDivMetricsByJrnl.csv", header = TRUE)
 PropSampsSimpsDivsPW <- read.csv("CleanData/ProporSampsSimpsDivPW.csv", header = TRUE)
 PropSampsSimpsDivsPW <- gather(PropSampsSimpsDivsPW)
+PropSampsSimpsDivPWLast <- read.csv("CleanData/ProporSampsSimpsDivPWLast.csv", header = TRUE)
+PropSampsSimpsDivPWLast <- gather(PropSampsSimpsDivPWLast)
 
 #over all richness for PW and OA each itteration (OA should stay the same)
 FirstRich1000 <- merge(FirstRich1000, FirstAuthDiv, by = "JournalAndType")
@@ -35,7 +37,7 @@ MeanOfMeanRichPW <- mean(MeanRichPW$MeanRich)
 # this is a plot of the over all diversity values calculated 1000 times
 # by subsetting the total PW pool by the same number as are in the OA
 # journals and it is proportionally the same as the OA journals between
-# specific mirror journals
+# specific mirror journals USING FIRST AUTHOR
 ggplot(PropSampsSimpsDivsPW, aes(x = value))+
   geom_histogram()+
   xlim(6,14)+
@@ -44,9 +46,22 @@ ggplot(PropSampsSimpsDivsPW, aes(x = value))+
                color = "red")+
   ggtitle("Histogram of PW Simpsons Inverse Diversity,
       taken from 1000 proportional subsamples of the PW pool,
-      red line = OA diversity")
+      red line = OA diversity (FIRST AUTHOR)")
 
 
+#this is a plot of the over all diversity values calculated 1000 times
+# by subsetting the total PW pool by the same number as are in the OA
+# journals and it is proportionally the same as the OA journals between
+# specific mirror journals USING LAST AUTHOR
+ggplot(PropSampsSimpsDivPWLast, aes(x = value))+
+  geom_histogram()+
+  #xlim(6,14)+
+  geom_segment(aes(x = DivMetricsFullPoolsLast$OADiversity, y = 0,
+                   xend = DivMetricsFullPoolsLast$OADiversity, yend = 170), 
+               color = "red")+
+  ggtitle("Histogram of PW Simpsons Inverse Diversity,
+      taken from 1000 proportional subsamples of the PW pool,
+      red line = OA diversity, (LAST AUTHOR)")
 
 
 
