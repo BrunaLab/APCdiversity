@@ -14,6 +14,8 @@ PropSampsSimpsDivsPW <- read.csv("CleanData/ProporSampsSimpsDivPW.csv", header =
 PropSampsSimpsDivsPW <- gather(PropSampsSimpsDivsPW)
 PropSampsSimpsDivPWLast <- read.csv("CleanData/ProporSampsSimpsDivPWLast.csv", header = TRUE)
 PropSampsSimpsDivPWLast <- gather(PropSampsSimpsDivPWLast)
+PropSampsDivAllAuth <- read.csv("CleanData/SimpsDivSubsAllAuthsPW.csv", header = TRUE)
+PropSampsDivAllAuth <- gather(PropSampsDivAllAuth)
 
 #over all richness for PW and OA each itteration (OA should stay the same)
 FirstRich1000 <- merge(FirstRich1000, FirstAuthDiv, by = "JournalAndType")
@@ -63,6 +65,19 @@ ggplot(PropSampsSimpsDivPWLast, aes(x = value))+
       taken from 1000 proportional subsamples of the PW pool,
       red line = OA diversity, (LAST AUTHOR)")
 
+#this is a plot of the over all diversity values calculated 1000 times
+# by subsetting the total PW pool by the same number as are in the OA
+# journals and it is proportionally the same as the OA journals between
+# specific mirror journals USING ALL AUTHORS
+ggplot(PropSampsDivAllAuth, aes(x = value))+
+  geom_histogram()+
+  #xlim(6,14)+
+  geom_segment(aes(x = DivMetricsAllAuthors$OADiversity, y = 0,
+                   xend = DivMetricsAllAuthors$OADiversity, yend = 170), 
+               color = "red")+
+  ggtitle("Histogram of PW Simpsons Inverse Diversity,
+      taken from 1000 proportional subsamples of the PW pool,
+      red line = OA diversity, (USING ALL AUTHORS)")
 
 
 
