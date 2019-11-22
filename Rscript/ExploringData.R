@@ -127,22 +127,60 @@ abundOA <-rowSums(country_countsOA)
 #richness
 richOA <- rowSums(country_counts > 0)
 
-DivMetricsOA <- as.data.frame(cbind(richOA, abundOA, DivSimpsonOA))
-DivMetricsOA$Journal <- SiteBySpec1$Journal
-DivMetricsOA$EffectSpecNumOA <- 1/(1-DivMetricsOA$DivSimpsonOA)
+DivMetrics <- as.data.frame(cbind(richOA, abundOA, DivSimpsonOA))
+DivMetrics$Journal <- SiteBySpec1$Journal
+DivMetrics$EffectSpecNumOA <- 1/(1-DivMetricsOA$DivSimpsonOA)
 
-write.csv(DivMetricsOA, "CleanData/FirstMetricsOAJrnls.csv", row.names = FALSE)
-sum(abundOA)
+#Calculate the diversity indices for PW JOURNALS by each JOURNAL!
+SiteBySpec2 <- FirstAuthPW %>%
+  filter(Country != "NA") %>%
+  group_by(Journal, Country)%>%
+  tally()
+
+SiteBySpec2 <- cast(SiteBySpec2, Journal ~ Country, value = 'n')
+SiteBySpec2[is.na(SiteBySpec2)] <- 0
+Countries <- names(SiteBySpec2[,2:126]) #check this to be sure this 
+
+####
+#Add diversity metrics
+country_countsPW <- SiteBySpec2[,Countries] #final site by species matrix
+row.names(country_countsPW) <- SiteBySpec2$Journal #add rownames for journals
+
+#simpson diversity index
+DivSimpsonPW <-diversity(country_countsPW, index = "simpson")
+
+#abundance
+abundPW <-rowSums(country_countsPW)
+
+#richness
+richPW <- rowSums(country_countsPW > 0)
+
+DivMetricsPW <- as.data.frame(cbind(richPW, abundPW, DivSimpsonPW))
+DivMetricsPW$Journal <- SiteBySpec2$Journal
+DivMetricsPW$EffectSpecNumPW <- 1/(1-DivMetricsPW$DivSimpsonPW)
+
+DivMetrics <- merge(DivMetrics, DivMetricsPW, by = "Journal")
+DivMetrics$DeltaDiv <- DivMetrics$EffectSpecNumOA - DivMetrics$EffectSpecNumPW
+
+boxplot(DivMetrics$DeltaDiv)
+median(DivMetrics$DeltaDiv)
+
+write.csv(DivMetrics, "CleanData/FirstDivMetricsByJrnl.csv", row.names = FALSE)
+
 
 ?diversity
+
+###############
+#DIVERSITY AND RICHNESS USING ENTIRE POOL FROM EACH JRNL TYPE
+#################
 #Calculate the diversity indices for ENTIRE OA COMMUNITY OF PAPERS
 SiteBySpecOA <- FirstAuthOA %>%
   group_by(Country)%>%
   tally()
 SiteBySpecOA <- SiteBySpecOA %>%
   spread(Country, n)
-OADiversity <- diversity(SiteBySpecOA, index = "simpson")
-OAEffectNum <- 1/(1-OADiversity)
+OADiversity <- diversity(SiteBySpecOA, index = "invsimpson")
+OARichness <- length(SiteBySpecOA)
 
 #DIversity for the entire Community of PW papers
 SiteBySpecPW <- FirstAuthPW %>%
@@ -152,9 +190,11 @@ SiteBySpecPW <- FirstAuthPW %>%
 
 SiteBySpecPW <- SiteBySpecPW %>%
   spread(Country, n)
-PWDiversity <- diversity(SiteBySpecPW, index = "simpson")
-PWEffectNum <- 1/(1-PWDiversity)
-?spread
+PWDiversity <- diversity(SiteBySpecPW, index = "invsimpson")
+PWRichness <- length(SiteBySpecPW)
+
+DivMetricsFullPools <- as.data.frame(cbind(OADiversity, OARichness, PWDiversity, PWRichness))
+write.csv(DivMetricsFullPools, "CleanData/DivMetricsFullPools.csv", row.names = FALSE)
 
 #sum(abund)# double check we have the same number of articles still
 #sum(SiteBySpec) #check against this
@@ -173,6 +213,37 @@ n_distinct(FirstAuthOA$Journal) #number of jourals in OA, they are the same!
 #BEWARE... THIS LOOP TOOK 21 MINS TO RUN ON MY COMPUTER!!!!
 #
 #############
+
+#For Loop to calculate over all simpsons diveristy (true diversity)
+#using similar randomly sampled chunks of the over all pool
+SimpsDiversitySubs <- matrix(nrow = 1, ncol = 1000) #empty matrix for diversity
+
+for (i in 1:1000){
+  SamplePW3 <- FirstAuthPW %>% 
+    filter(Country != "NA" & Journal != "NA" & JrnlType != "NA") %>% #remove any article that has no country listed
+    nest(data = c(Code, DOI, Year, AuthorNum, Country, JrnlType, Region, IncomeGroup)) %>% 
+    left_join(NumbArtOA2, by = "Journal") %>%
+    mutate(Sample = map2(data, n, sample_n)) %>% 
+    unnest(Sample)%>%
+    select(Code, DOI, Journal, Year, AuthorNum, Country, JrnlType, Region,
+           IncomeGroup)
+  
+  SiteBySpecPW2 <- SamplePW3 %>%
+    group_by(Country)%>%
+    tally()
+  
+  SiteBySpecPW2 <- SiteBySpecPW2 %>%
+    spread(Country, n)
+  
+  PWDiversitySub <- diversity(SiteBySpecPW2, index = "invsimpson")
+  SimpsDiversitySubs[,i] = PWDiversitySub
+  
+}
+
+SimpsDivSubsPW <- as.data.frame(SimpsDiversitySubs)
+write.csv(SimpsDivSubsPW, "CleanData/ProporSampsSimpsDivPW.csv", row.names = FALSE)
+
+#FOR LOOP FOR making ricness and diversity matrices by journal with sampling
 ?diversity
 # MAKE EMPTY MATRICES FOR THE FOR LOOP TO FILL
 richness <- matrix(nrow = 62, ncol = 1000) #empty matrix for richness

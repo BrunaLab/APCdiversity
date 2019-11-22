@@ -3,10 +3,15 @@ library(ggplot2)
 library(dplyr)
 
 #data
-FirstAuthDiv <- read.csv("CleanData/FirstAuthDiv.csv", header = TRUE)
-FirstRich1000 <- read.csv("CleanData/FirstRich1000itters.csv", header = TRUE)
-FirstRich1000 <- FirstRich1000 %>%
-  select(JournalAndType = X, V1:V1000)
+#FirstAuthDiv <- read.csv("CleanData/FirstAuthDiv.csv", header = TRUE)
+#FirstRich1000 <- read.csv("CleanData/FirstRich1000itters.csv", header = TRUE)
+#FirstRich1000 <- FirstRich1000 %>%
+#  select(JournalAndType = X, V1:V1000)
+
+DivMetricsFullPools <- read.csv("CleanData/DivMetricsFullPools.csv", header = TRUE)
+FirstDivMetricsByJrnl <- read.csv("CleanData/FirstDivMetricsByJrnl.csv", header = TRUE)
+PropSampsSimpsDivsPW <- read.csv("CleanData/ProporSampsSimpsDivPW.csv", header = TRUE)
+
 
 #over all richness for PW and OA each itteration (OA should stay the same)
 FirstRich1000 <- merge(FirstRich1000, FirstAuthDiv, by = "JournalAndType")
