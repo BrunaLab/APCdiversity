@@ -134,16 +134,26 @@ DivMetricsOA$EffectSpecNumOA <- 1/(1-DivMetricsOA$DivSimpsonOA)
 write.csv(DivMetricsOA, "CleanData/FirstMetricsOAJrnls.csv", row.names = FALSE)
 sum(abundOA)
 
-
+?diversity
 #Calculate the diversity indices for ENTIRE OA COMMUNITY OF PAPERS
-SiteBySpec2 <- FirstAuthOA %>%
+SiteBySpecOA <- FirstAuthOA %>%
   group_by(Country)%>%
   tally()
-SiteBySpec2 <- SiteBySpec2 %>%
+SiteBySpecOA <- SiteBySpecOA %>%
   spread(Country, n)
-OADiversity <- diversity(SiteBySpec2, index = "simpson")
+OADiversity <- diversity(SiteBySpecOA, index = "simpson")
 OAEffectNum <- 1/(1-OADiversity)
 
+#DIversity for the entire Community of PW papers
+SiteBySpecPW <- FirstAuthPW %>%
+  filter(Country != "NA") %>%
+  group_by(Country) %>%
+  tally()
+
+SiteBySpecPW <- SiteBySpecPW %>%
+  spread(Country, n)
+PWDiversity <- diversity(SiteBySpecPW, index = "simpson")
+PWEffectNum <- 1/(1-PWDiversity)
 ?spread
 
 #sum(abund)# double check we have the same number of articles still
