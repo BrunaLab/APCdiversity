@@ -99,6 +99,59 @@ LastAuthOA <- LastAuth %>%
 LastAuthPW <- LastAuth %>%
   filter(JrnlType == "paywall")
 
+############################################
+# shaping data to do barcharts of country representation
+# income representation
+# and region representation
+#################################################
+PayWallAllGeo <- PayWallAll %>%
+  filter(Country != "NA" & Code != "NA") %>%
+  group_by(Country, Code)%>%
+  tally()
+
+PayWallAllGeo <- left_join(PayWallAllGeo, CountryData, by = "Code")
+
+PayWallAllGeoInc <- PayWallAll %>%
+  filter(IncomeGroup != "NA")%>%
+  group_by(IncomeGroup)%>%
+  tally()
+
+OAAllGeo <- OpenAccessAll %>%
+  filter(Country != "NA" & Code != "NA") %>%
+  group_by(Country, Code)%>%
+  tally()
+
+OAAllGeo <- left_join(OAAllGeo, CountryData, by = "Code")
+
+OAAllInc <- OpenAccessAll %>%
+  filter(IncomeGroup != "NA") %>%
+  group_by(IncomeGroup) %>%
+  tally()
+
+#Country representation all authors PW
+ggplot(PayWallAllGeo, aes(Country, n, fill = IncomeGroup))+
+  geom_bar(stat = "identity")+
+  coord_flip()+
+  ggtitle("Country Representation by IncomeGroup PW")
+
+# Country Representation All authors OA
+ggplot(OAAllGeo, aes(Country, n, fill = IncomeGroup))+
+  geom_bar(stat = "identity")+
+  coord_flip()+
+  ggtitle("Country Representation by Income Group OA")
+
+#income representation of all authors PW
+ggplot(PayWallAllGeoInc, aes(IncomeGroup,
+                             y = n, fill = IncomeGroup))+
+  geom_bar(stat = "identity")+
+  ggtitle("Author Country Income Group For all Authors
+          in PW Journals")
+# income representation of all authors OA
+ggplot(OAAllInc, aes(IncomeGroup,
+                     y = n, fill = IncomeGroup))+
+  geom_bar(stat = "identity")+
+  ggtitle("Author Country Income Group for All Authors
+          in OA Journals")
 
 ##################################################
 #SUBSET and bootstrap Paywall Journals by the number found in Open Access Journals
