@@ -185,7 +185,7 @@ levels(all4$IncomeGroup)
 
 all4<-all4 %>% 
   select(Country,IncomeGroup,nPW,nOA ) %>%
-  filter(IncomeGroup == "Low income") %>% 
+  # filter(IncomeGroup == "Upper middle income") %>% 
   gather(category,count,nPW:nOA) 
 
-all4 %>% group_by(category) %>% summarize(sum(count))
+all4 %>% group_by(IncomeGroup,category) %>% summarize(n=sum(count))
