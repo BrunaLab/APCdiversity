@@ -51,21 +51,46 @@ list(AllData$Journal)
 # group and Subsets
 ####################
 
-NumbAuthors <- AllData %>% # number of authors per journal 
+# There are some with missing DOI values, if you don't replace these
+# They will be excluded from the grouping
+AllData$DOI<- as.character(AllData$DOI)
+AllData$DOI<- AllData$DOI %>% replace_na("missing_DOI")
+AllData$DOI<- as.factor(AllData$DOI)
+
+# NumbAuthors <- AllData %>% # number of authors per journal 
+#   filter(Year==2019) %>% 
+#   group_by(JrnlType, Journal,Year) %>% 
+#   summarize(n=n_distinct(DOI))
+
+NumbAuthors <- AllData %>% # average number of authors per journal 
   filter(Year==2019) %>% 
-  group_by(JrnlType, Journal,Year) %>% 
-  summarize(n=n_distinct(DOI))
+  group_by(JrnlType,Journal,DOI) %>% 
+  arrange(JrnlType, Journal) %>% 
+  filter(AuthorNum == max(AuthorNum)) %>% 
+  group_by(JrnlType, Journal) %>% 
+  summarize(avg_n=mean(AuthorNum),sd_n=sd(AuthorNum))
+NumbAuthors
 
 NumbArticles <- AllData %>% #number of papers per journal
   filter(Year==2019) %>% 
   group_by(JrnlType, Journal) %>% 
   summarize(n=n_distinct(DOI))
+NumbArticles
 
 NumbArtOA <- NumbArticles %>% #number of articles that are Open Access
   filter(JrnlType == "OA")
+NumbArtOA
+
+TOTAL_NumbArtOA<-sum(NumbArtOA$n) #total number summed accross all OA journals
+TOTAL_NumbArtOA
+
 
 NumbArtPW <- NumbArticles %>% #number of articles that are paywall
   filter(JrnlType == "paywall")
+NumbArtPW
+
+TOTAL_NumbArtPW<-sum(NumbArtPW$n) #total number summed accross all OA journals
+TOTAL_NumbArtPW
 
 OpenAccessAll <- AllData %>% #use the numbers of articles here to select those from paywal journals
   filter(JrnlType == "OA")
