@@ -124,6 +124,24 @@ LastAuthOA <- LastAuth %>%
 LastAuthPW <- LastAuth %>%
   filter(JrnlType == "paywall")
 
+
+
+#########
+LastAuthOA
+FirstAuthOA
+
+first_and_last_OA<-inner_join(FirstAuthOA,LastAuthOA,by="DOI")
+first_and_last_OA$country_same<-first_and_last_OA$Country.x==first_and_last_OA$Country.y
+summary(first_and_last_OA$country_same)  
+first_and_last_OA$Income_same<-first_and_last_OA$IncomeGroup.x==first_and_last_OA$IncomeGroup.y
+summary(first_and_last_OA$Income_same)  
+first_and_last_OA$Region_same<-first_and_last_OA$Region.x==first_and_last_OA$Region.y
+summary(first_and_last_OA$Region_same)  
+
+
+LastAuthPW
+FirstAuthPW
+
 ############################################
 # shaping data to do barcharts of country representation
 # income representation
