@@ -45,7 +45,7 @@ articles_pw_df <- convert2df(articles_pw, dbsource = "scopus", format = "bibtex"
 articles_pw_df$journal_cat<-"PW"
 str(articles_pw_df)
 
-articles_all_df<-bind_rows(articles_x_df,articles_x_df)
+articles_all_df<-bind_rows(articles_x_df,articles_pw_df)
 
 # save as a csv file
 write.csv(articles_pw_df,"./output/scopus_pw_EB.csv")

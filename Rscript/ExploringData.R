@@ -1,9 +1,9 @@
 ####################################################
 # This script is to start to clean and explore the data 
-# ultimately I think we need to get to a site by species type matrix in which each site is a journal and 
-# the sampling effort (number of articles) is the same for each mirror/sister journals
-# in a site by species matrix, country is the species, income or region is like taxon or functional group
-# maybe?
+# ultimately I think we need to get to a site by species type matrix in which 
+# each site is a journal and the sampling effort (number of articles) is the 
+# same for each mirror/sister journals in a site by species matrix, country 
+# is the species, income or region is like taxon or functional group maybe?
 ####################################################
 
 # libraries
@@ -16,7 +16,9 @@ library(vegan)
 library(purrr)
 
 # data
-load(file="./output/ALLDATA.RData")
+# load(file="./output/ALLDATA.RData")
+ALLDATA<-read_csv(file="./output/all_Journal_author_countries.csv")
+ALLDATA$X1<-NULL
 head(ALLDATA,10)
 str(ALLDATA)
 CountryData <- read.csv("data/CLASS.csv", header = TRUE)
@@ -26,7 +28,7 @@ head(ALLDATA)
 
 AllData <- ALLDATA %>%
   select(DOI = DI, Journal = SO, Year = PY, AuthorNum = author,
-         Country = country, Code = country_code, JrnlType = jrnl_type)
+         Country = country, Code = country_code, JrnlType = journal_cat)
 
 CountryData <- CountryData %>%
   select(Code,Region, IncomeGroup = Income.group)
@@ -35,16 +37,24 @@ CountryData <- CountryData %>%
 AllData <- merge(AllData, CountryData, by="Code", all.x=TRUE) # merge 
 
 head(AllData)
+# 
+# #scrap the "x" in the journal names, as this data is included in the JrnlType column
+# AllData <- AllData %>%
+#   separate(Journal, c("Journal", NA), ":") %>%
+#   separate(Journal, c("Journal", NA), " x") %>%
+#   separate(Journal, c("Journal", NA), " open")%>%
+#   filter(Journal != "biochimie") %>%
+#   filter(Year != 2018)
+# deleted this because not all mirror journals have
+# the same name as the original journal
+# In addition, the data harvesting was only done for 
+# the years of publishing of the mror journal so no 
+# need to filter by yer any more
 
-#scrap the "x" in the journal names, as this data is included in the JrnlType column
-AllData <- AllData %>%
-  separate(Journal, c("Journal", NA), ":") %>%
-  separate(Journal, c("Journal", NA), " x") %>%
-  separate(Journal, c("Journal", NA), " open")%>%
-  filter(Journal != "biochimie") %>%
-  filter(Year != 2018)
 #small revison. replace '&' with 'and'
-AllData[AllData$Journal=="biosensors & bioelectronics", "Journal"] <- "biosensors and bioelectronics"
+# AllData[AllData$Journal=="biosensors & bioelectronics", "Journal"] <- "biosensors and bioelectronics"
+
+
 list(AllData$Journal)
 
 ###################
@@ -63,7 +73,7 @@ AllData$DOI<- as.factor(AllData$DOI)
 #   summarize(n=n_distinct(DOI))
 
 NumbAuthors <- AllData %>% # average number of authors per journal 
-  filter(Year==2019) %>% 
+  # filter(Year==2019) %>% 
   group_by(JrnlType,Journal,DOI) %>% 
   arrange(JrnlType, Journal) %>% 
   filter(AuthorNum == max(AuthorNum)) %>% 
