@@ -15,6 +15,11 @@ library(reshape)
 library(vegan)
 library(purrr)
 
+# load journal list and pairs
+MirrorPairs<-read_csv(file="./data/MirrorPairs.csv")
+MirrorPairs$X4<-NULL
+
+
 # data
 # load(file="./output/ALLDATA.RData")
 ALLDATA<-read_csv(file="./output/all_Journal_author_countries.csv")
@@ -57,6 +62,26 @@ head(AllData)
 
 list(AllData$Journal)
 
+# ADD IN THE JOURNAL PAIR_KEY
+
+
+AllData<-left_join(AllData,MirrorPairs,by="Journal")
+colnames(AllData)
+AllData<-AllData %>% 
+  select(-notes) %>% 
+  filter(pair_key>0)
+
+
+AllData$pair_key<-as.factor(AllData$pair_key)
+AllData$pair_key<-droplevels(AllData$pair_key)
+str(AllData)
+
+levels(AllData$pair_key)
+
+# 
+# 
+# MirrorPairs
+
 ###################
 # group and Subsets
 ####################
@@ -78,13 +103,15 @@ NumbAuthors <- AllData %>% # average number of authors per journal
   arrange(JrnlType, Journal) %>% 
   filter(AuthorNum == max(AuthorNum)) %>% 
   group_by(JrnlType, Journal) %>% 
-  summarize(avg_n=mean(AuthorNum),sd_n=sd(AuthorNum))
+  summarize(avg_n=mean(AuthorNum),sd_n=sd(AuthorNum)) %>% 
+  arrange(Journal)
 NumbAuthors
 
 NumbArticles <- AllData %>% #number of papers per journal
   filter(Year==2019) %>% 
   group_by(JrnlType, Journal) %>% 
-  summarize(n=n_distinct(DOI))
+  summarize(n=n_distinct(DOI))%>% 
+  arrange(Journal)
 NumbArticles
 
 NumbArtOA <- NumbArticles %>% #number of articles that are Open Access
@@ -96,7 +123,7 @@ TOTAL_NumbArtOA
 
 
 NumbArtPW <- NumbArticles %>% #number of articles that are paywall
-  filter(JrnlType == "paywall")
+  filter(JrnlType == "PW")
 NumbArtPW
 
 TOTAL_NumbArtPW<-sum(NumbArtPW$n) #total number summed accross all OA journals
@@ -106,7 +133,7 @@ OpenAccessAll <- AllData %>% #use the numbers of articles here to select those f
   filter(JrnlType == "OA")
 
 PayWallAll <- AllData %>% 
-  filter(JrnlType == "paywall")
+  filter(JrnlType == "PW")
 
 
 test <- cbind(NumbArtOA, NumbArtPW)
@@ -119,7 +146,7 @@ FirstAuth <- AllData %>%
 FirstAuthOA <- FirstAuth %>%
   filter(JrnlType == "OA")
 FirstAuthPW <- FirstAuth %>%
-  filter(JrnlType == "paywall")
+  filter(JrnlType == "PW")
 
 #last author subsets
 LastAuth <- AllData %>%
@@ -132,7 +159,7 @@ LastAuthOA <- LastAuth %>%
   filter(JrnlType == "OA")
 
 LastAuthPW <- LastAuth %>%
-  filter(JrnlType == "paywall")
+  filter(JrnlType == "PW")
 
 
 
@@ -164,7 +191,7 @@ PayWallAllGeo <- PayWallAll %>%
 
 PayWallAllGeo <- left_join(PayWallAllGeo, CountryData, by = "Code")
 
-PayWallAllGeoInc <- PayWallAll %>%
+PayWallAllGeoInc <- PayWallAllGeo %>%
   filter(IncomeGroup != "NA")%>%
   group_by(IncomeGroup)%>%
   tally()
@@ -209,6 +236,7 @@ ggplot(OAAllInc, aes(IncomeGroup,
 ##################################################
 #SUBSET and bootstrap Paywall Journals by the number found in Open Access Journals
 ##################################################
+#TODO: convert this to a function, no need to do the same thing for both of them
 
 #Calculate the diversity indices for OA JOURNALS by each JOURNAL!
 SiteBySpec1 <- FirstAuthOA %>%
@@ -217,11 +245,12 @@ SiteBySpec1 <- FirstAuthOA %>%
 
 SiteBySpec1 <- cast(SiteBySpec1, Journal ~ Country, value = 'n')
 SiteBySpec1[is.na(SiteBySpec1)] <- 0
-Countries <- names(SiteBySpec1[,2:60]) #check this to be sure this 
+ncols_SiteBySpec1<-ncol(SiteBySpec1)
+CountriesOA <- names(SiteBySpec1[,2:ncols_SiteBySpec1]) #check this to be sure this 
 
 ####
 #Add diversity metrics
-country_countsOA <- SiteBySpec1[,Countries] #final site by species matrix
+country_countsOA <- SiteBySpec1[,CountriesOA] #final site by species matrix
 row.names(country_countsOA) <- SiteBySpec1$Journal #add rownames for journals
 
 #simpson diversity index
@@ -231,11 +260,11 @@ DivSimpsonOA <-diversity(country_countsOA, index = "simpson")
 abundOA <-rowSums(country_countsOA)
 
 #richness
-richOA <- rowSums(country_counts > 0)
+richOA <- rowSums(country_countsOA > 0)
 
-DivMetrics <- as.data.frame(cbind(richOA, abundOA, DivSimpsonOA))
-DivMetrics$Journal <- SiteBySpec1$Journal
-DivMetrics$EffectSpecNumOA <- 1/(1-DivMetricsOA$DivSimpsonOA)
+DivMetricsOA <- as.data.frame(cbind(richOA, abundOA, DivSimpsonOA))
+DivMetricsOA$Journal <- SiteBySpec1$Journal
+DivMetricsOA$EffectSpecNumOA <- 1/(1-DivMetricsOA$DivSimpsonOA)
 
 #Calculate the diversity indices for PW JOURNALS by each JOURNAL!
 SiteBySpec2 <- FirstAuthPW %>%
@@ -245,11 +274,12 @@ SiteBySpec2 <- FirstAuthPW %>%
 
 SiteBySpec2 <- cast(SiteBySpec2, Journal ~ Country, value = 'n')
 SiteBySpec2[is.na(SiteBySpec2)] <- 0
-Countries <- names(SiteBySpec2[,2:126]) #check this to be sure this 
+ncols_SiteBySpec2<-ncol(SiteBySpec2)
+CountriesPW <- names(SiteBySpec2[,2:ncols_SiteBySpec2]) #check this to be sure this 
 
 ####
 #Add diversity metrics
-country_countsPW <- SiteBySpec2[,Countries] #final site by species matrix
+country_countsPW <- SiteBySpec2[,CountriesPW] #final site by species matrix
 row.names(country_countsPW) <- SiteBySpec2$Journal #add rownames for journals
 
 #simpson diversity index
@@ -265,11 +295,27 @@ DivMetricsPW <- as.data.frame(cbind(richPW, abundPW, DivSimpsonPW))
 DivMetricsPW$Journal <- SiteBySpec2$Journal
 DivMetricsPW$EffectSpecNumPW <- 1/(1-DivMetricsPW$DivSimpsonPW)
 
-DivMetrics <- merge(DivMetrics, DivMetricsPW, by = "Journal")
-DivMetrics$DeltaDiv <- DivMetrics$EffectSpecNumOA - DivMetrics$EffectSpecNumPW
+#TODO: "journal was the key back when the X was removed from the name. 
+# now need to do by the "pair key" that will ID pairs of journals (since not)
+# all of them are simply name/name x
 
-boxplot(DivMetrics$DeltaDiv)
-median(DivMetrics$DeltaDiv)
+
+DivMetricsPW<-left_join(DivMetricsPW,MirrorPairs,by="Journal")
+DivMetricsPW$notes<-NULL
+
+DivMetricsOA<-left_join(DivMetricsOA,MirrorPairs,by="Journal")
+DivMetricsOA$notes<-NULL
+
+colnames(DivMetricsOA)
+colnames(DivMetricsPW)
+
+DivMetricsALL <- merge(DivMetricsOA, DivMetricsPW, by = "pair_key") 
+DivMetricsALL$DeltaDiv <- DivMetricsALL$EffectSpecNumPW - DivMetricsALL$EffectSpecNumOA
+
+# DivMetrics$DeltaDiv <- DivMetricsPW$EffectSpecNumPW - DivMetricsOA$EffectSpecNumOA
+
+boxplot(DivMetricsALL$DeltaDiv)
+median(DivMetricsALL$DeltaDiv)
 
 write.csv(DivMetrics, "CleanData/FirstDivMetricsByJrnl.csv", row.names = FALSE)
 
@@ -360,8 +406,9 @@ write.csv(DivMetricsAllAuthors, "CleanData/DivMetricsAllAuthors.csv", row.names 
 #############################################################################################
 # FOR LOOP
 ###################################################################################################
-n_distinct(SamplePW3$Journal) #number of journals in PW
+n_distinct(FirstAuthPW$Journal) #number of journals in PW
 n_distinct(FirstAuthOA$Journal) #number of jourals in OA, they are the same!
+
 
 #############
 #THE FOR LOOP TO MAKE FIRST AUTHOR RICHNESS AND DIVERSITY OF COUNTRY 
