@@ -35,17 +35,36 @@ articles_pw <- readFiles('./data/scopus_APC_12march/pw_journals/pw-bib/scopus1.b
                           
 articles_x <- readFiles('./data/scopus_APC_12march/oa_journals/scopus.bib')
 
+# load journal list and pairs
+MirrorPairs<-read_csv(file="./data/MirrorPairs.csv")
+
+
 # process the data and convert to dataframe with bibliometrix
 articles_x_df <- convert2df(articles_x, dbsource = "scopus", format = "bibtex")
-articles_x_df$journal_cat<-"OA"
-str(articles_x_df)
-
+# articles_x_df$journal_cat<-"OA"
+# str(articles_x_df)
+articles_x_df<-left_join(articles_x_df,MirrorPairs,by="SO")
+colnames(articles_x_df)
+articles_x_df<-articles_x_df %>% 
+  select(-notes) %>% 
+  filter(pair_key>0)  # the ones with 0 are the journals that need to be deleted
 
 articles_pw_df <- convert2df(articles_pw, dbsource = "scopus", format = "bibtex")
-articles_pw_df$journal_cat<-"PW"
-str(articles_pw_df)
+# articles_pw_df$journal_cat<-"PW"
+# str(articles_pw_df)
+articles_pw_df<-left_join(articles_pw_df,MirrorPairs,by="SO")
+colnames(articles_pw_df)
+articles_pw_df<-articles_pw_df %>% 
+  select(-notes) %>% 
+  filter(pair_key>0)
+
 
 articles_all_df<-bind_rows(articles_x_df,articles_pw_df)
+head(articles_all_df,10)
+articles_all_df$pair_key<-as.factor(articles_all_df$pair_key)
+articles_all_df$journal_cat<-as.factor(articles_all_df$journal_cat)
+articles_all_df$SO<-as.factor(articles_all_df$SO)
+articles_all_df$DI<-as.factor(articles_all_df$DI)
 
 # save as a csv file
 write.csv(articles_pw_df,"./output/scopus_pw_EB.csv")
@@ -54,6 +73,12 @@ write.csv(articles_all_df,"./output/scopus_all_EB.csv")
 
 
 # Now carry ourt bibliometrix default analyses on the "X journals only" df
+# TODO: still need to collect data on some missing journals, 
+# so i excluded the pairs from the analyses
+missing_jrnls<-c(6,7,9,10,16,33,35,36,37,38,40,41)
+articles_all_df<-articles_all_df %>% 
+  filter(!pair_key%in% missing_jrnls)
+
 results_all <- biblioAnalysis(articles_all_df, sep = ";")
 options(width=100)
 # a summary of their analyses
@@ -70,7 +95,7 @@ write.csv(AuGeoAll,"./output/AuGeoAll.csv")
 
 # TO STREAMLINE, select only the doi of the article, the journal, the year published, and the information on author country
 # note that all author countries are in a single column
-all_articles_geodata<-AuGeoAll %>% select(DI,SO,PY,AU_CO,journal_cat)
+all_articles_geodata<-AuGeoAll %>% select(DI,SO,PY,AU_CO,journal_cat, pair_key)
 all_articles_geodata<-droplevels(all_articles_geodata)
 str(all_articles_geodata)
 
@@ -82,7 +107,7 @@ tempDF <- data.frame(lapply(tempDF, as.character), stringsAsFactors=FALSE) # Nee
 all_articles_geodata<-cbind(all_articles_geodata,tempDF)
 rm(tempDF)
 str(all_articles_geodata)
-all_articles_geodata<-all_articles_geodata %>% gather(author,country,6:ncol(all_articles_geodata))
+all_articles_geodata<-all_articles_geodata %>% gather(author,country,7:ncol(all_articles_geodata))
 
 all_articles_geodata$author<-gsub("V","",all_articles_geodata$author) # remove the V, now have the author order
 all_articles_geodata$author<-as.numeric(all_articles_geodata$author)
