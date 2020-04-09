@@ -18,23 +18,26 @@ library(purrr)
 # load journal list and pairs
 MirrorPairs<-read_csv(file="./data/MirrorPairs.csv")
 MirrorPairs
-
+MirrorPairs <- MirrorPairs%>%
+  select(Journal = SO, JrnlType = journal_cat, pair_key)
 
 # data
 # load(file="./output/ALLDATA.RData")
 ALLDATA<-read_csv(file="./output/all_Journal_author_countries.csv")
 ALLDATA$X1<-NULL
-head(ALLDATA,10)
+head(ALLDATA,20)
 str(ALLDATA)
 CountryData <- read.csv("data/CLASS.csv", header = TRUE)
 CountryData <- CountryData[-1,]
-
+summary(CountryData)
 head(ALLDATA)
 
 AllData <- ALLDATA %>%
   select(DOI = DI, Journal = SO, Year = PY, AuthorNum = author,
          Country = country, Code = country_code, JrnlType = journal_cat, pair_key)
 
+head(AllData)
+head(MirrorPairs)
 CountryData <- CountryData %>%
   select(Code,Region, IncomeGroup = Income.group)
 
@@ -42,7 +45,13 @@ CountryData <- CountryData %>%
 AllData <- merge(AllData, CountryData, by="Code", all.x=TRUE) # merge 
 
 head(AllData)
-# 
+
+AllData$IncomeGroup<- ordered(AllData$IncomeGroup, levels = c("Low income", "Lower middle income", "Upper middle income","High income"))
+levels(AllData$IncomeGroup)[levels(AllData$IncomeGroup)=="High income"] <- "High"
+levels(AllData$IncomeGroup)[levels(AllData$IncomeGroup)=="Low income"] <- "Low"
+levels(AllData$IncomeGroup)[levels(AllData$IncomeGroup)=="Lower middle income"] <- "Lower middle"
+levels(AllData$IncomeGroup)[levels(AllData$IncomeGroup)=="Upper middle income"] <- "Upper middle"
+#
 # #scrap the "x" in the journal names, as this data is included in the JrnlType column
 # AllData <- AllData %>%
 #   separate(Journal, c("Journal", NA), ":") %>%
@@ -67,7 +76,12 @@ list(AllData$Journal)
 
 AllData<-left_join(AllData,MirrorPairs,by="Journal")
 colnames(AllData)
-str(AllData)
+summary(AllData$JrnlType.x==AllData$JrnlType.y)
+summary(AllData$pair_key.x==AllData$pair_key.y)
+AllData<-AllData %>%
+  dplyr::select(-JrnlType.y,-pair_key.y) %>% 
+  dplyr::rename(JrnlType=JrnlType.x,pair_key=pair_key.x)
+
 AllData$JrnlType<-as.factor(AllData$JrnlType)
 AllData$Code<-as.factor(AllData$Code)
 AllData$DOI<-as.factor(AllData$DOI)
@@ -79,20 +93,111 @@ str(AllData)
 
 levels(AllData$pair_key)
 
-###################
-# group and Subsets
-####################
-
 # There are some with missing DOI values, if you don't replace these
 # They will be excluded from the grouping
 AllData$DOI<- as.character(AllData$DOI)
 AllData$DOI<- AllData$DOI %>% replace_na("missing_DOI")
 AllData$DOI<- as.factor(AllData$DOI)
 
-# NumbAuthors <- AllData %>% # number of authors per journal 
-#   filter(Year==2019) %>% 
-#   group_by(JrnlType, Journal,Year) %>% 
-#   summarize(n=n_distinct(DOI))
+
+############################################################
+############################################################
+first_author_income_cats<-AllData %>% 
+  filter(AuthorNum==1) %>% 
+  group_by(JrnlType,IncomeGroup) %>% 
+  tally() %>% 
+  mutate(percentage=n/sum(n)*100)
+
+# IncomeCats_allJournals<-bind_rows(OAAllInc,PayWallAllGeoInc)
+# bar_order <- c("High", "Upper-middle", "Lower-middle","Low")
+# levels(IncomeCats_allJournals$IncomeGroup)
+plot1<-ggplot(first_author_income_cats, aes(x=IncomeGroup,y = percentage))+
+  geom_bar(stat = "identity")+
+  # scale_x_discrete(limits = bar_order)+
+  facet_grid(cols = vars(JrnlType))+
+  ggtitle("% of articles in each journal category by 1st authors from diff. income cats.")
+plot1<-plot1+
+  theme_classic()+
+  theme(
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+plot1
+############################################################
+############################################################
+# Here group by countries first. The idea is to compare
+# where authors from each income class publish
+first_jrnlcat_by_income_cats<-AllData %>% 
+  filter(AuthorNum==1) %>% 
+  group_by(IncomeGroup,JrnlType) %>% 
+  tally() %>% 
+  mutate(percentage=n/sum(n)*100)
+
+plot2<-ggplot(first_jrnlcat_by_income_cats, aes(x=IncomeGroup,y = percentage, fill=JrnlType))+
+  geom_bar(position="fill",stat = "identity")+
+  scale_fill_manual(values=c("midnightblue","dimgray"))+
+  coord_flip()+
+  ggtitle("% of articles by authors from different income classes in OA and PW journals")
+plot2<-plot2+
+  theme_classic()+
+  scale_y_continuous(breaks = seq(0, 1, 0.10))
+plot2
+
+############################################################
+############################################################
+
+
+############################################################
+############################################################
+OAAllGeo <-AllData %>%
+  filter(AuthorNum == 1) %>%
+  filter(JrnlType=="OA") %>% 
+  filter(Country != "NA" & Code != "NA") %>%
+  group_by(Country, Code)%>%
+  tally() %>% 
+  arrange(desc(n))
+OAAllGeo <-left_join(OAAllGeo, CountryData, by = "Code") %>%
+  filter(IncomeGroup != "NA") %>% 
+  ungroup() %>%
+  mutate(perc=n/sum(n)*100)
+OAAllGeo$perc<-round(OAAllGeo$perc,2)
+OAAllGeo<-arrange(OAAllGeo,desc(OAAllGeo$perc))
+OAAllGeo<- transform(OAAllGeo,Code = reorder(Code,perc))
+
+plot3<-ggplot(OAAllGeo, aes(Code, perc, fill=IncomeGroup))+
+  geom_bar(stat = "identity")+
+  coord_flip()+
+  ggtitle("Country Representation by Income Group OA")
+plot3<-plot3+theme_light()+
+  scale_y_continuous(breaks = seq(0, 100, 10))
+plot3  
+############################################################
+############################################################
+
+############################################################
+############################################################
+PWAllGeo <-AllData %>%
+  filter(AuthorNum == 1) %>%
+  filter(JrnlType=="PW") %>% 
+  filter(Country != "NA" & Code != "NA") %>%
+  group_by(Country, Code)%>%
+  tally() %>% 
+  arrange(desc(n))
+PWAllGeo <-left_join(PWAllGeo, CountryData, by = "Code") %>%
+  filter(IncomeGroup != "NA") %>% 
+  ungroup() %>%
+  mutate(perc=n/sum(n)*100)
+PWAllGeo$perc<-round(PWAllGeo$perc,2)
+PWAllGeo<-arrange(PWAllGeo,desc(PWAllGeo$perc))
+PWAllGeo<- transform(PWAllGeo,Code = reorder(Code,perc))
+
+plot4<-ggplot(PWAllGeo, aes(Code, perc, fill=IncomeGroup))+
+  geom_bar(stat = "identity")+
+  coord_flip()+
+  ggtitle("Country Representation by Income Group OA")
+plot4<-plot4+theme_light()+
+  scale_y_continuous(breaks = seq(0, 100, 10))
+plot4
+############################################################
+############################################################
 
 NumbAuthors <- AllData %>% # average number of authors per journal 
   # filter(Year==2019) %>% 
@@ -104,12 +209,20 @@ NumbAuthors <- AllData %>% # average number of authors per journal
   arrange(Journal)
 NumbAuthors
 
+############################################################
+############################################################
+
+
 NumbArticles <- AllData %>% #number of papers per journal
   filter(Year==2019) %>% 
   group_by(pair_key,JrnlType,Journal) %>% 
   summarize(n=n_distinct(DOI))%>% 
   arrange(Journal)
 NumbArticles
+
+############################################################
+############################################################
+
 
 NumbArtOA <- NumbArticles %>% #number of articles that are Open Access
   filter(JrnlType == "OA")
@@ -118,6 +231,8 @@ NumbArtOA
 TOTAL_NumbArtOA<-sum(NumbArtOA$n) #total number summed accross all OA journals
 TOTAL_NumbArtOA
 
+############################################################
+############################################################
 
 NumbArtPW <- NumbArticles %>% #number of articles that are paywall
   filter(JrnlType == "PW")
@@ -125,6 +240,19 @@ NumbArtPW
 
 TOTAL_NumbArtPW<-sum(NumbArtPW$n) #total number summed accross all OA journals
 TOTAL_NumbArtPW
+
+############################################################
+############################################################
+
+
+
+
+
+
+
+
+
+
 
 OpenAccessAll <- AllData %>% #use the numbers of articles here to select those from paywal journals
   filter(JrnlType == "OA")
@@ -135,6 +263,9 @@ PayWallAll <- AllData %>%
 
 test <- cbind(NumbArtOA, NumbArtPW)
 
+############################################################
+############################################################
+
 #Data subsets by author
 # first author subsets
 FirstAuth <- AllData %>%
@@ -144,6 +275,9 @@ FirstAuthOA <- FirstAuth %>%
   filter(JrnlType == "OA")
 FirstAuthPW <- FirstAuth %>%
   filter(JrnlType == "PW")
+
+############################################################
+############################################################
 
 #last author subsets
 LastAuth <- AllData %>%
@@ -157,6 +291,9 @@ LastAuthOA <- LastAuth %>%
 
 LastAuthPW <- LastAuth %>%
   filter(JrnlType == "PW")
+
+############################################################
+############################################################
 
 
 
@@ -176,73 +313,13 @@ summary(first_and_last_OA$Region_same)
 LastAuthPW
 FirstAuthPW
 
-############################################
-# shaping data to do barcharts of country representation
-# income representation
-# and region representation
-#################################################
-PayWallAllGeo <- PayWallAll %>%
-  filter(Country != "NA" & Code != "NA") %>%
-  group_by(Country, Code)%>%
-  tally() %>% 
-  arrange(desc(n))
-
-
-PayWallAllGeo <- left_join(PayWallAllGeo, CountryData, by = "Code")
-
-PayWallAllGeoInc <- PayWallAllGeo %>%
-  filter(IncomeGroup != "NA") %>%
-  group_by(IncomeGroup)%>%
-  tally()
-
-OAAllGeo <- OpenAccessAll %>%
-  filter(Country != "NA" & Code != "NA") %>%
-  group_by(Country, Code)%>%
-  tally() %>% 
-  arrange(desc(n))
-
-OAAllGeo <- left_join(OAAllGeo, CountryData, by = "Code")
-
-OAAllInc <- OAAllGeo %>%
-  filter(IncomeGroup != "NA") %>%
-  group_by(IncomeGroup) %>%
-  tally()
-
-#Country representation by income group
-
-PayWallAllGeo <- transform(PayWallAllGeo,Country = reorder(Country,n))
-
-ggplot(PayWallAllGeo, aes(Country, n, fill = IncomeGroup))+
-  geom_bar(stat = "identity")+
-  coord_flip()+
-  ggtitle("Country Representation by IncomeGroup PW")
 
 
 
 
-COUNTS_ALL<-full_join(PayWallAllGeo,OAAllGeo,by="Code") %>% 
-  select(Country = Country.x, Region = Region.x,
-               IncomeGroup = IncomeGroup.x, 
-               Code, n_PW = n.x, n_OA = n.y) %>% replace_na(list(n_OA=0))
 
 
-COUNTS_ALL$n_TOT<-COUNTS_ALL$n_PW+COUNTS_ALL$n_OA
-COUNTS_ALL$PW_perc<-COUNTS_ALL$n_PW/COUNTS_ALL$n_TOT*100
-COUNTS_ALL$OA_perc<-COUNTS_ALL$n_OA/COUNTS_ALL$n_TOT*100
-COUNTS_ALL$OA_perc<-round(COUNTS_ALL$OA_perc,2)
-COUNTS_ALL$PW_perc<-round(COUNTS_ALL$PW_perc,2)
 
-COUNTS_ALL<-COUNTS_ALL %>% arrange(desc(COUNTS_ALL$PW_perc))
-
-COUNTS_ALL <- transform(COUNTS_ALL,Country = reorder(Country,PW_perc))
-
-plot1<-ggplot(COUNTS_ALL, aes(Country, PW_perc, fill = IncomeGroup))+
-  geom_bar(stat = "identity")+
-  coord_flip()+
-  ggtitle("Country Representation by Income Group OA")
-plot1<-plot1+theme_light()+
-  scale_y_continuous(breaks = seq(0, 100, 10))
-plot1  
 
 
 
@@ -256,23 +333,11 @@ ggplot(OAAllGeo, aes(Country, n, fill = IncomeGroup))+
   ggtitle("Country Representation by Income Group OA")
 
 #income representation of all authors PW
-
 PayWallAllGeoInc$JrnlType<-"PW"
 PayWallAllGeoInc$Pcnt<-PayWallAllGeoInc$n/(sum(PayWallAllGeoInc$n))*100
 
-
 OAAllInc$JrnlType<-"OA"
 OAAllInc$Pcnt<-OAAllInc$n/(sum(OAAllInc$n))*100
-
-IncomeCats_allJournals<-bind_rows(OAAllInc,PayWallAllGeoInc)
-
-ggplot(IncomeCats_allJournals, aes(x=IncomeGroup,
-                                   y = Pcnt, fill = JrnlType))+
-  geom_bar(position="dodge",stat = "identity")+
-  ggtitle("Countries in each Income Group")
-
-
-
 
 
 

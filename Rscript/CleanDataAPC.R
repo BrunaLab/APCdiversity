@@ -128,6 +128,15 @@ head(all_articles_geodata,10)
 summary(all_articles_geodata)
 write.csv(all_articles_geodata,"./output/all_Journal_author_countries.csv")
 
+
+
+
+
+
+
+
+
+
 # ################################################################
 # # THIS IS FOR THE X JOURNALS, WHCIH WERE DOWNLOADED FROM SCOPUS
 # ################################################################
