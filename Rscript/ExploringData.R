@@ -101,6 +101,71 @@ AllData$DOI<- as.factor(AllData$DOI)
 
 
 ############################################################
+# Total number of articles in study
+############################################################
+
+
+NumbArticles <- AllData %>% #number of papers per journal
+  group_by(pair_key,JrnlType,Journal) %>% 
+  summarize(n=n_distinct(DOI))%>% 
+  arrange(Journal)
+NumbArticles
+
+
+############################################################
+# Number of articles in each OA Journal
+# and
+# total number of OA articles (all journals pooled)
+############################################################
+NumbArtOA <- NumbArticles %>% #number of articles that are Open Access
+  filter(JrnlType == "OA")
+NumbArtOA
+
+TOTAL_NumbArtOA<-sum(NumbArtOA$n) #total number summed accross all OA journals
+TOTAL_NumbArtOA
+
+############################################################
+# Number of articles in each PW Journal
+# and
+# total number of PW articles (all journals pooled)
+############################################################
+
+NumbArtPW <- NumbArticles %>% #number of articles that are paywall
+  filter(JrnlType == "PW")
+NumbArtPW
+
+TOTAL_NumbArtPW<-sum(NumbArtPW$n) #total number summed accross all OA journals
+TOTAL_NumbArtPW
+
+
+############################################################
+# Mean No. of authors per article (& SD) for each journal
+############################################################
+AvgNumbAuthors <- AllData %>% # average number of authors per journal 
+  # filter(Year==2019) %>% 
+  group_by(JrnlType,Journal,pair_key,DOI) %>% 
+  arrange(JrnlType, Journal) %>% 
+  filter(AuthorNum == max(AuthorNum)) %>% 
+  group_by(pair_key,JrnlType,Journal) %>% 
+  summarize(avg_n=mean(AuthorNum),sd_n=sd(AuthorNum)) %>% 
+  arrange(Journal)
+AvgNumbAuthors
+
+############################################################
+# histogram of author number and mean/Sd number of 
+# authors (all journals pooled)
+############################################################
+AvgNumbAuthorsAll <- AllData %>% # average number of authors per journal 
+  group_by(DOI) %>% 
+  filter(AuthorNum == max(AuthorNum)) %>% 
+  ungroup()
+hist(AvgNumbAuthorsAll$AuthorNum, breaks=150)
+
+summarize(AvgNumbAuthorsAll,avg_n=mean(AuthorNum),sd_n=sd(AuthorNum))
+
+############################################################
+# For each journal category: 
+# the % of articles by 1st authores from different national income classes
 ############################################################
 first_author_income_cats<-AllData %>% 
   filter(AuthorNum==1) %>% 
@@ -121,7 +186,10 @@ plot1<-plot1+
   theme(
     axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
 plot1
+
 ############################################################
+# For 1st authors from each national income class: 
+# The % of articles that were in PW vs OA journals
 ############################################################
 # Here group by countries first. The idea is to compare
 # where authors from each income class publish
@@ -142,11 +210,10 @@ plot2<-plot2+
 plot2
 
 ############################################################
+# for articles in OA journals: the number of articles by
+# 1st authors in each country
 ############################################################
 
-
-############################################################
-############################################################
 OAAllGeo <-AllData %>%
   filter(AuthorNum == 1) %>%
   filter(JrnlType=="OA") %>% 
@@ -169,10 +236,10 @@ plot3<-ggplot(OAAllGeo, aes(Code, perc, fill=IncomeGroup))+
 plot3<-plot3+theme_light()+
   scale_y_continuous(breaks = seq(0, 100, 10))
 plot3  
-############################################################
-############################################################
 
 ############################################################
+# for articles in PW journals: the number of articles by
+# 1st authors in each country
 ############################################################
 PWAllGeo <-AllData %>%
   filter(AuthorNum == 1) %>%
@@ -196,53 +263,7 @@ plot4<-ggplot(PWAllGeo, aes(Code, perc, fill=IncomeGroup))+
 plot4<-plot4+theme_light()+
   scale_y_continuous(breaks = seq(0, 100, 10))
 plot4
-############################################################
-############################################################
 
-
-NumbArticles <- AllData %>% #number of papers per journal
-  group_by(pair_key,JrnlType,Journal) %>% 
-  summarize(n=n_distinct(DOI))%>% 
-  arrange(Journal)
-NumbArticles
-
-############################################################
-############################################################
-
-
-NumbArtOA <- NumbArticles %>% #number of articles that are Open Access
-  filter(JrnlType == "OA")
-NumbArtOA
-
-TOTAL_NumbArtOA<-sum(NumbArtOA$n) #total number summed accross all OA journals
-TOTAL_NumbArtOA
-
-############################################################
-############################################################
-
-NumbArtPW <- NumbArticles %>% #number of articles that are paywall
-  filter(JrnlType == "PW")
-NumbArtPW
-
-TOTAL_NumbArtPW<-sum(NumbArtPW$n) #total number summed accross all OA journals
-TOTAL_NumbArtPW
-
-############################################################
-############################################################
-
-
-NumbAuthors <- AllData %>% # average number of authors per journal 
-  # filter(Year==2019) %>% 
-  group_by(JrnlType,Journal,pair_key,DOI) %>% 
-  arrange(JrnlType, Journal) %>% 
-  filter(AuthorNum == max(AuthorNum)) %>% 
-  group_by(pair_key,JrnlType,Journal) %>% 
-  summarize(avg_n=mean(AuthorNum),sd_n=sd(AuthorNum)) %>% 
-  arrange(Journal)
-NumbAuthors
-
-############################################################
-############################################################
 
 
 ##################################################
@@ -316,28 +337,41 @@ DivMetricsPW <- as.data.frame(cbind(rich, abund, DivSimpson))
 DivMetricsPW$Journal <- SiteBySpec2$Journal
 DivMetricsPW$EffectSpecNum <- 1/(1-DivMetricsPW$DivSimpson)
 
-#TODO: "journal was the key back when the X was removed from the name. 
-# now need to do by the "pair key" that will ID pairs of journals (since not)
-# all of them are simply name/name x
-
-MirrorPairs
-
 DivMetricsOA<-inner_join(DivMetricsOA,MirrorPairs,by="Journal")
 DivMetricsPW<-inner_join(DivMetricsPW,MirrorPairs,by="Journal")
 DivMetrics<-bind_rows(DivMetricsOA,DivMetricsPW) %>% 
   arrange(pair_key)
 
+colnames(DivMetrics)
+
+DivMetrics<-select(DivMetrics, Journal, pair_key,JrnlType,
+                   rich, DivSimpson,abund, EffectSpecNum)
 
 
 ###########
-# TODO: need to reshape to calcl the diffs and do the box plot
-DivMetricsALL$DeltaDiv <- DivMetricsALL$EffectSpecNumPW - DivMetricsALL$EffectSpecNumOA
+
+DivMetricsOA<-DivMetrics %>% filter(JrnlType=="OA")
+DivMetricsPW<-DivMetrics %>% filter(JrnlType=="PW")
+
+DivMetricsPW_wide<-DivMetricsPW %>% 
+  select(-Journal) %>% 
+  spread(JrnlType,DivSimpson) %>% 
+  dplyr::rename(PW_DivSimpson=PW,PW_rich=rich,PW_abund=abund,PW_EffectSpecNum=EffectSpecNum)
+
+DivMetricsOA_wide<-DivMetricsOA %>% 
+  select(-Journal) %>% 
+  spread(JrnlType,DivSimpson) %>% 
+  dplyr::rename(OA_DivSimpson=OA,OA_rich=rich,OA_abund=abund,OA_EffectSpecNum=EffectSpecNum)
+
+DivMetricsALL<-left_join(DivMetricsPW_wide,DivMetricsOA_wide,by="pair_key")
+
+DivMetricsALL$DeltaDiv <- DivMetricsALL$PW_DivSimpson - DivMetricsALL$OA_DivSimpson
 
 # DivMetrics$DeltaDiv <- DivMetricsPW$EffectSpecNumPW - DivMetricsOA$EffectSpecNumOA
 
 boxplot(DivMetricsALL$DeltaDiv)
-median(DivMetricsALL$DeltaDiv)
-
+median(DivMetricsALL$DeltaDiv,na.rm=TRUE)
+str(DivMetricsALL)
 write.csv(DivMetrics, "CleanData/FirstDivMetricsByJrnl.csv", row.names = FALSE)
 
 ###############
@@ -345,77 +379,93 @@ write.csv(DivMetrics, "CleanData/FirstDivMetricsByJrnl.csv", row.names = FALSE)
 #################
 #Calculate the diversity indices for ENTIRE OA COMMUNITY OF PAPERS
 # First Authors
-SiteBySpecOA <- FirstAuthOA %>%
+SiteBySpecOA_pooled_FIRST<-AllData %>% 
+  filter(Country != "NA" & Code != "NA") %>%
+  filter(JrnlType=="OA") %>% 
+  filter(AuthorNum==1) %>%
   group_by(Country)%>%
   tally()
-SiteBySpecOA <- SiteBySpecOA %>%
+
+SiteBySpecOA_pooled_FIRST <- SiteBySpecOA_pooled_FIRST %>%
   spread(Country, n)
-OADiversity <- diversity(SiteBySpecOA, index = "invsimpson")
-OARichness <- length(SiteBySpecOA)
+OADiversity_FIRST <- diversity(SiteBySpecOA_pooled_FIRST, index = "invsimpson")
+OARichness_FIRST <- length(SiteBySpecOA_pooled_FIRST)
 
 #DIversity for the entire Community of PW papers
-SiteBySpecPW <- FirstAuthPW %>%
-  filter(Country != "NA") %>%
+SiteBySpecPW_pooled_FIRST<-AllData %>% 
+  filter(Country != "NA" & Code != "NA") %>%
+  filter(JrnlType=="PW") %>% 
+  filter(AuthorNum==1) %>%
   group_by(Country) %>%
   tally()
 
-SiteBySpecPW <- SiteBySpecPW %>%
+SiteBySpecPW_pooled_FIRST <- SiteBySpecPW_pooled_FIRST %>%
   spread(Country, n)
-PWDiversity <- diversity(SiteBySpecPW, index = "invsimpson")
-PWRichness <- length(SiteBySpecPW)
+PWDiversity_FIRST <- diversity(SiteBySpecPW_pooled_FIRST, index = "invsimpson")
+PWRichness_FIRST <- length(SiteBySpecPW_pooled_FIRST)
 
-DivMetricsFullPools <- as.data.frame(cbind(OADiversity, OARichness, PWDiversity, PWRichness))
-write.csv(DivMetricsFullPools, "CleanData/DivMetricsFullPools.csv", row.names = FALSE)
+DivMetricsFullPools_FIRST <- as.data.frame(cbind(OADiversity_FIRST, OARichness_FIRST, PWDiversity_FIRST, PWRichness_FIRST))
+write.csv(DivMetricsFullPools_FIRST, "CleanData/DivMetricsFullPools_FIRST.csv", row.names = FALSE)
+
+
 # Calculate the diversity indices for ENTIRE OA COMMUNITY OF PAPERS 
 # LAST AUTHOR
-
-SiteBySpecOA <- LastAuthOA %>%
-  group_by(Country)%>%
+SiteBySpecOA_pooled_last <- AllData %>%
+  filter(Country != "NA" & Code != "NA") %>%
+  filter(JrnlType=="OA") %>% 
+  group_by(DOI) %>% 
+  filter(AuthorNum == max(AuthorNum)) %>% 
+  group_by(Country) %>% 
   tally()
-SiteBySpecOA <- SiteBySpecOA %>%
+  
+SiteBySpecOA_pooled_last <- SiteBySpecOA_pooled_last %>%
   spread(Country, n)
-OADiversity <- diversity(SiteBySpecOA, index = "invsimpson")
-OARichness <- length(SiteBySpecOA)
+OADiversity_LAST <- diversity(SiteBySpecOA_pooled_last, index = "invsimpson")
+OARichness_LAST <- length(SiteBySpecOA_pooled_last)
 
 #DIversity for the entire Community of PW papers
-SiteBySpecPW <- LastAuthPW %>%
-  filter(Country != "NA")
-  
-SiteBySpecPW <- SiteBySpecPW %>%
-  group_by(Country) %>%
+SiteBySpecPW_pooled_last <- AllData %>%
+  filter(Country != "NA" & Code != "NA") %>%
+  filter(JrnlType=="PW") %>% 
+  group_by(DOI) %>% 
+  filter(AuthorNum == max(AuthorNum)) %>% 
+  group_by(Country) %>% 
   tally()
 
-SiteBySpecPW <- SiteBySpecPW %>%
+SiteBySpecPW_pooled_last <- SiteBySpecPW_pooled_last %>%
   spread(Country, n)
-PWDiversity <- diversity(SiteBySpecPW, index = "invsimpson")
-PWRichness <- length(SiteBySpecPW)
+PWDiversity_LAST <- diversity(SiteBySpecPW_pooled_last, index = "invsimpson")
+PWRichness_LAST <- length(SiteBySpecPW_pooled_last)
 
-DivMetricsFullPoolsLast <- as.data.frame(cbind(OADiversity, OARichness, PWDiversity, PWRichness))
+DivMetricsFullPoolsLast <- as.data.frame(cbind(OADiversity_LAST, OARichness_LAST, PWDiversity_LAST, PWRichness_LAST))
 write.csv(DivMetricsFullPoolsLast, "CleanData/DivMetricsFullPoolLast.csv", row.names = FALSE)
 
 #Calculate the diversity indices for ENTIRE OA COMMUNITY OF PAPERS
 # ALL AUTHORS
-SiteBySpecOA <- OpenAccessAll %>%
-  filter(Country != "NA") %>%
-  group_by(Country)%>%
+SiteBySpecOA_pooled_ALL <- AllData %>%
+  filter(Country != "NA" & Code != "NA") %>%
+  filter(JrnlType=="OA") %>% 
+  group_by(Country) %>% 
   tally()
-SiteBySpecOA <- SiteBySpecOA %>%
+
+SiteBySpecOA_pooled_ALL <- SiteBySpecOA_pooled_ALL %>%
   spread(Country, n)
-OADiversity <- diversity(SiteBySpecOA, index = "invsimpson")
-OARichness <- length(SiteBySpecOA)
+OADiversity_ALL <- diversity(SiteBySpecOA_pooled_ALL, index = "invsimpson")
+OARichness_ALL <- length(SiteBySpecOA_pooled_ALL)
 
 #DIversity for the entire Community of PW papers
-SiteBySpecPW <- PayWallAll %>%
-  filter(Country != "NA") %>%
-  group_by(Country) %>%
+SiteBySpecPW_pooled_ALL <- AllData %>%
+  filter(Country != "NA" & Code != "NA") %>%
+  filter(JrnlType=="PW") %>% 
+  group_by(Country) %>% 
   tally()
 
-SiteBySpecPW <- SiteBySpecPW %>%
+SiteBySpecPW_pooled_ALL <- SiteBySpecPW_pooled_ALL %>%
   spread(Country, n)
-PWDiversity <- diversity(SiteBySpecPW, index = "invsimpson")
-PWRichness <- length(SiteBySpecPW)
+PWDiversity_ALL <- diversity(SiteBySpecPW_pooled_ALL, index = "invsimpson")
+PWRichness_ALL <- length(SiteBySpecPW_pooled_ALL)
 
-DivMetricsAllAuthors <- as.data.frame(cbind(OADiversity, OARichness, PWDiversity, PWRichness))
+DivMetricsAllAuthors <- as.data.frame(cbind(OADiversity_ALL, OARichness_ALL, PWDiversity_ALL, PWRichness_ALL))
 write.csv(DivMetricsAllAuthors, "CleanData/DivMetricsAllAuthors.csv", row.names = FALSE)
 #sum(abund)# double check we have the same number of articles still
 #sum(SiteBySpec) #check against this
@@ -424,8 +474,32 @@ write.csv(DivMetricsAllAuthors, "CleanData/DivMetricsAllAuthors.csv", row.names 
 #############################################################################################
 # FOR LOOP
 ###################################################################################################
-n_distinct(FirstAuthPW$Journal) #number of journals in PW
-n_distinct(FirstAuthOA$Journal) #number of jourals in OA, they are the same!
+
+FirstAuthPW<-AllData %>% 
+  filter(Country != "NA" & Code != "NA") %>%
+  filter(JrnlType=="PW") %>% 
+  filter(AuthorNum==1)
+FirstAuthPW$Journal<-droplevels(FirstAuthPW$Journal)
+
+
+FirstAuthOA<-AllData %>% 
+  filter(Country != "NA" & Code != "NA") %>%
+  filter(JrnlType=="OA") %>% 
+  filter(AuthorNum==1)
+FirstAuthOA$Journal<-droplevels(FirstAuthOA$Journal)
+
+nlevels(FirstAuthPW$Journal)#number of journals in PW
+nlevels(FirstAuthOA$Journal)#number of jourals in OA, they are the same!
+
+
+
+
+
+
+
+
+
+
 
 
 #############
