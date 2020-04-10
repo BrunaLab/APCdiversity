@@ -199,22 +199,8 @@ plot4
 ############################################################
 ############################################################
 
-NumbAuthors <- AllData %>% # average number of authors per journal 
-  # filter(Year==2019) %>% 
-  group_by(JrnlType,Journal,pair_key,DOI) %>% 
-  arrange(JrnlType, Journal) %>% 
-  filter(AuthorNum == max(AuthorNum)) %>% 
-  group_by(pair_key,JrnlType,Journal) %>% 
-  summarize(avg_n=mean(AuthorNum),sd_n=sd(AuthorNum)) %>% 
-  arrange(Journal)
-NumbAuthors
-
-############################################################
-############################################################
-
 
 NumbArticles <- AllData %>% #number of papers per journal
-  filter(Year==2019) %>% 
   group_by(pair_key,JrnlType,Journal) %>% 
   summarize(n=n_distinct(DOI))%>% 
   arrange(Journal)
@@ -245,192 +231,106 @@ TOTAL_NumbArtPW
 ############################################################
 
 
-
-
-
-
-
-
-
-
-
-OpenAccessAll <- AllData %>% #use the numbers of articles here to select those from paywal journals
-  filter(JrnlType == "OA")
-
-PayWallAll <- AllData %>% 
-  filter(JrnlType == "PW")
-
-
-test <- cbind(NumbArtOA, NumbArtPW)
+NumbAuthors <- AllData %>% # average number of authors per journal 
+  # filter(Year==2019) %>% 
+  group_by(JrnlType,Journal,pair_key,DOI) %>% 
+  arrange(JrnlType, Journal) %>% 
+  filter(AuthorNum == max(AuthorNum)) %>% 
+  group_by(pair_key,JrnlType,Journal) %>% 
+  summarize(avg_n=mean(AuthorNum),sd_n=sd(AuthorNum)) %>% 
+  arrange(Journal)
+NumbAuthors
 
 ############################################################
 ############################################################
 
-#Data subsets by author
-# first author subsets
-FirstAuth <- AllData %>%
-  filter(AuthorNum == 1)
-
-FirstAuthOA <- FirstAuth %>%
-  filter(JrnlType == "OA")
-FirstAuthPW <- FirstAuth %>%
-  filter(JrnlType == "PW")
-
-############################################################
-############################################################
-
-#last author subsets
-LastAuth <- AllData %>%
-  group_by(DOI) %>%
-  arrange(AuthorNum) %>%
-  slice(n()) %>%
-  ungroup
-
-LastAuthOA <- LastAuth %>%
-  filter(JrnlType == "OA")
-
-LastAuthPW <- LastAuth %>%
-  filter(JrnlType == "PW")
-
-############################################################
-############################################################
-
-
-
-#########
-LastAuthOA
-FirstAuthOA
-
-first_and_last_OA<-inner_join(FirstAuthOA,LastAuthOA,by="DOI")
-first_and_last_OA$country_same<-first_and_last_OA$Country.x==first_and_last_OA$Country.y
-summary(first_and_last_OA$country_same)  
-first_and_last_OA$Income_same<-first_and_last_OA$IncomeGroup.x==first_and_last_OA$IncomeGroup.y
-summary(first_and_last_OA$Income_same)  
-first_and_last_OA$Region_same<-first_and_last_OA$Region.x==first_and_last_OA$Region.y
-summary(first_and_last_OA$Region_same)  
-
-
-LastAuthPW
-FirstAuthPW
-
-
-
-
-
-
-
-
-
-
-
-# Country Representation All authors OA
-
-OAAllGeo <- transform(OAAllGeo,Country = reorder(Country,n))
-
-ggplot(OAAllGeo, aes(Country, n, fill = IncomeGroup))+
-  geom_bar(stat = "identity")+
-  coord_flip()+
-  ggtitle("Country Representation by Income Group OA")
-
-#income representation of all authors PW
-PayWallAllGeoInc$JrnlType<-"PW"
-PayWallAllGeoInc$Pcnt<-PayWallAllGeoInc$n/(sum(PayWallAllGeoInc$n))*100
-
-OAAllInc$JrnlType<-"OA"
-OAAllInc$Pcnt<-OAAllInc$n/(sum(OAAllInc$n))*100
-
-
-
-
-ggplot(PayWallAllGeoInc, aes(IncomeGroup,
-                             y = n, fill = IncomeGroup))+
-  geom_bar(stat = "identity")+
-  ggtitle("Author Country Income Group For all Authors
-          in PW Journals")
-# income representation of all authors OA
-ggplot(OAAllInc, aes(IncomeGroup,
-                     y = n, fill = IncomeGroup))+
-  geom_bar(stat = "identity")+
-  ggtitle("Author Country Income Group for All Authors
-          in OA Journals")
 
 ##################################################
 #SUBSET and bootstrap Paywall Journals by the number found in Open Access Journals
 ##################################################
 #TODO: convert this to a function, no need to do the same thing for both of them
 
-#Calculate the diversity indices for OA JOURNALS by each JOURNAL!
-SiteBySpec1 <- FirstAuthOA %>%
+#################################################################
+# diversity indices for OA JOURNALS by each JOURNAL 1st AUTHORS
+#################################################################
+SiteBySpec1<-AllData %>% 
+  filter(Country != "NA" & Code != "NA") %>%
+  filter(JrnlType=="OA") %>% 
+  filter(AuthorNum==1) %>%
   group_by(Journal, Country)%>%
   tally()
 
 SiteBySpec1 <- cast(SiteBySpec1, Journal ~ Country, value = 'n')
 SiteBySpec1[is.na(SiteBySpec1)] <- 0
 ncols_SiteBySpec1<-ncol(SiteBySpec1)
-CountriesOA <- names(SiteBySpec1[,2:ncols_SiteBySpec1]) #check this to be sure this 
+Countries <- names(SiteBySpec1[,2:ncols_SiteBySpec1]) #check this to be sure this 
 
 ####
 #Add diversity metrics
-country_countsOA <- SiteBySpec1[,CountriesOA] #final site by species matrix
-row.names(country_countsOA) <- SiteBySpec1$Journal #add rownames for journals
+country_counts <- SiteBySpec1[,Countries] #final site by species matrix
+row.names(country_counts) <- SiteBySpec1$Journal #add rownames for journals
 
 #simpson diversity index
-DivSimpsonOA <-diversity(country_countsOA, index = "simpson")
+DivSimpson <-diversity(country_counts, index = "simpson")
 
 #abundance
-abundOA <-rowSums(country_countsOA)
+abund <-rowSums(country_counts)
 
 #richness
-richOA <- rowSums(country_countsOA > 0)
+rich <- rowSums(country_counts > 0)
 
-DivMetricsOA <- as.data.frame(cbind(richOA, abundOA, DivSimpsonOA))
+DivMetricsOA <- as.data.frame(cbind(rich, abund, DivSimpson)) 
 DivMetricsOA$Journal <- SiteBySpec1$Journal
-DivMetricsOA$EffectSpecNumOA <- 1/(1-DivMetricsOA$DivSimpsonOA)
+DivMetricsOA$EffectSpecNum <- 1/(1-DivMetricsOA$DivSimpson)
 
-#Calculate the diversity indices for PW JOURNALS by each JOURNAL!
-SiteBySpec2 <- FirstAuthPW %>%
-  filter(Country != "NA") %>%
+#################################################################
+# diversity indices for PW JOURNALS by each JOURNAL 1st AUTHORS
+#################################################################
+SiteBySpec2<-AllData %>% 
+  filter(Country != "NA" & Code != "NA") %>%
+  filter(JrnlType=="PW") %>% 
+  filter(AuthorNum==1) %>%
   group_by(Journal, Country)%>%
   tally()
 
 SiteBySpec2 <- cast(SiteBySpec2, Journal ~ Country, value = 'n')
 SiteBySpec2[is.na(SiteBySpec2)] <- 0
 ncols_SiteBySpec2<-ncol(SiteBySpec2)
-CountriesPW <- names(SiteBySpec2[,2:ncols_SiteBySpec2]) #check this to be sure this 
+Countries<- names(SiteBySpec2[,2:ncols_SiteBySpec2]) #check this to be sure this 
 
 ####
 #Add diversity metrics
-country_countsPW <- SiteBySpec2[,CountriesPW] #final site by species matrix
-row.names(country_countsPW) <- SiteBySpec2$Journal #add rownames for journals
+country_counts <- SiteBySpec2[,Countries] #final site by species matrix
+row.names(country_counts) <- SiteBySpec2$Journal #add rownames for journals
 
 #simpson diversity index
-DivSimpsonPW <-diversity(country_countsPW, index = "simpson")
+DivSimpson <-diversity(country_counts, index = "simpson")
 
 #abundance
-abundPW <-rowSums(country_countsPW)
+abund <-rowSums(country_counts)
 
 #richness
-richPW <- rowSums(country_countsPW > 0)
+rich <- rowSums(country_counts > 0)
 
-DivMetricsPW <- as.data.frame(cbind(richPW, abundPW, DivSimpsonPW))
+DivMetricsPW <- as.data.frame(cbind(rich, abund, DivSimpson))
 DivMetricsPW$Journal <- SiteBySpec2$Journal
-DivMetricsPW$EffectSpecNumPW <- 1/(1-DivMetricsPW$DivSimpsonPW)
+DivMetricsPW$EffectSpecNum <- 1/(1-DivMetricsPW$DivSimpson)
 
 #TODO: "journal was the key back when the X was removed from the name. 
 # now need to do by the "pair key" that will ID pairs of journals (since not)
 # all of them are simply name/name x
 
+MirrorPairs
 
-DivMetricsPW<-left_join(DivMetricsPW,MirrorPairs,by="Journal")
-DivMetricsPW$notes<-NULL
+DivMetricsOA<-inner_join(DivMetricsOA,MirrorPairs,by="Journal")
+DivMetricsPW<-inner_join(DivMetricsPW,MirrorPairs,by="Journal")
+DivMetrics<-bind_rows(DivMetricsOA,DivMetricsPW) %>% 
+  arrange(pair_key)
 
-DivMetricsOA<-left_join(DivMetricsOA,MirrorPairs,by="Journal")
-DivMetricsOA$notes<-NULL
 
-colnames(DivMetricsOA)
-colnames(DivMetricsPW)
 
-DivMetricsALL <- merge(DivMetricsOA, DivMetricsPW, by = "pair_key") 
+###########
+# TODO: need to reshape to calcl the diffs and do the box plot
 DivMetricsALL$DeltaDiv <- DivMetricsALL$EffectSpecNumPW - DivMetricsALL$EffectSpecNumOA
 
 # DivMetrics$DeltaDiv <- DivMetricsPW$EffectSpecNumPW - DivMetricsOA$EffectSpecNumOA
@@ -439,9 +339,6 @@ boxplot(DivMetricsALL$DeltaDiv)
 median(DivMetricsALL$DeltaDiv)
 
 write.csv(DivMetrics, "CleanData/FirstDivMetricsByJrnl.csv", row.names = FALSE)
-
-
-?diversity
 
 ###############
 #DIVERSITY AND RICHNESS USING ENTIRE POOL FROM EACH JRNL TYPE
