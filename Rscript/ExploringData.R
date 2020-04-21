@@ -272,99 +272,32 @@ plot4
 #TODO: convert this to a function, no need to do the same thing for both of them
 
 #################################################################
-# diversity indices for OA JOURNALS by each JOURNAL 1st AUTHORS
+# calculate diversity indices BY CAT AND JOURNAL
 #################################################################
-SiteBySpec1<-AllData %>% 
-  filter(Country != "NA" & Code != "NA") %>%
-  filter(JrnlType=="OA") %>% 
-  filter(AuthorNum==1) %>%
-  group_by(Journal, Country)%>%
-  tally()
 
-SiteBySpec1 <- cast(SiteBySpec1, Journal ~ Country, value = 'n')
-SiteBySpec1[is.na(SiteBySpec1)] <- 0
-ncols_SiteBySpec1<-ncol(SiteBySpec1)
-Countries <- names(SiteBySpec1[,2:ncols_SiteBySpec1]) #check this to be sure this 
+source("./Rscript/functions/divCalc.R") # enter as divCalc(df,JrnlType,Author)
+# OA JOURNALS by 1st AUTHORS
+DivMetricsOA<-divCalc(AllData,"OA",1)
+# PW JOURNALS by 1st AUTHORS
+DivMetricsPW<-divCalc(AllData,"PW",1)
 
-####
-#Add diversity metrics
-country_counts <- SiteBySpec1[,Countries] #final site by species matrix
-row.names(country_counts) <- SiteBySpec1$Journal #add rownames for journals
-
-#simpson diversity index
-DivSimpson <-diversity(country_counts, index = "simpson")
-
-#abundance
-abund <-rowSums(country_counts)
-
-#richness
-rich <- rowSums(country_counts > 0)
-
-DivMetricsOA <- as.data.frame(cbind(rich, abund, DivSimpson)) 
-DivMetricsOA$Journal <- SiteBySpec1$Journal
-DivMetricsOA$EffectSpecNum <- 1/(1-DivMetricsOA$DivSimpson)
-
-#################################################################
-# diversity indices for PW JOURNALS by each JOURNAL 1st AUTHORS
-#################################################################
-SiteBySpec2<-AllData %>% 
-  filter(Country != "NA" & Code != "NA") %>%
-  filter(JrnlType=="PW") %>% 
-  filter(AuthorNum==1) %>%
-  group_by(Journal, Country)%>%
-  tally()
-
-SiteBySpec2 <- cast(SiteBySpec2, Journal ~ Country, value = 'n')
-SiteBySpec2[is.na(SiteBySpec2)] <- 0
-ncols_SiteBySpec2<-ncol(SiteBySpec2)
-Countries<- names(SiteBySpec2[,2:ncols_SiteBySpec2]) #check this to be sure this 
-
-####
-#Add diversity metrics
-country_counts <- SiteBySpec2[,Countries] #final site by species matrix
-row.names(country_counts) <- SiteBySpec2$Journal #add rownames for journals
-
-#simpson diversity index
-DivSimpson <-diversity(country_counts, index = "simpson")
-
-#abundance
-abund <-rowSums(country_counts)
-
-#richness
-rich <- rowSums(country_counts > 0)
-
-DivMetricsPW <- as.data.frame(cbind(rich, abund, DivSimpson))
-DivMetricsPW$Journal <- SiteBySpec2$Journal
-DivMetricsPW$EffectSpecNum <- 1/(1-DivMetricsPW$DivSimpson)
-
-DivMetricsOA<-inner_join(DivMetricsOA,MirrorPairs,by="Journal")
-DivMetricsPW<-inner_join(DivMetricsPW,MirrorPairs,by="Journal")
+#############################
+# bind and make wide 
+#############################
 DivMetrics<-bind_rows(DivMetricsOA,DivMetricsPW) %>% 
   arrange(pair_key)
-
 colnames(DivMetrics)
-
-DivMetrics<-select(DivMetrics, Journal, pair_key,JrnlType,
-                   rich, DivSimpson,abund, EffectSpecNum)
-
-
-###########
-
-DivMetricsOA<-DivMetrics %>% filter(JrnlType=="OA")
-DivMetricsPW<-DivMetrics %>% filter(JrnlType=="PW")
-
 DivMetricsPW_wide<-DivMetricsPW %>% 
   select(-Journal) %>% 
-  spread(JrnlType,DivSimpson) %>% 
+  spread(JrnlCat,DivSimpson) %>% 
   dplyr::rename(PW_DivSimpson=PW,PW_rich=rich,PW_abund=abund,PW_EffectSpecNum=EffectSpecNum)
-
 DivMetricsOA_wide<-DivMetricsOA %>% 
   select(-Journal) %>% 
-  spread(JrnlType,DivSimpson) %>% 
+  spread(JrnlCat,DivSimpson) %>% 
   dplyr::rename(OA_DivSimpson=OA,OA_rich=rich,OA_abund=abund,OA_EffectSpecNum=EffectSpecNum)
-
 DivMetricsALL<-left_join(DivMetricsPW_wide,DivMetricsOA_wide,by="pair_key")
 
+# Add Difference in diversity score (DeltaDiv)
 DivMetricsALL$DeltaDiv <- DivMetricsALL$PW_DivSimpson - DivMetricsALL$OA_DivSimpson
 
 # DivMetrics$DeltaDiv <- DivMetricsPW$EffectSpecNumPW - DivMetricsOA$EffectSpecNumOA
@@ -379,6 +312,10 @@ write.csv(DivMetrics, "CleanData/FirstDivMetricsByJrnl.csv", row.names = FALSE)
 #################
 #Calculate the diversity indices for ENTIRE OA COMMUNITY OF PAPERS
 # First Authors
+
+DivMetricsOA<-divCalc(AllData,"OA",1)
+
+
 SiteBySpecOA_pooled_FIRST<-AllData %>% 
   filter(Country != "NA" & Code != "NA") %>%
   filter(JrnlType=="OA") %>% 
@@ -474,29 +411,53 @@ write.csv(DivMetricsAllAuthors, "CleanData/DivMetricsAllAuthors.csv", row.names 
 #############################################################################################
 # FOR LOOP
 ###################################################################################################
-
+# df of all articles in PW journals
 FirstAuthPW<-AllData %>% 
   filter(Country != "NA" & Code != "NA") %>%
   filter(JrnlType=="PW") %>% 
   filter(AuthorNum==1)
 FirstAuthPW$Journal<-droplevels(FirstAuthPW$Journal)
 
-
+# df of all articles in OA journals
 FirstAuthOA<-AllData %>% 
   filter(Country != "NA" & Code != "NA") %>%
   filter(JrnlType=="OA") %>% 
   filter(AuthorNum==1)
 FirstAuthOA$Journal<-droplevels(FirstAuthOA$Journal)
 
-nlevels(FirstAuthPW$Journal)#number of journals in PW
-nlevels(FirstAuthOA$Journal)#number of jourals in OA, they are the same!
+# number oif journals, make sure they are the same!
+nlevels(FirstAuthPW$Journal)==nlevels(FirstAuthOA$Journal)
 
+# How to sample different amounts from different groups is very nicely laid out in this post:
+# https://jennybc.github.io/purrr-tutorial/ls12_different-sized-samples.html
 
+# create a df telling you how many articles published in each OA journal
+# will sample in this amount from the df of PW articles
+OA_sample<-NumbArtOA %>% 
+  select(pair_key,n)
+OA_sample<-ungroup(OA_sample) 
+OA_sample<-select(OA_sample,-JrnlType)
+nlevels(OA_sample$pair_key)
+OA_sample<-droplevels(OA_sample)
+nlevels(OA_sample$pair_key)
 
+PW_papers<-AllData %>%
+  group_by(pair_key) %>% 
+  filter(JrnlType=="PW") 
+nlevels(PW_papers$pair_key)
+levels(PW_papers$pair_key)
+PW_papers<-droplevels(PW_papers)
+nlevels(PW_papers$pair_key)
 
+source("./Rscript/functions/samplePW.R")
+PW_sample<-samplePW(OA_sample,PW_papers)
 
-
-
+# To double check and see which might have been in OA sample but no PW papers
+PW_sample_check<-PW_sample %>% 
+  group_by(pair_key) %>% 
+  summarize(sample_n=n())
+PW_sample_check<-full_join(PW_sample_check,OA_sample, by="pair_key")
+summary(PW_sample_check$sample_n==PW_sample_check$n)
 
 
 
