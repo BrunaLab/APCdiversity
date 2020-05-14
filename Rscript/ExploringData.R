@@ -22,7 +22,6 @@ MirrorPairs <- MirrorPairs%>%
   select(Journal = SO, JrnlType = journal_cat, pair_key)
 
 # data
-# load(file="./output/ALLDATA.RData")
 ALLDATA<-read_csv(file="./output/all_Journal_author_countries.csv")
 ALLDATA$X1<-NULL
 head(ALLDATA,20)
@@ -72,8 +71,6 @@ levels(AllData$IncomeGroup)[levels(AllData$IncomeGroup)=="Upper middle income"] 
 list(AllData$Journal)
 
 # ADD IN THE JOURNAL PAIR_KEY
-
-
 AllData<-left_join(AllData,MirrorPairs,by="Journal")
 colnames(AllData)
 summary(AllData$JrnlType.x==AllData$JrnlType.y)
@@ -90,9 +87,7 @@ AllData$Country<-as.factor(AllData$Country)
 AllData$pair_key<-as.factor(AllData$pair_key)
 AllData$pair_key<-droplevels(AllData$pair_key)
 str(AllData)
-
 levels(AllData$pair_key)
-
 # There are some with missing DOI values, if you don't replace these
 # They will be excluded from the grouping
 AllData$DOI<- as.character(AllData$DOI)
@@ -100,17 +95,15 @@ AllData$DOI<- AllData$DOI %>% replace_na("missing_DOI")
 AllData$DOI<- as.factor(AllData$DOI)
 
 
+rm(ALLDATA, CountryData)
 ############################################################
 # Total number of articles in study
 ############################################################
-
-
 NumbArticles <- AllData %>% #number of papers per journal
   group_by(pair_key,JrnlType,Journal) %>% 
   summarize(n=n_distinct(DOI))%>% 
   arrange(Journal)
 NumbArticles
-
 
 ############################################################
 # Number of articles in each OA Journal
@@ -187,6 +180,24 @@ plot1<-plot1+
     axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
 plot1
 
+
+# As a waffle plot
+library(waffle)
+foo<-filter(first_author_income_cats,JrnlType=="OA")
+percOA<-foo$percentage
+names(percOA)<-as.character(foo$IncomeGroup)
+foo2<-filter(first_author_income_cats,JrnlType=="PW")
+percPW<-foo2$percentage
+names(percPW)<-as.character(foo2$IncomeGroup)
+waffle(percPW,rows=14, size=1,legend_pos = "top", title = "1st Authors - Paywalled Articles")
+
+
+waffle(numberOA/5,rows=6, size=1,legend_pos = "top", title = "1st Authors - Open Access Articles")
+
+gridExtra::grid.arrange(
+  waffle(percOA,rows=14, size=1,legend_pos = "top", title = "1st Authors - OA Articles", flip=TRUE),
+  waffle(percPW,rows=14, size=1,legend_pos = "top", title = "1st Authors - Paywalled Articles", flip=TRUE)
+)
 ############################################################
 # For 1st authors from each national income class: 
 # The % of articles that were in PW vs OA journals
@@ -264,152 +275,120 @@ plot4<-plot4+theme_light()+
   scale_y_continuous(breaks = seq(0, 100, 10))
 plot4
 
-
-
 ##################################################
-#SUBSET and bootstrap Paywall Journals by the number found in Open Access Journals
+# SUBSET and bootstrap Paywall Journals 
+# by the number found in Open Access Journals
 ##################################################
-#TODO: convert this to a function, no need to do the same thing for both of them
+
+OA_papers <- AllData %>% filter(JrnlType == "OA")
+OA_papers_boot<-sample_n(OA_papers, nrow(OA_papers), replace = TRUE)
+source("./Rscript/functions/DivCalcPooledFirst.R") 
+nboot <-1000 #number of bootstrap samples
+Richness <-rep(NA, nboot)
+InvSimp <-rep(NA, nboot)
+bootstrap.OA.1st<-data.frame(Richness,InvSimp)
+rm(Richness,InvSimp)
+set.seed(10)
+for(i in 1:nboot){
+  bootOA<-DivCalcPooledFirst(sample_n(OA_papers, nrow(OA_papers), replace = TRUE))
+  bootstrap.OA.1st[i,1]<-bootOA[1]
+  bootstrap.OA.1st[i,2]<-bootOA[2]
+}
+
+OAdiv<-as.numeric(DivCalcPooledFirst(OA_papers)[2])
+
+OAbootPlot<-ggplot(bootstrap.OA.1st, aes(x=InvSimp)) + 
+  geom_histogram(bins=25, colour="black", fill="white")+
+  geom_vline(aes(xintercept=OAdiv),
+             color="blue", linetype="dashed", size=1)
+OAbootPlot<-OAbootPlot+theme_classic()
+OAbootPlot
 
 #################################################################
 # calculate diversity indices BY CAT AND JOURNAL
 #################################################################
 
-source("./Rscript/functions/divCalc.R") # enter as divCalc(df,JrnlType,Author)
-# OA JOURNALS by 1st AUTHORS
-DivMetricsOA<-divCalc(AllData,"OA",1)
-# PW JOURNALS by 1st AUTHORS
-DivMetricsPW<-divCalc(AllData,"PW",1)
+source("./Rscript/functions/DivCalcJrnl.R") # enter as divCalc(df,JrnlType,Author)
+# OA JOURNALS by 1st AUTHORS and journal
+OA_papers <- AllData %>% filter(JrnlType == "OA")
+DivMetricsOA<-DivCalcJrnl(OA_papers)
 
-#############################
-# bind and make wide 
-#############################
-DivMetrics<-bind_rows(DivMetricsOA,DivMetricsPW) %>% 
-  arrange(pair_key)
-colnames(DivMetrics)
+# PW JOURNALS by 1st AUTHORS and jourmal
+PW_papers <- AllData %>% filter(JrnlType == "PW")
+DivMetricsPW<-DivCalcJrnl(PW_papers)
+
+###################################
+# Put them together in wide format
+###################################
+# DivMetrics<-bind_rows(DivMetricsOA,DivMetricsPW) %>% 
+#   arrange(pair_key)
+# colnames(DivMetrics)
 DivMetricsPW_wide<-DivMetricsPW %>% 
   select(-Journal) %>% 
-  spread(JrnlCat,DivSimpson) %>% 
+  spread(JrnlType,DivSimpson) %>% 
   dplyr::rename(PW_DivSimpson=PW,PW_rich=rich,PW_abund=abund,PW_EffectSpecNum=EffectSpecNum)
 DivMetricsOA_wide<-DivMetricsOA %>% 
   select(-Journal) %>% 
-  spread(JrnlCat,DivSimpson) %>% 
+  spread(JrnlType,DivSimpson) %>% 
   dplyr::rename(OA_DivSimpson=OA,OA_rich=rich,OA_abund=abund,OA_EffectSpecNum=EffectSpecNum)
 DivMetricsALL<-left_join(DivMetricsPW_wide,DivMetricsOA_wide,by="pair_key")
-
 # Add Difference in diversity score (DeltaDiv)
 DivMetricsALL$DeltaDiv <- DivMetricsALL$PW_DivSimpson - DivMetricsALL$OA_DivSimpson
-
-# DivMetrics$DeltaDiv <- DivMetricsPW$EffectSpecNumPW - DivMetricsOA$EffectSpecNumOA
-
+DivMetrics$DeltaRich <- DivMetricsALL$PW_rich - DivMetricsALL$OA_rich
+str(DivMetricsALL)
 boxplot(DivMetricsALL$DeltaDiv)
 median(DivMetricsALL$DeltaDiv,na.rm=TRUE)
-str(DivMetricsALL)
 write.csv(DivMetrics, "CleanData/FirstDivMetricsByJrnl.csv", row.names = FALSE)
 
-###############
-#DIVERSITY AND RICHNESS USING ENTIRE POOL FROM EACH JRNL TYPE
+#############################################
+# DIVERSITY & RICHNESS of ENTIRE POOL 
+# By FIRST AUTHOR, LAST AUTHOR, or ALL AUTHORS
+#############################################
+
 #################
-#Calculate the diversity indices for ENTIRE OA COMMUNITY OF PAPERS
-# First Authors
-
-DivMetricsOA<-divCalc(AllData,"OA",1)
-
-
-SiteBySpecOA_pooled_FIRST<-AllData %>% 
-  filter(Country != "NA" & Code != "NA") %>%
-  filter(JrnlType=="OA") %>% 
-  filter(AuthorNum==1) %>%
-  group_by(Country)%>%
-  tally()
-
-SiteBySpecOA_pooled_FIRST <- SiteBySpecOA_pooled_FIRST %>%
-  spread(Country, n)
-OADiversity_FIRST <- diversity(SiteBySpecOA_pooled_FIRST, index = "invsimpson")
-OARichness_FIRST <- length(SiteBySpecOA_pooled_FIRST)
-
+# By First Author
+#################
+source("./Rscript/functions/DivCalcPooledFirst.R") 
+Div_OA_pool_first<-DivCalcPooledFirst(OA_papers)
 #DIversity for the entire Community of PW papers
-SiteBySpecPW_pooled_FIRST<-AllData %>% 
-  filter(Country != "NA" & Code != "NA") %>%
-  filter(JrnlType=="PW") %>% 
-  filter(AuthorNum==1) %>%
-  group_by(Country) %>%
-  tally()
+Div_PW_pool_first<-DivCalcPooledFirst(PW_papers)
 
-SiteBySpecPW_pooled_FIRST <- SiteBySpecPW_pooled_FIRST %>%
-  spread(Country, n)
-PWDiversity_FIRST <- diversity(SiteBySpecPW_pooled_FIRST, index = "invsimpson")
-PWRichness_FIRST <- length(SiteBySpecPW_pooled_FIRST)
+# Binding together
+DivMetricsPooled_first <- as.data.frame(cbind(Div_OA_pool_first[1], Div_PW_pool_first[1],Div_OA_pool_first[2], Div_PW_pool_first[2]))
+DivMetricsPooled_first <-DivMetricsPooled_first %>% dplyr::rename(OA_richness=V1,PW_richness=V2,OA_invSimp=V3,PW_invSimp=V4)
+rownames(DivMetricsPooled_first)<-nrow(DivMetricsPooled_first)
+# write.csv(DivMetricsPooled_first, "CleanData/DivMetricsPooled_first.csv", row.names = FALSE)
 
-DivMetricsFullPools_FIRST <- as.data.frame(cbind(OADiversity_FIRST, OARichness_FIRST, PWDiversity_FIRST, PWRichness_FIRST))
-write.csv(DivMetricsFullPools_FIRST, "CleanData/DivMetricsFullPools_FIRST.csv", row.names = FALSE)
-
-
-# Calculate the diversity indices for ENTIRE OA COMMUNITY OF PAPERS 
-# LAST AUTHOR
-SiteBySpecOA_pooled_last <- AllData %>%
-  filter(Country != "NA" & Code != "NA") %>%
-  filter(JrnlType=="OA") %>% 
-  group_by(DOI) %>% 
-  filter(AuthorNum == max(AuthorNum)) %>% 
-  group_by(Country) %>% 
-  tally()
-  
-SiteBySpecOA_pooled_last <- SiteBySpecOA_pooled_last %>%
-  spread(Country, n)
-OADiversity_LAST <- diversity(SiteBySpecOA_pooled_last, index = "invsimpson")
-OARichness_LAST <- length(SiteBySpecOA_pooled_last)
-
+#################
+# By Last Author
+#################
+source("./Rscript/functions/DivCalcPooledLast.R") 
+Div_OA_pool_last<-DivCalcPooledLast(OA_papers)
 #DIversity for the entire Community of PW papers
-SiteBySpecPW_pooled_last <- AllData %>%
-  filter(Country != "NA" & Code != "NA") %>%
-  filter(JrnlType=="PW") %>% 
-  group_by(DOI) %>% 
-  filter(AuthorNum == max(AuthorNum)) %>% 
-  group_by(Country) %>% 
-  tally()
+Div_PW_pool_last<-DivCalcPooledLast(PW_papers)
 
-SiteBySpecPW_pooled_last <- SiteBySpecPW_pooled_last %>%
-  spread(Country, n)
-PWDiversity_LAST <- diversity(SiteBySpecPW_pooled_last, index = "invsimpson")
-PWRichness_LAST <- length(SiteBySpecPW_pooled_last)
+# Binding together
+DivMetricsPooled_last <- as.data.frame(cbind(Div_OA_pool_last[1], Div_PW_pool_last[1],Div_OA_pool_last[2], Div_PW_pool_last[2]))
+DivMetricsPooled_last <-DivMetricsPooled_last %>% dplyr::rename(OA_richness=V1,PW_richness=V2,OA_invSimp=V3,PW_invSimp=V4)
+rownames(DivMetricsPooled_last)<-nrow(DivMetricsPooled_last)
+# write.csv(DivMetricsPooled_last, "CleanData/DivMetricsPooled_last.csv", row.names = FALSE)
 
-DivMetricsFullPoolsLast <- as.data.frame(cbind(OADiversity_LAST, OARichness_LAST, PWDiversity_LAST, PWRichness_LAST))
-write.csv(DivMetricsFullPoolsLast, "CleanData/DivMetricsFullPoolLast.csv", row.names = FALSE)
-
-#Calculate the diversity indices for ENTIRE OA COMMUNITY OF PAPERS
-# ALL AUTHORS
-SiteBySpecOA_pooled_ALL <- AllData %>%
-  filter(Country != "NA" & Code != "NA") %>%
-  filter(JrnlType=="OA") %>% 
-  group_by(Country) %>% 
-  tally()
-
-SiteBySpecOA_pooled_ALL <- SiteBySpecOA_pooled_ALL %>%
-  spread(Country, n)
-OADiversity_ALL <- diversity(SiteBySpecOA_pooled_ALL, index = "invsimpson")
-OARichness_ALL <- length(SiteBySpecOA_pooled_ALL)
-
+#################
+# By All Author
+#################
+source("./Rscript/functions/DivCalcPooledAll.R") 
+Div_OA_pool_all<-DivCalcPooledAll(OA_papers)
 #DIversity for the entire Community of PW papers
-SiteBySpecPW_pooled_ALL <- AllData %>%
-  filter(Country != "NA" & Code != "NA") %>%
-  filter(JrnlType=="PW") %>% 
-  group_by(Country) %>% 
-  tally()
+Div_PW_pool_all<-DivCalcPooledAll(PW_papers)
 
-SiteBySpecPW_pooled_ALL <- SiteBySpecPW_pooled_ALL %>%
-  spread(Country, n)
-PWDiversity_ALL <- diversity(SiteBySpecPW_pooled_ALL, index = "invsimpson")
-PWRichness_ALL <- length(SiteBySpecPW_pooled_ALL)
-
-DivMetricsAllAuthors <- as.data.frame(cbind(OADiversity_ALL, OARichness_ALL, PWDiversity_ALL, PWRichness_ALL))
-write.csv(DivMetricsAllAuthors, "CleanData/DivMetricsAllAuthors.csv", row.names = FALSE)
-#sum(abund)# double check we have the same number of articles still
-#sum(SiteBySpec) #check against this
-
+# Binding together
+DivMetricsPooled_all <- as.data.frame(cbind(Div_OA_pool_all[1], Div_PW_pool_all[1],Div_OA_pool_all[2], Div_PW_pool_all[2]))
+DivMetricsPooled_all <-DivMetricsPooled_all %>% dplyr::rename(OA_richness=V1,PW_richness=V2,OA_invSimp=V3,PW_invSimp=V4)
+rownames(DivMetricsPooled_all)<-nrow(DivMetricsPooled_all)
+# write.csv(DivMetricsPooled_all, "CleanData/DivMetricsPooled_all.csv", row.names = FALSE)
 
 #############################################################################################
-# FOR LOOP
+# DIV OF PW SUBSAMPLES MATCHING OA BY NUMBER OF ARTICLES
 ###################################################################################################
 # df of all articles in PW journals
 FirstAuthPW<-AllData %>% 
@@ -449,282 +428,419 @@ levels(PW_papers$pair_key)
 PW_papers<-droplevels(PW_papers)
 nlevels(PW_papers$pair_key)
 
+# STEP 1
+# Are you sure all the journals in PW df are represented 
+# in the OA df and vice versa?
+
+# FALSES would indicate "no"
+# levels(PW_papers$pair_key)==levels(OA_sample$pair_key)
+
+# This will ensure the journals are in both (using intersection
+# of pair_key in OA and PW)
+OA_pk<-OA_sample$pair_key
+PW_papers_pk<-PW_papers$pair_key
+Ipk<-intersect(PW_papers_pk,OA_pk)
+Ipk<-as_factor(Ipk)
+OA_sample$pair_key
+OA_sample<-OA_sample %>% filter(pair_key%in%Ipk)
+OA_sample<-droplevels(OA_sample)
+
+PW_papers<-semi_join(PW_papers,OA_sample,buy="pair_key") #this is what makes sure you are only sampling from PW journals for which there is OA
+PW_papers$pair_key<-as.factor(PW_papers$pair_key)
+nlevels(PW_papers$pair_key)
+PW_papers<-droplevels(PW_papers)
+nlevels(PW_papers$pair_key)
+PW_papers<-arrange(PW_papers,pair_key)
+
+# This is how many you are going to be sampling from each PW Journal.
+# It is the number of articles n in each OA journal 
+n = as.data.frame(OA_sample$n)
 source("./Rscript/functions/samplePW.R")
-PW_sample<-samplePW(OA_sample,PW_papers)
+PW_sample<-samplePW(PW_papers,n)
 
 # To double check and see which might have been in OA sample but no PW papers
 PW_sample_check<-PW_sample %>% 
   group_by(pair_key) %>% 
   summarize(sample_n=n())
 PW_sample_check<-full_join(PW_sample_check,OA_sample, by="pair_key")
-summary(PW_sample_check$sample_n==PW_sample_check$n)
-
-
-
-
-
-#############
-#THE FOR LOOP TO MAKE FIRST AUTHOR RICHNESS AND DIVERSITY OF COUNTRY 
-#ITTERATIONS
-#
-#BEWARE... THIS LOOP TOOK 21 MINS TO RUN ON MY COMPUTER!!!!
-#
-#############
-
-#For Loop to calculate over all simpsons diveristy (true diversity)
-#using similar randomly sampled chunks of the over all pool
-# USING FIRST AUTHOR
-SimpsDiversitySubs <- matrix(nrow = 1, ncol = 1000) #empty matrix for diversity
-
-for (i in 1:1000){
-  NumbArtOA2 <- NumbArtOA[-1]  
-  SamplePW3 <- FirstAuthPW %>% 
-    filter(Country != "NA" & Journal != "NA" & JrnlType != "NA") %>% #remove any article that has no country listed
-    nest(data = c(Code, DOI, Year, AuthorNum, Country, JrnlType, Region, IncomeGroup)) %>% 
-    left_join(NumbArtOA2, by = "Journal") %>%
-    mutate(Sample = map2(data, n, sample_n)) %>% 
-    unnest(Sample)%>%
-    select(Code, DOI, Journal, Year, AuthorNum, Country, JrnlType, Region,
-           IncomeGroup)
-  
-  SiteBySpecPW2 <- SamplePW3 %>%
-    group_by(Country)%>%
-    tally()
-  
-  SiteBySpecPW2 <- SiteBySpecPW2 %>%
-    spread(Country, n)
-  
-  PWDiversitySub <- diversity(SiteBySpecPW2, index = "invsimpson")
-  SimpsDiversitySubs[,i] = PWDiversitySub
-  
-}
-
-SimpsDivSubsPW <- as.data.frame(SimpsDiversitySubs)
-write.csv(SimpsDivSubsPW, "CleanData/ProporSampsSimpsDivPW.csv", row.names = FALSE)
-
-
-#For Loop to calculate over all simpsons diveristy (true diversity)
-#using similar randomly sampled chunks of the over all pool
-# USING LAST AUTHOR
-SimpsDivSubsLast <- matrix(nrow = 1, ncol = 1000) #empty matrix for diversity
-
-for (i in 1:1000){
-  NumbArtOA2 <- NumbArtOA[-1]  
-  SamplePW3 <- LastAuthPW %>% 
-    filter(Country != "NA" & Journal != "NA" & JrnlType != "NA") %>% #remove any article that has no country listed
-    nest(data = c(Code, DOI, Year, AuthorNum, Country, JrnlType, Region, IncomeGroup)) %>% 
-    left_join(NumbArtOA2, by = "Journal") %>%
-    mutate(Sample = map2(data, n, sample_n)) %>% 
-    unnest(Sample)%>%
-    select(Code, DOI, Journal, Year, AuthorNum, Country, JrnlType, Region,
-           IncomeGroup)
-  
-  SiteBySpecPW2 <- SamplePW3 %>%
-    group_by(Country)%>%
-    tally()
-  
-  SiteBySpecPW2 <- SiteBySpecPW2 %>%
-    spread(Country, n)
-  
-  PWDiversitySub <- diversity(SiteBySpecPW2, index = "invsimpson")
-  SimpsDivSubsLast[,i] = PWDiversitySub
-  
-}
-
-SimpsDivSubsPW <- as.data.frame(SimpsDivSubsLast)
-write.csv(SimpsDivSubsPW, "CleanData/ProporSampsSimpsDivPWLast.csv", row.names = FALSE)
-
-#For Loop to calculate over all simpsons diveristy (true diversity)
-#using similar randomly sampled chunks of the over all pool
-# USING ALL AUTHORs
-SimpsDivSubsAllAuths <- matrix(nrow = 1, ncol = 1000) #empty matrix for diversity
-NumbAuthsOA <- OpenAccessAll %>%
-  group_by(Journal) %>%
-  tally()
-
-for (i in 1:1000){
-  SamplePW3 <- PayWallAll %>% 
-    filter(Country != "NA" & Journal != "NA" & JrnlType != "NA") %>% #remove any article that has no country listed
-    nest(data = c(Code, DOI, Year, AuthorNum, Country, JrnlType, Region, IncomeGroup)) %>% 
-    left_join(NumbAuthsOA, by = "Journal") %>%
-    mutate(Sample = map2(data, n, sample_n)) %>% 
-    unnest(Sample)%>%
-    select(Code, DOI, Journal, Year, AuthorNum, Country, JrnlType, Region,
-           IncomeGroup)
-  
-  SiteBySpecPW2 <- SamplePW3 %>%
-    group_by(Country)%>%
-    tally()
-  
-  SiteBySpecPW2 <- SiteBySpecPW2 %>%
-    spread(Country, n)
-  
-  PWDiversitySub <- diversity(SiteBySpecPW2, index = "invsimpson")
-  SimpsDivSubsAllAuths[,i] = PWDiversitySub
-  
-}
-
-SimpsDivSubsPW <- as.data.frame(SimpsDivSubsAllAuths)
-write.csv(SimpsDivSubsPW, "CleanData/SimpsDivSubsAllAuthsPW.csv", row.names = FALSE)
-
-
-
-
-
-
-
-
-#FOR LOOP FOR making ricness and diversity matrices by journal with sampling
-?diversity
-# MAKE EMPTY MATRICES FOR THE FOR LOOP TO FILL
-richness <- matrix(nrow = 62, ncol = 1000) #empty matrix for richness
-SimpsonDiversity <- matrix(nrow = 62, ncol = 1000) #empty matrix for diversity
-
-for (i in 1:1000){ #do loop 100 times
-  NumbArtOA2 <- NumbArtOA[-1]   # remove "JnrlType" column from the NumbartOA dataframe
-  
-  #SUBSET
-  #this subsets PW journals (FirstauthPW df) by the number of Aricles per journal in OA sources (the numbartoa df). can change this to lastauth as well
-  SamplePW3 <- FirstAuthPW %>% 
-    filter(Country != "NA" & Journal != "NA" & JrnlType != "NA") %>% #remove any article that has no country listed
-    nest(data = c(Code, DOI, Year, AuthorNum, Country, JrnlType, Region, IncomeGroup)) %>% 
-    left_join(NumbArtOA2, by = "Journal") %>%
-    mutate(Sample = map2(data, n, sample_n)) %>% 
-    unnest(Sample)%>%
-    select(Code, DOI, Journal, Year, AuthorNum, Country, JrnlType, Region,
-           IncomeGroup)
-  #ADD OA DATA
-  FirstAuthAll <- rbind(SamplePW3, FirstAuthOA) #put randomly sampled PW articles into 
-  #the same data frame wiht our OA articles
-  FirstAuthAll$JournalAndType <- paste(FirstAuthAll$Journal, FirstAuthAll$JrnlType)
-  #TURN IT INTO SITE BY SPECIES (JRNL BY COUNTRY)
-  SiteBySpec <- FirstAuthAll %>%
-    group_by(JournalAndType, Country)%>%
-    tally()
-  
-  SiteBySpec <- cast(SiteBySpec, JournalAndType ~ Country, value = 'n')
-  SiteBySpec[is.na(SiteBySpec)] <- 0
-  Countries <- names(SiteBySpec[,2:(ncol(SiteBySpec)-1)]) #check this to be sure this 
-  
-  ####
-  #Add diversity metrics
-  country_counts <- SiteBySpec[,Countries] #final site by species matrix
-  row.names(country_counts) <- SiteBySpec$JournalAndType #add rownames for journals
-  
-  #simpson diversity index
-  DivSimpson <-diversity(country_counts, index = "simpson")
-  
-  #richness
-  rich <- rowSums(country_counts > 0)
-  
-  richness[,i] = rich
-  SimpsonDiversity[,i] = DivSimpson
-}
-
-###################################################
-
-#now manipulate the 62 x 1000 matrix of itterations
-#richness
-
-richness <- as.data.frame(richness) #make it a data frame
-richness$MeanRich <- rowMeans(richness) #add a mean column from the 1000 itterations
-write.csv(richness, "CleanData/FirstRich1000itters.csv", row.names = TRUE)
-
-FirstAuthRich <- richness %>% #just grab the mean column
-  select(MeanRich)
-FirstAuthRich$JournalAndType <- SiteBySpec$JournalAndType #add journals in
-#now for diversity
-FirstAuthSimpDiv <- as.data.frame(SimpsonDiversity) 
-  FirstAuthSimpDiv$MeanDiveristy <- rowMeans(FirstAuthSimpDiv)
-write.csv(FirstAuthDiv, "CleanData/FirstDiv1000itter.csv", row.names = TRUE)
-  FirstAuthSimpDiv <- FirstAuthSimpDiv %>%
-  select(MeanDiveristy)
-FirstAuthSimpDiv$JournalAndType <- SiteBySpec$JournalAndType
-
-#make a richness and diversity data frame for each journal
-FirstAuthDiv <- merge(FirstAuthSimpDiv, FirstAuthRich, by = "JournalAndType") 
-#re-grab journal types to paste onto the diersity dataframe
-AllData$JournalAndType <- paste(AllData$Journal, AllData$JrnlType) 
-JournalTypes <- AllData %>%
-  select(JournalAndType, JrnlType)%>%
-  distinct()
-
-FirstAuthDiv <- merge(FirstAuthDiv, JournalTypes, by = "JournalAndType") #merge for final first author dataframe
-write.csv(FirstAuthDiv, "CleanData/FirstAuthDiv.csv", row.names = FALSE)
-
-
-
-
-
-
-
-
-
-
-
-################
-#CountryRichness OVERALL
 ################
 
-# total country richness between the two journal types for FIRST authors
-# this does not control for sample size
-TotalRichFirst <- FirstAuth %>% 
-  group_by(JrnlType) %>%
-  summarise(Rich = n_distinct(Country))
-# same as above for last authors
-TotalRichLast <- LastAuth %>% 
-  group_by(JrnlType) %>%
-  summarise(Rich = n_distinct(Country))
+# STEP 1
+# Are you sure all the journals in PW df are represented 
+# in the OA df and vice versa?
+
+# FALSES would indicate "no"
+# levels(PW_papers$pair_key)==levels(OA_sample$pair_key)
+
+# This will ensure the journals are in both (using intersection
+# of pair_key in OA and PW)
+OA_pk<-OA_sample$pair_key
+PW_papers_pk<-PW_papers$pair_key
+Ipk<-intersect(PW_papers_pk,OA_pk)
+Ipk<-as_factor(Ipk)
+OA_sample$pair_key
+OA_sample<-OA_sample %>% filter(pair_key%in%Ipk)
+OA_sample<-droplevels(OA_sample)
+
+PW_papers<-semi_join(PW_papers,OA_sample,buy="pair_key") #this is what makes sure you are only sampling from PW journals for which there is OA
+PW_papers$pair_key<-as.factor(PW_papers$pair_key)
+nlevels(PW_papers$pair_key)
+PW_papers<-droplevels(PW_papers)
+nlevels(PW_papers$pair_key)
+PW_papers<-arrange(PW_papers,pair_key)
+
+# This is how many you are going to be sampling from each PW Journal.
+# It is the number of articles n in each OA journal 
+n = as.data.frame(OA_sample$n)
+str(n)
+
+############################################
+
+# now sample and iterate!
+# THIS IS FOR MATCHED SUBSAMPLING - FIRST
+# 1<-Richness  2<-InvSimpsons 3<-Countries
+############################################
+source("./Rscript/functions/samplePW.R")
+library(tictoc)
+tic()
+nboot <-1000 #number of bootstrap samples
+InvSimp <-rep(NA, nboot)
+Richness<-rep(NA, nboot)
+SubsampledPW.results <- data.frame(Richness,InvSimp)
+rm(InvSimp,Richness)
+set.seed(10)
+for(i in 1:nboot){
+  PW_sample<-samplePW(PW_papers,n)
+  results<-DivCalcPooledFirst(PW_sample)
+  SubsampledPW.results[i,1]<-(results)[1]
+  SubsampledPW.results[i,2]<-(results)[2]
+  }
+SubsampledPW.results
+toc()
 
 
-RichnessOA <- FirstAuthOA %>%
-  summarise(Rich = n_distinct(Country))
-
-RichnessPW <- SamplePW2 %>%
-  group_by(JrnlType) %>%
-  summarise(Rich = n_distinct(Country))
-
-
+OAdiv<-as.numeric(DivCalcPooledFirst(OA_papers)[2])
+pDiv<-ggplot(SubsampledPW.results, aes(x=InvSimp)) + 
+  geom_histogram(bins=25, colour="black", fill="white")+
+  geom_vline(aes(xintercept=OAdiv),
+               color="blue", linetype="dashed", size=1)
+pDiv<-pDiv+theme_classic() 
 
 
+############################################
+
+# now sample and iterate!
+# THIS IS FOR NO SUBSAMPLING - FIRST AUTHOR, ALL ARTICLES POOLED
+# 1<-Richness  2<-InvSimpsons 3<-Countries
+############################################
+
+library(tictoc)
+tic()
+nboot <-1000 #number of bootstrap samples
+InvSimp <-rep(NA, nboot)
+Richness<-rep(NA, nboot)
+SubsampledPW.pooled.results <- data.frame(Richness,InvSimp)
+rm(InvSimp,Richness)
+set.seed(10)
+for(i in 1:nboot){
+  PW_sample<-samplePW(PW_papers,nrow(OA_papers))
+  results<-DivCalcPooledFirst(PW_sample)
+  SubsampledPW.pooled.results[i,1]<-(results)[1]
+  SubsampledPW.pooled.results[i,2]<-(results)[2]
+}
+SubsampledPW.pooled.results
+toc()
+head(SubsampledPW.pooled.results) 
+write.csv(SubsampledPW.pooled.results, "CleanData/SubsampledPW.pooled.results.csv", row.names = FALSE)
+# SubsampledPW.pooled.results<-read_csv("CleanData/SubsampledPW.pooled.results.csv")
+source("./Rscript/functions/DivCalcPooledFirst.R") 
+OAdiv<-as.numeric(DivCalcPooledFirst(OA_papers)[2])
+PWdiv<-as.numeric(DivCalcPooledFirst(PW_papers)[2])
+# SubsampledPW.pooled.results<-read.csv("CleanData/SubsampledPW.pooled.results.csv")
+
+pDiv<-ggplot(SubsampledPW.pooled.results, aes(x=InvSimp)) + 
+  geom_histogram(bins=25, colour="black", fill="white")+
+  geom_vline(aes(xintercept=OAdiv),
+             color="blue", linetype="dashed", size=1)+
+  geom_label(label="OA InvSimp", x=13.5,y=170,
+             # label.padding = unit(0.55, "lines"), # Rectangle size around label
+    label.size = 0.15,color = "blue")+
+  geom_vline(aes(xintercept=PWdiv),
+           color="red", linetype="dashed", size=1)+
+  geom_label(label="PW InvSimp", x=6,y=150,
+             # label.padding = unit(0.55, "lines"), # Rectangle size around label
+             label.size = 0.15,color = "red")
+pDiv<-pDiv+theme_classic() 
+pDiv
+
+dev.off()
 
 
-##################################################################################################
-#############################################################################################
-#OLD CODE FOR OTHER SAMPLING TECHNIQUES> NO LONGER NEEDED!
 
-#this is a way to randomly sample from each Paywall journal to 
-#match the number of articles in its OA mirror journal --CKG
 
-FirstAuthPWAlphab<-FirstAuthPW[order(FirstAuthPW$Journal),]#sort the paywall article df alphabetically by journal title
 
-SamplePW1 <- strata(FirstAuthPWAlphab, "Journal", 
-                    size = c(14,6,47,9,29,21,9,5,10,10,9,31,16,32,6,8,6,30,28,32,9,17,32,2,8,1,14,33,14,18,36),
-                    method = "srswor")
-sum(NumbArtOA$n) #using this to double check the sample size
-
-summary(c(14,6,47,9,29,21,9,5,10,10,9,31,16,32,6,8,6,30,28,32,9,17,32,2,8,1,14,33,14,18,36))
-
-# the code above!
-# for each strata of journal, I took the number of articles available in the OA mirror 
-# journals, and randomly sampled articles in PW journals based on those numbers. 
-# I got the number of articles per OA journal from the NumbArtOA dataframe and just typed theminto the 'size' argument.
-# Two issues: 1.) the sum of articles in NumbArtOA is 542, but the length of the FirstAuthOA dataframe is 553
-# There are 11 articles in NumbArtOA that are 2018 articles, not 2019. I don't know why they weren't excluded in lines 47 and 52.
-# specifically, they are all water research articles in theFirstAuthOA df. (lines 37, 57, 81, 116, 242, 293, 383, 392, 497, 510, 515)
-# 2.) sleep medicine and research policy have 1 and 2 articles in those journals, respectively, according to NumbArtOA. I feel like we should delete them, 
-# as we probably can't get a good diversity estimate from such a small number of articles.
-
-SamplePW2 <- FirstAuthPW %>% #subset the paywall journals First Author Data 
-  #filter(DOI != "NA") %>%
-  group_by(Journal)%>%
-  sample_n(c(14,6,47,9,29,21,9,5,10,10,9,31,16,32,6,8,6,30,28,32,9,17,32,2,8,1,14,33,14,18,36)) # this code only grabs 30 from each journal, which is a random number SIMILAR to the 
-#numbers of articles in the open access journals
-# Number of articles to pull should be from NumbArtOA dataframe
-SamplePW4 <- FirstAuthOA %>% #subset the paywall journals First Author Data 
-  #filter(DOI != "NA") %>%
-  group_by(Journal)%>%
-  sample_n(17, replace = TRUE) # this code only grabs 30 from each journal, which is a random number SIMILAR to the 
+# #############
+# #THE FOR LOOP TO MAKE FIRST AUTHOR RICHNESS AND DIVERSITY OF COUNTRY 
+# #ITTERATIONS
+# #
+# #BEWARE... THIS LOOP TOOK 21 MINS TO RUN ON MY COMPUTER!!!!
+# #
+# #############
+# 
+# #For Loop to calculate over all simpsons diveristy (true diversity)
+# #using similar randomly sampled chunks of the over all pool
+# # USING FIRST AUTHOR
+# SimpsDiversitySubs <- matrix(nrow = 1, ncol = 1000) #empty matrix for diversity
+# 
+# for (i in 1:1000){
+#   NumbArtOA2 <- NumbArtOA[-1]  
+#   SamplePW3 <- FirstAuthPW %>% 
+#     filter(Country != "NA" & Journal != "NA" & JrnlType != "NA") %>% #remove any article that has no country listed
+#     nest(data = c(Code, DOI, Year, AuthorNum, Country, JrnlType, Region, IncomeGroup)) %>% 
+#     left_join(NumbArtOA2, by = "Journal") %>%
+#     mutate(Sample = map2(data, n, sample_n)) %>% 
+#     unnest(Sample)%>%
+#     select(Code, DOI, Journal, Year, AuthorNum, Country, JrnlType, Region,
+#            IncomeGroup)
+#   
+#   SiteBySpecPW2 <- SamplePW3 %>%
+#     group_by(Country)%>%
+#     tally()
+#   
+#   SiteBySpecPW2 <- SiteBySpecPW2 %>%
+#     spread(Country, n)
+#   
+#   PWDiversitySub <- diversity(SiteBySpecPW2, index = "invsimpson")
+#   SimpsDiversitySubs[,i] = PWDiversitySub
+#   
+# }
+# 
+# SimpsDivSubsPW <- as.data.frame(SimpsDiversitySubs)
+# write.csv(SimpsDivSubsPW, "CleanData/ProporSampsSimpsDivPW.csv", row.names = FALSE)
+# 
+# 
+# #For Loop to calculate over all simpsons diveristy (true diversity)
+# #using similar randomly sampled chunks of the over all pool
+# # USING LAST AUTHOR
+# SimpsDivSubsLast <- matrix(nrow = 1, ncol = 1000) #empty matrix for diversity
+# 
+# for (i in 1:1000){
+#   NumbArtOA2 <- NumbArtOA[-1]  
+#   SamplePW3 <- LastAuthPW %>% 
+#     filter(Country != "NA" & Journal != "NA" & JrnlType != "NA") %>% #remove any article that has no country listed
+#     nest(data = c(Code, DOI, Year, AuthorNum, Country, JrnlType, Region, IncomeGroup)) %>% 
+#     left_join(NumbArtOA2, by = "Journal") %>%
+#     mutate(Sample = map2(data, n, sample_n)) %>% 
+#     unnest(Sample)%>%
+#     select(Code, DOI, Journal, Year, AuthorNum, Country, JrnlType, Region,
+#            IncomeGroup)
+#   
+#   SiteBySpecPW2 <- SamplePW3 %>%
+#     group_by(Country)%>%
+#     tally()
+#   
+#   SiteBySpecPW2 <- SiteBySpecPW2 %>%
+#     spread(Country, n)
+#   
+#   PWDiversitySub <- diversity(SiteBySpecPW2, index = "invsimpson")
+#   SimpsDivSubsLast[,i] = PWDiversitySub
+#   
+# }
+# 
+# SimpsDivSubsPW <- as.data.frame(SimpsDivSubsLast)
+# write.csv(SimpsDivSubsPW, "CleanData/ProporSampsSimpsDivPWLast.csv", row.names = FALSE)
+# 
+# #For Loop to calculate over all simpsons diveristy (true diversity)
+# #using similar randomly sampled chunks of the over all pool
+# # USING ALL AUTHORs
+# SimpsDivSubsAllAuths <- matrix(nrow = 1, ncol = 1000) #empty matrix for diversity
+# NumbAuthsOA <- OpenAccessAll %>%
+#   group_by(Journal) %>%
+#   tally()
+# 
+# for (i in 1:1000){
+#   SamplePW3 <- PayWallAll %>% 
+#     filter(Country != "NA" & Journal != "NA" & JrnlType != "NA") %>% #remove any article that has no country listed
+#     nest(data = c(Code, DOI, Year, AuthorNum, Country, JrnlType, Region, IncomeGroup)) %>% 
+#     left_join(NumbAuthsOA, by = "Journal") %>%
+#     mutate(Sample = map2(data, n, sample_n)) %>% 
+#     unnest(Sample)%>%
+#     select(Code, DOI, Journal, Year, AuthorNum, Country, JrnlType, Region,
+#            IncomeGroup)
+#   
+#   SiteBySpecPW2 <- SamplePW3 %>%
+#     group_by(Country)%>%
+#     tally()
+#   
+#   SiteBySpecPW2 <- SiteBySpecPW2 %>%
+#     spread(Country, n)
+#   
+#   PWDiversitySub <- diversity(SiteBySpecPW2, index = "invsimpson")
+#   SimpsDivSubsAllAuths[,i] = PWDiversitySub
+#   
+# }
+# 
+# SimpsDivSubsPW <- as.data.frame(SimpsDivSubsAllAuths)
+# write.csv(SimpsDivSubsPW, "CleanData/SimpsDivSubsAllAuthsPW.csv", row.names = FALSE)
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# #FOR LOOP FOR making ricness and diversity matrices by journal with sampling
+# ?diversity
+# # MAKE EMPTY MATRICES FOR THE FOR LOOP TO FILL
+# richness <- matrix(nrow = 62, ncol = 1000) #empty matrix for richness
+# SimpsonDiversity <- matrix(nrow = 62, ncol = 1000) #empty matrix for diversity
+# 
+# for (i in 1:1000){ #do loop 100 times
+#   NumbArtOA2 <- NumbArtOA[-1]   # remove "JnrlType" column from the NumbartOA dataframe
+#   
+#   #SUBSET
+#   #this subsets PW journals (FirstauthPW df) by the number of Aricles per journal in OA sources (the numbartoa df). can change this to lastauth as well
+#   SamplePW3 <- FirstAuthPW %>% 
+#     filter(Country != "NA" & Journal != "NA" & JrnlType != "NA") %>% #remove any article that has no country listed
+#     nest(data = c(Code, DOI, Year, AuthorNum, Country, JrnlType, Region, IncomeGroup)) %>% 
+#     left_join(NumbArtOA2, by = "Journal") %>%
+#     mutate(Sample = map2(data, n, sample_n)) %>% 
+#     unnest(Sample)%>%
+#     select(Code, DOI, Journal, Year, AuthorNum, Country, JrnlType, Region,
+#            IncomeGroup)
+#   #ADD OA DATA
+#   FirstAuthAll <- rbind(SamplePW3, FirstAuthOA) #put randomly sampled PW articles into 
+#   #the same data frame wiht our OA articles
+#   FirstAuthAll$JournalAndType <- paste(FirstAuthAll$Journal, FirstAuthAll$JrnlType)
+#   #TURN IT INTO SITE BY SPECIES (JRNL BY COUNTRY)
+#   SiteBySpec <- FirstAuthAll %>%
+#     group_by(JournalAndType, Country)%>%
+#     tally()
+#   
+#   SiteBySpec <- cast(SiteBySpec, JournalAndType ~ Country, value = 'n')
+#   SiteBySpec[is.na(SiteBySpec)] <- 0
+#   Countries <- names(SiteBySpec[,2:(ncol(SiteBySpec)-1)]) #check this to be sure this 
+#   
+#   ####
+#   #Add diversity metrics
+#   country_counts <- SiteBySpec[,Countries] #final site by species matrix
+#   row.names(country_counts) <- SiteBySpec$JournalAndType #add rownames for journals
+#   
+#   #simpson diversity index
+#   DivSimpson <-diversity(country_counts, index = "simpson")
+#   
+#   #richness
+#   rich <- rowSums(country_counts > 0)
+#   
+#   richness[,i] = rich
+#   SimpsonDiversity[,i] = DivSimpson
+# }
+# 
+# ###################################################
+# 
+# #now manipulate the 62 x 1000 matrix of itterations
+# #richness
+# 
+# richness <- as.data.frame(richness) #make it a data frame
+# richness$MeanRich <- rowMeans(richness) #add a mean column from the 1000 itterations
+# write.csv(richness, "CleanData/FirstRich1000itters.csv", row.names = TRUE)
+# 
+# FirstAuthRich <- richness %>% #just grab the mean column
+#   select(MeanRich)
+# FirstAuthRich$JournalAndType <- SiteBySpec$JournalAndType #add journals in
+# #now for diversity
+# FirstAuthSimpDiv <- as.data.frame(SimpsonDiversity) 
+#   FirstAuthSimpDiv$MeanDiveristy <- rowMeans(FirstAuthSimpDiv)
+# write.csv(FirstAuthDiv, "CleanData/FirstDiv1000itter.csv", row.names = TRUE)
+#   FirstAuthSimpDiv <- FirstAuthSimpDiv %>%
+#   select(MeanDiveristy)
+# FirstAuthSimpDiv$JournalAndType <- SiteBySpec$JournalAndType
+# 
+# #make a richness and diversity data frame for each journal
+# FirstAuthDiv <- merge(FirstAuthSimpDiv, FirstAuthRich, by = "JournalAndType") 
+# #re-grab journal types to paste onto the diersity dataframe
+# AllData$JournalAndType <- paste(AllData$Journal, AllData$JrnlType) 
+# JournalTypes <- AllData %>%
+#   select(JournalAndType, JrnlType)%>%
+#   distinct()
+# 
+# FirstAuthDiv <- merge(FirstAuthDiv, JournalTypes, by = "JournalAndType") #merge for final first author dataframe
+# write.csv(FirstAuthDiv, "CleanData/FirstAuthDiv.csv", row.names = FALSE)
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# ################
+# #CountryRichness OVERALL
+# ################
+# 
+# # total country richness between the two journal types for FIRST authors
+# # this does not control for sample size
+# TotalRichFirst <- FirstAuth %>% 
+#   group_by(JrnlType) %>%
+#   summarise(Rich = n_distinct(Country))
+# # same as above for last authors
+# TotalRichLast <- LastAuth %>% 
+#   group_by(JrnlType) %>%
+#   summarise(Rich = n_distinct(Country))
+# 
+# 
+# RichnessOA <- FirstAuthOA %>%
+#   summarise(Rich = n_distinct(Country))
+# 
+# RichnessPW <- SamplePW2 %>%
+#   group_by(JrnlType) %>%
+#   summarise(Rich = n_distinct(Country))
+# 
+# 
+# 
+# 
+# 
+# 
+# ##################################################################################################
+# #############################################################################################
+# #OLD CODE FOR OTHER SAMPLING TECHNIQUES> NO LONGER NEEDED!
+# 
+# #this is a way to randomly sample from each Paywall journal to 
+# #match the number of articles in its OA mirror journal --CKG
+# 
+# FirstAuthPWAlphab<-FirstAuthPW[order(FirstAuthPW$Journal),]#sort the paywall article df alphabetically by journal title
+# 
+# SamplePW1 <- strata(FirstAuthPWAlphab, "Journal", 
+#                     size = c(14,6,47,9,29,21,9,5,10,10,9,31,16,32,6,8,6,30,28,32,9,17,32,2,8,1,14,33,14,18,36),
+#                     method = "srswor")
+# sum(NumbArtOA$n) #using this to double check the sample size
+# 
+# summary(c(14,6,47,9,29,21,9,5,10,10,9,31,16,32,6,8,6,30,28,32,9,17,32,2,8,1,14,33,14,18,36))
+# 
+# # the code above!
+# # for each strata of journal, I took the number of articles available in the OA mirror 
+# # journals, and randomly sampled articles in PW journals based on those numbers. 
+# # I got the number of articles per OA journal from the NumbArtOA dataframe and just typed theminto the 'size' argument.
+# # Two issues: 1.) the sum of articles in NumbArtOA is 542, but the length of the FirstAuthOA dataframe is 553
+# # There are 11 articles in NumbArtOA that are 2018 articles, not 2019. I don't know why they weren't excluded in lines 47 and 52.
+# # specifically, they are all water research articles in theFirstAuthOA df. (lines 37, 57, 81, 116, 242, 293, 383, 392, 497, 510, 515)
+# # 2.) sleep medicine and research policy have 1 and 2 articles in those journals, respectively, according to NumbArtOA. I feel like we should delete them, 
+# # as we probably can't get a good diversity estimate from such a small number of articles.
+# 
+# SamplePW2 <- FirstAuthPW %>% #subset the paywall journals First Author Data 
+#   #filter(DOI != "NA") %>%
+#   group_by(Journal)%>%
+#   sample_n(c(14,6,47,9,29,21,9,5,10,10,9,31,16,32,6,8,6,30,28,32,9,17,32,2,8,1,14,33,14,18,36)) # this code only grabs 30 from each journal, which is a random number SIMILAR to the 
+# #numbers of articles in the open access journals
+# # Number of articles to pull should be from NumbArtOA dataframe
+# SamplePW4 <- FirstAuthOA %>% #subset the paywall journals First Author Data 
+#   #filter(DOI != "NA") %>%
+#   group_by(Journal)%>%
+#   sample_n(17, replace = TRUE) # this code only grabs 30 from each journal, which is a random number SIMILAR to the 
 
 
 

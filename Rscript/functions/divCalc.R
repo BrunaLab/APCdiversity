@@ -1,10 +1,13 @@
-divCalc<-function(DataSet,JrnlType,Author) {
-  # DataSet<-AllData
-  # JrnlCat<-"OA"
+divCalc<-function(DataSet,Author) {
+  
+  library(vegan)
+  library(reshape)
+  library(tidyr)
+  library(dplyr)
+  # DataSet<-OA_papers
   # Author=1
-  SiteBySpec1<-DataSet %>% 
+  SiteBySpec1<-DataSet %>%
     filter(Country != "NA" & Code != "NA") %>%
-    filter(JrnlType==JrnlType) %>% 
     filter(AuthorNum==Author) %>%
     group_by(Journal, Country)%>%
     tally()
@@ -32,14 +35,16 @@ divCalc<-function(DataSet,JrnlType,Author) {
   DivMetrics$Journal <- SiteBySpec1$Journal
   DivMetrics$EffectSpecNum <- 1/(1-DivMetrics$DivSimpson)
   
+  
   MirrorPairs<-read_csv(file="./data/MirrorPairs.csv")
-  MirrorPairs<-dplyr::rename(MirrorPairs,"Journal"="SO")
+  MirrorPairs<-MirrorPairs %>% dplyr::rename("Journal"="SO")
+   
   DivMetrics<-left_join(DivMetrics,MirrorPairs,by="Journal")
   DivMetrics$Journal<-as.factor(DivMetrics$Journal)
   DivMetrics<-select(DivMetrics, Journal, pair_key,journal_cat,
-                     rich, DivSimpson,abund, EffectSpecNum)
-  
-  
+                      rich, DivSimpson,abund, EffectSpecNum)
+  DivMetrics<-DivMetrics<-DivMetrics %>% dplyr::rename("JrnlType"="journal_cat")
+
   return(DivMetrics)
   
   
