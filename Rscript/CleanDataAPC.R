@@ -1,178 +1,229 @@
+#=============================================================================================================#
+# Script created by Emilio M. Bruna (embruna@ufl.edu) to import and prepare
+# data for the analyses present in : PAPER CITATION TO BE ADDED 
+# Script created in  R version 3.6.3 (2020-02-29)
+# Uses packages bibliometrix_3.0.0 , tidyverse_1.3.0 , countrycode_1.1.3
+#=============================================================================================================#
+
 # the libraries
 library(tidyverse)
 library(bibliometrix)
-
-################################################################
-# THIS IS FOR ÅLL DOWNLOADED FROM SCOPUS BY EB
-################################################################
-
-# load journal list and pairs
-MirrorPairs<-read_csv(file="./data/MirrorPairs.csv")
-
-######################
-# Process the data
-######################
-###################################
-# PW: 2 sets
-###################################
-
-
-articles_wos <- c('./data/raw_data_wos/savedrecs1.txt',
-                  './data/raw_data_wos/savedrecs2.txt',
-                  './data/raw_data_wos/savedrecs3.txt',
-                  './data/raw_data_wos/savedrecs4.txt',
-                  './data/raw_data_wos/savedrecs5.txt',
-                  './data/raw_data_wos/savedrecs6.txt',
-                  './data/raw_data_wos/savedrecs7.txt',
-                  './data/raw_data_wos/savedrecs8.txt',
-                  './data/raw_data_wos/savedrecs9.txt',
-                  './data/raw_data_wos/savedrecs10.txt',
-                  './data/raw_data_wos/savedrecs11.txt',
-                  './data/raw_data_wos/savedrecs12.txt',
-                  './data/raw_data_wos/savedrecs13.txt',
-                  './data/raw_data_wos/savedrecs14.txt')
-
-articles_wos_df <- convert2df(articles_wos, dbsource = "wos", format = "plaintext")
-articles_wos <- biblioAnalysis(articles_wos_df, sep = ";")
-summary_wos <- summary(object = articles_wos, k = 10, pause = FALSE)
-# # # The have some nice plots
-plot(x = articles_wos14may, k = 10, pause = FALSE)
-# # # We need to extract the countries for each author
-# # # These data will be the last column of the processed df
-AuGeo_wos <- metaTagExtraction(articles_wos_df, Field = "AU_CO", sep = ";")
-str(AuGeo_wos)
-head(AuGeo_wos,20)
-
-write.csv(articles_wos_df,"./output/articles_wos_df.csv")
-write.csv(AuGeo_wos,"./output/AuGeo_wos.csv")
-###################################
-# read in the SCOPUS DATA
-articles_scopus <- c('./data/raw_data_scopus/scopus1.bib',
-                          './data/raw_data_scopus/scopus2.bib',
-                          './data/raw_data_scopus/scopus3.bib',
-                          './data/raw_data_scopus/scopus4.bib',
-                          './data/raw_data_scopus/scopus5.bib',
-                          './data/raw_data_scopus/scopus6.bib',
-                          './data/raw_data_scopus/scopus7.bib',
-                          './data/raw_data_scopus/scopus8.bib',
-                          './data/raw_data_scopus/scopus9.bib',
-                          './data/raw_data_scopus/scopus10.bib',
-                          './data/raw_data_scopus/scopus11.bib',
-                          './data/raw_data_scopus/scopus12.bib',
-                          './data/raw_data_scopus/scopus13.bib',
-                          './data/raw_data_scopus/scopus14.bib',
-                          './data/raw_data_scopus/scopus15.bib',
-                          './data/raw_data_scopus/scopus16.bib',
-                          './data/raw_data_scopus/scopus17.bib',
-                          './data/raw_data_scopus/scopus18.bib',
-                          './data/raw_data_scopus/scopus19.bib',
-                          './data/raw_data_scopus/scopus20.bib',
-                          './data/raw_data_scopus/scopus21.bib',
-                          './data/raw_data_scopus/scopus22.bib',
-                          './data/raw_data_scopus/scopus23.bib',
-                          './data/raw_data_scopus/scopus24.bib',
-                 './data/raw_data_scopus/scopusOA.bib')
-                          
-articles_scopus_df <- convert2df(articles_scopus, dbsource = "scopus", format = "bibtex")
-articles_scopus <- biblioAnalysis(articles_scopus_df, sep = ";")
-
-AuGeo_scopus <- metaTagExtraction(articles_scopus_df, Field = "AU_CO", sep = ";")
-str(AuGeo_scopus)
-head(AuGeo_scopus,20)
-write.csv(articles_scopus_df,"./output/articles_scopus_df.csv")
-write.csv(AuGeo_scopus,"./output/AuGeo_scopus.csv")
-
-
-colnames(AuGeo_scopus)
-colnames(AuGeo_wos)
-
-
-# #########################
-# # x_articles_df$C1
-# #########################
-# 
-# ########################################
-# x_articles_df <-bind_rows(articles_x_df,articles_x2_df)
-all_articles_df<-bind_rows(articles_scopus_df,articles_wos_df)
-# all_articles_df$SO<-as.factor(all_articles_df$SO)
-# all_articles_df$DI<-as.factor(all_articles_df$DI)
-head(all_articles_df,20)
-all_articles_df<-all_articles_df[colSums(!is.na(all_articles_df)) > 0]
-head(all_articles_df,20)
-
-# After doing analyses I discovered some duplicates were not being eliminated
-# by bibliometrix, so search and clear them
-# ID the dupes and tell you how many there are
-dupes<-duplicated(all_articles_df$DI)
-summary(dupes)
-
-# eliminate the duplicates
-all_articles_df<-all_articles_df[!duplicated(all_articles_df$DI), ]
-dupes<-duplicated(all_articles_df$DI)
-summary(dupes)
-
-
-# save as a csv file
-write.csv(all_articles_df,"./output/all_articles.csv")
-# all_articles_df<-read_csv("./output/all_articles.csv")
-
-# pw_articles<-filter(all_articles_df, journal_cat=="PW")
-# oa_articles<-filter(all_articles_df, journal_cat=="OA")
-
-results_all <- biblioAnalysis(all_articles_df, sep = ";")
-
-levels(as.factor(results_all$CO))
-options(width=100)
-# a summary of their analyses
-
-summary_all <- summary(object = results_all, k = 10, pause = FALSE)
-# The have some nice plots
-plot(x = results_all, k = 10, pause = FALSE)
-
-# We need to extract the countries for each author
-# These data will be the last column of the processed df
-AuGeoAll <- metaTagExtraction(all_articles_df, Field = "AU_CO", sep = ";")
-str(AuGeoAll)
-head(AuGeoAll,20)
-write.csv(AuGeoAll,"./output/AuGeoAll.csv")
-
-# TO STREAMLINE, select only the doi of the article, the journal, the year published, and the information on author country
-# note that all author countries are in a single column
-AuGeoAll<-bind_rows(AuGeo_scopus,AuGeo_wos)
-all_articles_geodata<-AuGeoAll %>% select(DI,SO,PY,AU_CO)
-# Add the pair key and journal type
-all_articles_geodata<-left_join(all_articles_geodata,MirrorPairs,by="SO") 
-all_articles_geodata<-select(all_articles_geodata,-notes)
-colnames(all_articles_geodata)
-
-all_articles_geodata<-droplevels(all_articles_geodata)
-str(all_articles_geodata)
-
-# this splits up the author countries - currently in a single column - into multiple columns (each country in its own column)
-tempDF<- as.data.frame(str_split(all_articles_geodata$AU_CO, ";", simplify = TRUE))
-tempDF <- tempDF %>% mutate_all(na_if,"")  #replace the blanks with NA
-
-tempDF <- data.frame(lapply(tempDF, as.character), stringsAsFactors=FALSE) # Need to do this or gather won't work properly
-all_articles_geodata<-cbind(all_articles_geodata,tempDF)
-rm(tempDF)
-all_articles_geodata<-all_articles_geodata %>% gather(author,country,7:ncol(all_articles_geodata))
-all_articles_geodata$author<-gsub("V","",all_articles_geodata$author) # remove the V, now have the author order
-all_articles_geodata$author<-as.numeric(all_articles_geodata$author)
-head(all_articles_geodata,10)
-all_articles_geodata<-all_articles_geodata %>% arrange(DI,author)
-all_articles_geodata<-all_articles_geodata[complete.cases(all_articles_geodata), ]
-head(all_articles_geodata,10)
-all_articles_geodata$DI<-as.factor(all_articles_geodata$DI)
-all_articles_geodata$AU_CO<-NULL #delete the column with all countries in a single cell
-
-# You can add the ISO three digit code for each country using library(countrycode)
 library(countrycode) 
-all_articles_geodata$country_code<-countrycode(all_articles_geodata$country,"country.name", "iso3c", warn = TRUE)
-#By setting "warn=TRUE" it will tell you which ones it couldn't convert. Because of spelling mistakes, etc.
-all_articles_geodata$country_code<-as.factor(all_articles_geodata$country_code)
-summary(all_articles_geodata$country_code)
-head(all_articles_geodata,10)
-summary(all_articles_geodata)
-colnames(all_articles_geodata)
+################################################################
+# Load the list of Pawall Journals and their OA mirrors 
+################################################################
+MirrorPairs<-read_csv(file="./data_raw/MirrorPairs.csv")
 
-write.csv(all_articles_geodata,"./output/all_Journal_author_countries.csv")
+################################################################
+# Load and process publication records. These were downloaded
+# from Web of Science (WOS) and SCOPUS.
+################################################################
+# Load records from WOS 
+articles_wos <- c('./data_raw/raw_data_wos/savedrecs1.txt',
+                  './data_raw/raw_data_wos/savedrecs2.txt',
+                  './data_raw/raw_data_wos/savedrecs3.txt',
+                  './data_raw/raw_data_wos/savedrecs4.txt',
+                  './data_raw/raw_data_wos/savedrecs5.txt',
+                  './data_raw/raw_data_wos/savedrecs6.txt',
+                  './data_raw/raw_data_wos/savedrecs7.txt',
+                  './data_raw/raw_data_wos/savedrecs8.txt',
+                  './data_raw/raw_data_wos/savedrecs9.txt',
+                  './data_raw/raw_data_wos/savedrecs10.txt',
+                  './data_raw/raw_data_wos/savedrecs11.txt',
+                  './data_raw/raw_data_wos/savedrecs12.txt',
+                  './data_raw/raw_data_wos/savedrecs13.txt',
+                  './data_raw/raw_data_wos/savedrecs14.txt')
+
+# load records from SCOPUS  
+articles_scopus <- c('./data_raw/raw_data_scopus/scopus1.bib',
+                          './data_raw/raw_data_scopus/scopus2.bib',
+                          './data_raw/raw_data_scopus/scopus3.bib',
+                          './data_raw/raw_data_scopus/scopus4.bib',
+                          './data_raw/raw_data_scopus/scopus5.bib',
+                          './data_raw/raw_data_scopus/scopus6.bib',
+                          './data_raw/raw_data_scopus/scopus7.bib',
+                          './data_raw/raw_data_scopus/scopus8.bib',
+                          './data_raw/raw_data_scopus/scopus9.bib',
+                          './data_raw/raw_data_scopus/scopus10.bib',
+                          './data_raw/raw_data_scopus/scopus11.bib',
+                          './data_raw/raw_data_scopus/scopus12.bib',
+                          './data_raw/raw_data_scopus/scopus13.bib',
+                          './data_raw/raw_data_scopus/scopus14.bib',
+                          './data_raw/raw_data_scopus/scopus15.bib',
+                          './data_raw/raw_data_scopus/scopus16.bib',
+                          './data_raw/raw_data_scopus/scopus17.bib',
+                          './data_raw/raw_data_scopus/scopus18.bib',
+                          './data_raw/raw_data_scopus/scopus19.bib',
+                          './data_raw/raw_data_scopus/scopus20.bib',
+                          './data_raw/raw_data_scopus/scopus21.bib',
+                          './data_raw/raw_data_scopus/scopus22.bib',
+                          './data_raw/raw_data_scopus/scopus23.bib',
+                          './data_raw/raw_data_scopus/scopus24.bib',
+                 './data_raw/raw_data_scopus/scopusOA.bib')
+
+
+################################################################
+# Use package 'bibliometrix' to convert these to dataframes                         
+################################################################
+articles_wos_df <- convert2df(articles_wos, dbsource = "wos", format = "plaintext")
+articles_scopus_df <- convert2df(articles_scopus, dbsource = "scopus", format = "bibtex")
+
+
+################################################################
+# bind the SCOPUS and WOS dataframes together and
+# remove any duplicate records, and save the resulting df
+################################################################
+all_articles_df<-bind_rows(articles_scopus_df,articles_wos_df)
+
+# Remove columns from the dataframe that only have NA values in them 
+all_articles_df<-all_articles_df[colSums(!is.na(all_articles_df)) > 0]
+# head(all_articles_df,20)
+
+# Search for any duplicate records using the article DOI
+dupes<-duplicated(all_articles_df$DI) # IDs the dupes
+summary(dupes) # TRUE tells you how many dupes there are
+# Keep only one of the duplicated records
+all_articles_df<-all_articles_df[!duplicated(all_articles_df$DI), ]
+# Check again to ensure there are no duplicates remaining
+dupes<-duplicated(all_articles_df$DI)
+summary(dupes) # all will be FALSE if no duplicates
+rm(dupes)
+# save the df of records as .csv file in "data_clean" folder
+write.csv(all_articles_df,"./data_clean/all_articles.csv", row.names = FALSE)
+
+# clean these out of the environment
+rm(articles_wos,articles_scopus,articles_scopus_df,articles_wos_df)
+################################################################
+
+
+
+################################################################
+# process the dataframe with 'bibliometrix'
+# (it's commented out because it's not necessary for us)
+################################################################
+#results_all <- biblioAnalysis(all_articles_df, sep = ";")
+
+################################################################
+# Extract each authors country of affiliation (the last column
+# of the processed df) and save the resulting df as a csv file
+################################################################
+AuGeoAll <- metaTagExtraction(all_articles_df, Field = "AU_CO", sep = ";")
+# head(AuGeoAll,20)
+
+# save the resulting output as a csv file
+write.csv(AuGeoAll,"./data_clean/AuGeoAll.csv", row.names = FALSE)
+
+# remove from the environment
+rm(all_articles_df)
+################################################################
+# Prep the and save the datafile that will be used in analyses
+# select only columns needed, then add:
+# ISO 3 digit codes for each country, world bank income classes
+# for each country, info on the journal category
+################################################################
+
+################################################################
+# select columns: article DOI, journal, year published, author country.
+################################################################
+AllData<-AuGeoAll %>% select(DI,SO,PY,AU_CO)
+# Add pair_key (id no. for a mirror pair) & journal type (OA or PW)
+AllData<-left_join(AllData,MirrorPairs,by="SO") 
+AllData<-select(AllData,-notes) #remove notes column
+AllData<-droplevels(AllData)
+
+# remove from the environment
+rm(AuGeoAll)
+################################################################
+# The countries of all authors of an article are in one cell. 
+# this section splits them into multiple columns, then converts
+# the df from wide to long form.
+tempDF<- as.data.frame(str_split(AllData$AU_CO, ";", simplify = TRUE))
+tempDF <- tempDF %>% mutate_all(na_if,"")  #replace the blanks with NA
+# Need to do this next step or 'gather' won't work properly
+tempDF <- data.frame(lapply(tempDF, as.character), stringsAsFactors=FALSE) 
+#bind the new dataframe of countries in wide form to original
+AllData<-cbind(AllData,tempDF)
+rm(tempDF) #remove the tempdf from environment
+# gather into long form 
+AllData<-AllData %>%
+  gather(author,country,7:ncol(AllData))
+# remove the 'V' from cells in author column
+# This also adds the order of authors for each paper 
+AllData$author<-gsub("V","",AllData$author) 
+AllData$author<-as.numeric(AllData$author)
+# head(AllData,10)
+# organize the df by article, with authors in order from 1...N
+AllData<-AllData %>% arrange(DI,author)
+# remove any that are incomplete
+AllData<-AllData[complete.cases(AllData), ]
+# convert DOI to a factor
+AllData$DI<-as.factor(AllData$DI)
+# delete the column with all countries in a single cell
+AllData$AU_CO<-NULL 
+
+################################################################
+# Add  ISO 3-digit code for each country with 'countrycode'
+################################################################
+# Setting "warn=TRUE" tells you of any it couldn't convert 
+# because of spelling mistakes, etc.
+AllData$country_code<-
+  countrycode(AllData$country,"country.name", "iso3c", warn = TRUE)
+
+# convert variables to factor
+AllData$country_code<-as.factor(AllData$country_code)
+AllData$journal_cat<-as.factor(AllData$journal_cat)
+AllData$country<-as.factor(AllData$country)
+AllData$SO<-as.factor(AllData$SO)
+
+# rename columns
+AllData <- AllData %>%
+  select(DOI = DI, Journal = SO, Year = PY, AuthorNum = author,
+         Country = country, Code = country_code, JrnlType = journal_cat, pair_key)
+
+
+
+################################################################
+# load and add World Bank data on national income categories
+CountryData <- read.csv("data_raw/CLASS.csv", header = TRUE)
+CountryData <- CountryData[-1,]
+CountryData <- CountryData %>%
+  select(Code,Region, IncomeGroup = Income.group)
+# add it to the dataframe
+AllData <- merge(AllData, CountryData, by="Code", all.x=TRUE) # merge 
+# remove CountryData from the environment
+rm(CountryData)
+
+# make IncomeGroup an ordered factor (Low to High)
+AllData$IncomeGroup<- ordered(AllData$IncomeGroup, levels = c("Low income", "Lower middle income", "Upper middle income","High income"))
+levels(AllData$IncomeGroup)[levels(AllData$IncomeGroup)=="High income"] <- "High"
+levels(AllData$IncomeGroup)[levels(AllData$IncomeGroup)=="Low income"] <- "Low"
+levels(AllData$IncomeGroup)[levels(AllData$IncomeGroup)=="Lower middle income"] <- "Lower middle"
+levels(AllData$IncomeGroup)[levels(AllData$IncomeGroup)=="Upper middle income"] <- "Upper middle"
+str(AllData)
+
+# convert to factor
+AllData$pair_key<-as.factor(AllData$pair_key)
+AllData$pair_key<-droplevels(AllData$pair_key)
+# levels(AllData$pair_key)
+# There are some with missing DOI values, if you don't replace missing DOI
+# they will be excluded when grouping
+AllData$DOI<- as.character(AllData$DOI)
+AllData$DOI<- AllData$DOI %>% replace_na("missing_DOI")
+AllData$DOI<- as.factor(AllData$DOI)
+AllData<-AllData %>% arrange(DOI,AuthorNum)
+# head(AllData)
+# save the csv
+write.csv(AllData,"./data_clean/AllData.csv", row.names = FALSE)
+
+
+################################################################
+# Change column names of Mirror Pairs and save csv to 'data_clean'
+################################################################
+MirrorPairs <- MirrorPairs%>%
+  select(Journal = SO, JrnlType = journal_cat, pair_key) %>% 
+  filter(pair_key>0)
+# save the df as .csv file in "data_clean" folder
+write.csv(MirrorPairs,"./data_clean/MirrorPairs.csv", row.names = FALSE)
+# remove from the environment
+rm(MirrorPairs)
+################################################################
