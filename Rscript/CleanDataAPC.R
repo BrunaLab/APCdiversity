@@ -65,20 +65,41 @@ articles_scopus <- c('./data_raw/raw_data_scopus/scopus1.bib',
 ################################################################
 # Use package 'bibliometrix' to convert these to dataframes                         
 ################################################################
+# WOS dataframe
 articles_wos_df <- convert2df(articles_wos, dbsource = "wos", format = "plaintext")
-articles_scopus_df <- convert2df(articles_scopus, dbsource = "scopus", format = "bibtex")
+# Remove columns from the dataframe that only have NA values in them 
+articles_wos_df<-articles_wos_df[colSums(!is.na(articles_wos_df)) > 0]
+# Search for any duplicate records using the article DOI
+dupes<-duplicated(articles_wos_df$DI) # IDs the dupes
+summary(dupes) # TRUE tells you how many dupes there are
+# Keep only one of the duplicated records
+articles_wos_df<-articles_wos_df[!duplicated(articles_wos_df$DI), ]
+# Check again to ensure there are no duplicates remaining
+dupes<-duplicated(articles_wos_df$DI)
+summary(dupes) # all will be FALSE if no duplicates
+rm(dupes)
 
+# SCOPUS dataframe
+articles_scopus_df <- convert2df(articles_scopus, dbsource = "scopus", format = "bibtex")
+# Remove columns from the dataframe that only have NA values in them 
+articles_scopus_df<-articles_scopus_df[colSums(!is.na(articles_scopus_df)) > 0]
+# Search for any duplicate records using the article DOI
+dupes<-duplicated(articles_scopus_df$DI) # IDs the dupes
+summary(dupes) # TRUE tells you how many dupes there are
+# Keep only one of the duplicated records
+articles_scopus_df<-articles_scopus_df[!duplicated(articles_scopus_df$DI), ]
+# Check again to ensure there are no duplicates remaining
+dupes<-duplicated(articles_scopus_df$DI)
+summary(dupes) # all will be FALSE if no duplicates
+rm(dupes)
 
 ################################################################
 # bind the SCOPUS and WOS dataframes together and
 # remove any duplicate records, and save the resulting df
 ################################################################
 all_articles_df<-bind_rows(articles_scopus_df,articles_wos_df)
-
 # Remove columns from the dataframe that only have NA values in them 
 all_articles_df<-all_articles_df[colSums(!is.na(all_articles_df)) > 0]
-# head(all_articles_df,20)
-
 # Search for any duplicate records using the article DOI
 dupes<-duplicated(all_articles_df$DI) # IDs the dupes
 summary(dupes) # TRUE tells you how many dupes there are
@@ -90,9 +111,6 @@ summary(dupes) # all will be FALSE if no duplicates
 rm(dupes)
 # save the df of records as .csv file in "data_clean" folder
 write.csv(all_articles_df,"./data_clean/all_articles.csv", row.names = FALSE)
-
-# clean these out of the environment
-rm(articles_wos,articles_scopus,articles_scopus_df,articles_wos_df)
 ################################################################
 
 
@@ -103,18 +121,7 @@ rm(articles_wos,articles_scopus,articles_scopus_df,articles_wos_df)
 ################################################################
 #results_all <- biblioAnalysis(all_articles_df, sep = ";")
 
-################################################################
-# Extract each authors country of affiliation (the last column
-# of the processed df) and save the resulting df as a csv file
-################################################################
-AuGeoAll <- metaTagExtraction(all_articles_df, Field = "AU_CO", sep = ";")
-# head(AuGeoAll,20)
 
-# save the resulting output as a csv file
-write.csv(AuGeoAll,"./data_clean/AuGeoAll.csv", row.names = FALSE)
-
-# remove from the environment
-rm(all_articles_df)
 ################################################################
 # Prep the and save the datafile that will be used in analyses
 # select only columns needed, then add:
@@ -122,10 +129,30 @@ rm(all_articles_df)
 # for each country, info on the journal category
 ################################################################
 
+
+################################################################
+# First Extract each authors country of affiliation 
+# (the last column of the processed df) 
+################################################################
+# for some reason it is necessary to extract country data from 
+# SCOPUS and WOS files independently, then merge. That's why can't use: 
+# AuGeoAll <- metaTagExtraction(all_articles_df, Field = "AU_CO", sep = ";")
+AuGeo_wos <- metaTagExtraction(articles_wos_df, Field = "AU_CO", sep = ";")
+AuGeo_scopus <- metaTagExtraction(articles_scopus_df, Field = "AU_CO", sep = ";")
+AllData<-bind_rows(AuGeo_scopus,AuGeo_wos)
+
+# remove from the environment
+rm(all_articles_df,
+   articles_wos,
+   articles_scopus,
+   articles_scopus_df,
+   articles_wos_df)
+
 ################################################################
 # select columns: article DOI, journal, year published, author country.
 ################################################################
-AllData<-AuGeoAll %>% select(DI,SO,PY,AU_CO)
+AllData<-AllData %>% select(DI,SO,PY,AU_CO)
+
 # Add pair_key (id no. for a mirror pair) & journal type (OA or PW)
 AllData<-left_join(AllData,MirrorPairs,by="SO") 
 AllData<-select(AllData,-notes) #remove notes column
