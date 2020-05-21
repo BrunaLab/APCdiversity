@@ -1,8 +1,6 @@
 # the libraries
 library(tidyverse)
 library(bibliometrix)
-library(refsplitr)
-
 
 ################################################################
 # THIS IS FOR ÅLL DOWNLOADED FROM SCOPUS BY EB
@@ -20,18 +18,19 @@ MirrorPairs<-read_csv(file="./data/MirrorPairs.csv")
 
 
 articles_wos <- c('./data/raw_data_wos/savedrecs1.txt',
-                             './data/raw_data_wos/savedrecs2.txt',
-                             './data/raw_data_wos/savedrecs3.txt',
-                             './data/raw_data_wos/savedrecs4.txt',
-                             './data/raw_data_wos/savedrecs5.txt',
-                             './data/raw_data_wos/savedrecs6.txt',
-                             './data/raw_data_wos/savedrecs7.txt',
-                             './data/raw_data_wos/savedrecs8.txt',
-                             './data/raw_data_wos/savedrecs9.txt',
-                             './data/raw_data_wos/savedrecs10.txt',
-                             './data/raw_data_wos/savedrecs11.txt',
-                             './data/raw_data_wos/savedrecs12.txt',
-                  './data/raw_data_wos/savedrecs13.txt')
+                  './data/raw_data_wos/savedrecs2.txt',
+                  './data/raw_data_wos/savedrecs3.txt',
+                  './data/raw_data_wos/savedrecs4.txt',
+                  './data/raw_data_wos/savedrecs5.txt',
+                  './data/raw_data_wos/savedrecs6.txt',
+                  './data/raw_data_wos/savedrecs7.txt',
+                  './data/raw_data_wos/savedrecs8.txt',
+                  './data/raw_data_wos/savedrecs9.txt',
+                  './data/raw_data_wos/savedrecs10.txt',
+                  './data/raw_data_wos/savedrecs11.txt',
+                  './data/raw_data_wos/savedrecs12.txt',
+                  './data/raw_data_wos/savedrecs13.txt',
+                  './data/raw_data_wos/savedrecs14.txt')
 
 articles_wos_df <- convert2df(articles_wos, dbsource = "wos", format = "plaintext")
 articles_wos <- biblioAnalysis(articles_wos_df, sep = ";")
@@ -97,14 +96,26 @@ colnames(AuGeo_wos)
 all_articles_df<-bind_rows(articles_scopus_df,articles_wos_df)
 # all_articles_df$SO<-as.factor(all_articles_df$SO)
 # all_articles_df$DI<-as.factor(all_articles_df$DI)
-head(all_articles_df,10)
+head(all_articles_df,20)
 all_articles_df<-all_articles_df[colSums(!is.na(all_articles_df)) > 0]
+head(all_articles_df,20)
 
+# After doing analyses I discovered some duplicates were not being eliminated
+# by bibliometrix, so search and clear them
+# ID the dupes and tell you how many there are
+dupes<-duplicated(all_articles_df$DI)
+summary(dupes)
+
+# eliminate the duplicates
+all_articles_df<-all_articles_df[!duplicated(all_articles_df$DI), ]
+dupes<-duplicated(all_articles_df$DI)
+summary(dupes)
 
 
 # save as a csv file
 write.csv(all_articles_df,"./output/all_articles.csv")
-# 
+# all_articles_df<-read_csv("./output/all_articles.csv")
+
 # pw_articles<-filter(all_articles_df, journal_cat=="PW")
 # oa_articles<-filter(all_articles_df, journal_cat=="OA")
 

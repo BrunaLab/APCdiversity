@@ -14,6 +14,7 @@ library(sampling)
 library(reshape)
 library(vegan)
 library(purrr)
+library(stringr)
 
 # load journal list and pairs
 MirrorPairs<-read_csv(file="./data/MirrorPairs.csv")
@@ -93,9 +94,34 @@ levels(AllData$pair_key)
 AllData$DOI<- as.character(AllData$DOI)
 AllData$DOI<- AllData$DOI %>% replace_na("missing_DOI")
 AllData$DOI<- as.factor(AllData$DOI)
+AllData<-AllData %>% arrange(DOI,AuthorNum)
+
+head(AllData,20)
 
 
-rm(ALLDATA, CountryData)
+############################################################
+# Remove any journal pairs for whihc data re incomplete
+############################################################
+
+# TODO: 
+# no articles for  "Clinics and Research in
+# Hepatology and Gastroenterology: X (9)" so exclude it and mirror
+# Diabetes and Metabolism: X (13) is missing (no info on page) 
+# Europ. J Obsterics, Gynecology: X (16) none published) 
+missing_jrnls<-c(9,13,16)
+
+AllData<-AllData %>% filter(!pair_key%in% missing_jrnls)
+rm(missing_jrnls)
+rm(ALLDATA)
+############################################################
+# Total number of journals
+############################################################
+n_journals <- AllData %>% 
+  group_by(JrnlType) %>% 
+  summarize(n=n_distinct(Journal))
+n_journals
+sum(n_journals$n)
+
 ############################################################
 # Total number of articles in study
 ############################################################
@@ -104,7 +130,8 @@ NumbArticles <- AllData %>% #number of papers per journal
   summarize(n=n_distinct(DOI))%>% 
   arrange(Journal)
 NumbArticles
-
+Total_No_Articles<-sum(NumbArticles$n)
+arrange(NumbArticles,desc(n))
 ############################################################
 # Number of articles in each OA Journal
 # and
@@ -116,7 +143,7 @@ NumbArtOA
 
 TOTAL_NumbArtOA<-sum(NumbArtOA$n) #total number summed accross all OA journals
 TOTAL_NumbArtOA
-
+ 
 ############################################################
 # Number of articles in each PW Journal
 # and
@@ -129,6 +156,7 @@ NumbArtPW
 
 TOTAL_NumbArtPW<-sum(NumbArtPW$n) #total number summed accross all OA journals
 TOTAL_NumbArtPW
+
 
 
 ############################################################
@@ -156,124 +184,271 @@ hist(AvgNumbAuthorsAll$AuthorNum, breaks=150)
 
 summarize(AvgNumbAuthorsAll,avg_n=mean(AuthorNum),sd_n=sd(AuthorNum))
 
-############################################################
+############################################################################
+# Make a table of the results 
+############################################################################
+Table1<-ungroup(NumbArticles) %>%
+  # select(-pair_key) %>% 
+  select(JrnlType,Journal,pair_key) %>% 
+  spread(JrnlType,Journal)
+Table1
+
+Table1.1<-ungroup(NumbArticles) %>%
+  # select(-pair_key) %>% 
+  select(JrnlType,n,pair_key) %>% 
+  spread(JrnlType,n)
+Table1.1
+Table1<-bind_cols(Table1,Table1.1) %>% 
+  select(PW,PW1,OA,OA1)
+Table1$PW<-as.character(Table1$PW)
+Table1$PW<-str_to_title(Table1$PW)
+Table1$OA<-as.character(Table1$OA)
+Table1$OA<-str_to_title(Table1$OA)
+Table1$OA<-str_replace(Table1$OA, " And ", " and ")
+Table1$OA<-str_replace(Table1$OA, " Of ", " of ")
+Table1$PW<-str_replace(Table1$PW, " And ", " and ")
+Table1$PW<-str_replace(Table1$PW, " Of ", " of ")
+# Table1$PW<-str_replace(Table1$PW, "Journal ", "J. ")
+# Table1$OA<-str_replace(Table1$PW, "Journal ", "J. ")
+names(Table1)<-c("Journal","Articles (n)","Open Access Mirror","Articles (n)")
+rm(Table1.1)
+pub_totals<-c("Total: ",TOTAL_NumbArtPW,"Total:",TOTAL_NumbArtOA)
+Table1<-rbind(Table1,pub_totals)
+write.csv(Table1, "./tables_figs/Table1.csv", row.names = FALSE)
+
+####ALTERNATIVE, MORE EFFICIENT TABLE 1
+Table1v2<-Table1
+names(Table1v2)<- names(Table1v2)<-c("Journal","No. Articles","Open Access Mirror","No. Articles - OA Mirror")
+Table1v2<-Table1v2 %>% select(-'Open Access Mirror')
+write.csv(Table1v2, "./tables_figs/Table1v2.csv", row.names = FALSE)
+
+
+
+############################################################################
 # For each journal category: 
-# the % of articles by 1st authores from different national income classes
-############################################################
+# the % of articles by 1st authors from different national income classes
+############################################################################
+################
+# PREP THE DATA 
+################
 first_author_income_cats<-AllData %>% 
   filter(AuthorNum==1) %>% 
   group_by(JrnlType,IncomeGroup) %>% 
   tally() %>% 
   mutate(percentage=n/sum(n)*100)
 
-# IncomeCats_allJournals<-bind_rows(OAAllInc,PayWallAllGeoInc)
-# bar_order <- c("High", "Upper-middle", "Lower-middle","Low")
-# levels(IncomeCats_allJournals$IncomeGroup)
+
+
+
+
+################
+# FIGURE 
+################
+
+png(file="./tables_figs/plot1.png",width=1000, height=700)
+labels <- c(OA = "Open Access Articles", PW = "Paywalled Articles")
 plot1<-ggplot(first_author_income_cats, aes(x=IncomeGroup,y = percentage))+
   geom_bar(stat = "identity")+
+  xlab("Author National Income Category") + ylab("Articles Published (%)")+
   # scale_x_discrete(limits = bar_order)+
-  facet_grid(cols = vars(JrnlType))+
-  ggtitle("% of articles in each journal category by 1st authors from diff. income cats.")
+  facet_grid(cols = vars(JrnlType),labeller=labeller(JrnlType = labels))+
+  ggtitle("Figure 1")
 plot1<-plot1+
   theme_classic()+
   theme(
-    axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+    axis.text.x = element_text(size=18,angle = 45, vjust = 1, hjust = 1),
+    axis.text.y = element_text(size=18),
+    axis.title.x=element_text(colour="black", size = 24, vjust=-0.5),
+    axis.title.y=element_text(colour="black", size = 24, vjust=2),
+    strip.text.x = element_text(size = 18),
+    plot.margin =unit(c(1,1,1,1.5), "lines")   #plot margin - top, right, bottom, left
+    )
 plot1
-
-
-# As a waffle plot
+dev.off()
+################
+# As a waffle 
+################
 library(waffle)
-foo<-filter(first_author_income_cats,JrnlType=="OA")
-percOA<-foo$percentage
-names(percOA)<-as.character(foo$IncomeGroup)
-foo2<-filter(first_author_income_cats,JrnlType=="PW")
-percPW<-foo2$percentage
-names(percPW)<-as.character(foo2$IncomeGroup)
-waffle(percPW,rows=14, size=1,legend_pos = "top", title = "1st Authors - Paywalled Articles")
+waffle_df<-filter(first_author_income_cats,JrnlType=="OA")
+percOA<-waffle_df$percentage
+names(percOA)<-as.character(waffle_df$IncomeGroup)
+waffle_df2<-filter(first_author_income_cats,JrnlType=="PW")
+percPW<-waffle_df2$percentage
+names(percPW)<-as.character(waffle_df2$IncomeGroup)
 
-
-waffle(numberOA/5,rows=6, size=1,legend_pos = "top", title = "1st Authors - Open Access Articles")
+waffle(percPW,rows=14, size=1,legend_pos = "top", title = "Paywalled Articles")
+waffle(percOA,rows=6, size=1,legend_pos = "top", title = "Open Access Articles")
 
 gridExtra::grid.arrange(
-  waffle(percOA,rows=14, size=1,legend_pos = "top", title = "1st Authors - OA Articles", flip=TRUE),
-  waffle(percPW,rows=14, size=1,legend_pos = "top", title = "1st Authors - Paywalled Articles", flip=TRUE)
+  waffle(percOA,rows=14, size=1,legend_pos = "right", xlab = "Open Access Articles",flip=TRUE,title="Fig. 1: 1st Author National Income Category (%)"),
+  waffle(percPW,rows=14, size=1,legend_pos = "right", xlab = "Paywalled Articles", flip=TRUE, title =" ") #to get the spacing right include a blank title
 )
+
+rm(waffle_df,waffle_df2)
+
+
 ############################################################
 # For 1st authors from each national income class: 
 # The % of articles that were in PW vs OA journals
 ############################################################
+
+################
+# PREP THE DATA 
+################
+
 # Here group by countries first. The idea is to compare
 # where authors from each income class publish
+
+# ISOLATE FIRST AUTHORS
 first_jrnlcat_by_income_cats<-AllData %>% 
   filter(AuthorNum==1) %>% 
   group_by(IncomeGroup,JrnlType) %>% 
   tally() %>% 
   mutate(percentage=n/sum(n)*100)
 
-plot2<-ggplot(first_jrnlcat_by_income_cats, aes(x=IncomeGroup,y = percentage, fill=JrnlType))+
-  geom_bar(position="fill",stat = "identity")+
-  scale_fill_manual(values=c("midnightblue","dimgray"))+
-  coord_flip()+
-  ggtitle("% of articles by authors from different income classes in OA and PW journals")
+
+# ISOLATE LAST AUTHORS
+last_jrnlcat_by_income_cats<-AllData %>% 
+  group_by(DOI) %>% 
+  filter(AuthorNum == max(AuthorNum)) %>% 
+  group_by(IncomeGroup,JrnlType) %>% 
+  tally() %>% 
+  mutate(percentage=n/sum(n)*100) 
+  
+
+# SELECT 1st or last Author
+plot2data<-first_jrnlcat_by_income_cats
+# OR
+# plot2data<-last_jrnlcat_by_income_cats
+################
+# FIGURE 2
+################
+png(file="./tables_figs/plot2.png",width=1000, height=700)
+plot2<-ggplot(plot2data, aes(x=JrnlType,y = percentage, fill=JrnlType))+
+  geom_bar(stat = "identity")+
+  facet_grid(cols = vars(IncomeGroup))+
+  xlab("Author National Income Category") + ylab("Articles published in\nPW vs. OA Journals (%)")+
+  # scale_fill_manual(values=c("midnightblue","dimgray"), name="Journal Category",
+  scale_fill_manual(values=c("dimgray","dimgray"), name="Journal Category",
+                         breaks=c("OA", "PW"),
+                         labels=c("Open Access", "Paywalled"))+
+  scale_y_continuous(breaks = seq(0, 100, 10))+
+  # coord_flip()+
+  ggtitle("Fig. 2")
 plot2<-plot2+
   theme_classic()+
-  scale_y_continuous(breaks = seq(0, 1, 0.10))
+  theme(
+    axis.text.x = element_text(size=18),
+    axis.text.y = element_text(size=18),
+    axis.title.x=element_text(colour="black", size = 24, vjust=-0.5),
+    axis.title.y=element_text(colour="black", size = 24, vjust=2),
+    legend.position="none",
+    strip.text.x = element_text(size = 20),
+    plot.margin =unit(c(1,1,1,1.5), "lines")   #plot margin - top, right, bottom, left
+    # legend.text =element_text(colour="black", size = 16),
+    # legend.title =element_text(colour="black", size = 18),
+  )
 plot2
+dev.off()
 
 ############################################################
 # for articles in OA journals: the number of articles by
 # 1st authors in each country
 ############################################################
 
-OAAllGeo <-AllData %>%
+#################
+# SELECT OA OR PW, FIRST OR LAST AUTHOR
+#################
+
+JournalCategory<-"OA"
+# OR 
+# JournalCategory<-"PW"
+
+# FIRST AUTHOR
+AllGeo <-AllData %>%
+  group_by(DOI) %>% 
   filter(AuthorNum == 1) %>%
-  filter(JrnlType=="OA") %>% 
+  filter(JrnlType==JournalCategory) %>% 
   filter(Country != "NA" & Code != "NA") %>%
   group_by(Country, Code)%>%
   tally() %>% 
   arrange(desc(n))
-OAAllGeo <-left_join(OAAllGeo, CountryData, by = "Code") %>%
+sum(AllGeo$n)
+
+# LAST AUTHOR
+# AllGeo <-AllData %>%
+#   group_by(DOI) %>%
+#   filter(AuthorNum == max(AuthorNum)) %>%
+#   filter(JrnlType==JournalCategory) %>%
+#   filter(Country != "NA" & Code != "NA") %>%
+#   group_by(Country, Code)%>%
+#   tally() %>%
+#   arrange(desc(n))
+# sum(AllGeo$n)
+
+head(AllData,10)
+
+
+AllGeo <-left_join(AllGeo, CountryData, by = "Code") %>%
   filter(IncomeGroup != "NA") %>% 
   ungroup() %>%
   mutate(perc=n/sum(n)*100)
-OAAllGeo$perc<-round(OAAllGeo$perc,2)
-OAAllGeo<-arrange(OAAllGeo,desc(OAAllGeo$perc))
-OAAllGeo<- transform(OAAllGeo,Code = reorder(Code,perc))
+AllGeo$perc<-round(AllGeo$perc,2)
+AllGeo<-arrange(AllGeo,desc(AllGeo$perc))
+AllGeo<- transform(AllGeo,Code = reorder(Code,perc))
+AllGeo$IncomeGroup<-droplevels(AllGeo$IncomeGroup)
+AllGeo$IncomeGroup <- ordered(AllGeo$IncomeGroup, levels = c("High income", "Upper middle income","Lower middle income","Low income"))
+levels(AllGeo$IncomeGroup)
 
-plot3<-ggplot(OAAllGeo, aes(Code, perc, fill=IncomeGroup))+
+cutoff = 25 # This is how many countries you want on the chart, all the rest will be in "OTHER"
+AllGeo<-arrange(AllGeo, desc(perc)) %>% select(Code,n,perc, IncomeGroup)
+most.common.authors<-slice(AllGeo, 1:cutoff)
+lst.common.authors<-slice(AllGeo, (cutoff+1):nrow(AllGeo)) 
+# lst.common.authors$Code<-"all others"
+# lst.common.authors$IncomeGroup<-"all others"
+lst.common.authors<-lst.common.authors %>% 
+  group_by(IncomeGroup) %>% 
+  summarize(n=sum(n),perc=sum(perc),n_countries=n_distinct(Code)) 
+lst.common.authors$Code<-paste(lst.common.authors$n_countries,lst.common.authors$IncomeGroup,"countries", sep = " ", collapse = NULL)
+lst.common.authors$Code<-gsub("income countries","",lst.common.authors$Code)
+most.common.authors<-bind_rows(most.common.authors, lst.common.authors)
+most.common.authors$Code<-as.factor(most.common.authors$Code)
+most.common.authors
+
+# This is needed to put them in order in the plot with OTHER at the end of the graph
+order<-rev(seq(1:nrow(most.common.authors))) #REV is what makes it go tyop to bottom if flipped coordinates
+most.common.authors$Code <- factor(most.common.authors$Code,most.common.authors$Code[levels = order])
+# rm(order,AllGeo,lst.common.authors)
+most.common.authors
+
+# png(file="./tables_figs/plot3a_OA.png",width=1000, height=700)
+# png(file="./tables_figs/plot3b_PW.png",width=1000, height=700)
+png(file="./tables_figs/plot3c_OA.png",width=1000, height=700)
+# png(file="./tables_figs/plot3d_PW.png",width=1000, height=700)
+plot3<-ggplot(most.common.authors, aes(x=Code,y=perc, fill=IncomeGroup))+
   geom_bar(stat = "identity")+
+  # geom_text(size = 3, position = position_stack(vjust = 0.5))+
+  xlab("Country in which\nfirst author\nis based") + ylab("Percentage of Articles")+
+  ylim(0, 35)+
   coord_flip()+
-  ggtitle("Country Representation by Income Group OA")
+    scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73"), 
+                    name="National Income Category",
+                    breaks=c("High income", "Upper middle income","Lower middle income","Low income"))+
+  ggtitle("Fig. 3a: OA Journals")
+  
 plot3<-plot3+theme_light()+
-  scale_y_continuous(breaks = seq(0, 100, 10))
+  theme(
+    axis.text.x = element_text(size=18),
+    axis.text.y = element_text(size=18),
+    axis.title.x=element_text(colour="black", size = 24, vjust=-0.5),
+    axis.title.y=element_text(colour="black", size = 24, hjust=0.5,vjust=0.5,angle = 0),
+    legend.position="right",
+    plot.margin =unit(c(1,1,1,1.5), "lines")  
+  )
 plot3  
+dev.off()
 
-############################################################
-# for articles in PW journals: the number of articles by
-# 1st authors in each country
-############################################################
-PWAllGeo <-AllData %>%
-  filter(AuthorNum == 1) %>%
-  filter(JrnlType=="PW") %>% 
-  filter(Country != "NA" & Code != "NA") %>%
-  group_by(Country, Code)%>%
-  tally() %>% 
-  arrange(desc(n))
-PWAllGeo <-left_join(PWAllGeo, CountryData, by = "Code") %>%
-  filter(IncomeGroup != "NA") %>% 
-  ungroup() %>%
-  mutate(perc=n/sum(n)*100)
-PWAllGeo$perc<-round(PWAllGeo$perc,2)
-PWAllGeo<-arrange(PWAllGeo,desc(PWAllGeo$perc))
-PWAllGeo<- transform(PWAllGeo,Code = reorder(Code,perc))
 
-plot4<-ggplot(PWAllGeo, aes(Code, perc, fill=IncomeGroup))+
-  geom_bar(stat = "identity")+
-  coord_flip()+
-  ggtitle("Country Representation by Income Group OA")
-plot4<-plot4+theme_light()+
-  scale_y_continuous(breaks = seq(0, 100, 10))
-plot4
 
 ##################################################
 # SUBSET and bootstrap Paywall Journals 
@@ -296,13 +471,56 @@ for(i in 1:nboot){
 }
 
 OAdiv<-as.numeric(DivCalcPooledFirst(OA_papers)[2])
+OARich<-as.numeric(DivCalcPooledFirst(OA_papers)[1])
 
+########## BOOTSTRAP 1st author diversity OA
+
+png(file="./tables_figs/plot4a.png",width=1000, height=700)
 OAbootPlot<-ggplot(bootstrap.OA.1st, aes(x=InvSimp)) + 
   geom_histogram(bins=25, colour="black", fill="white")+
   geom_vline(aes(xintercept=OAdiv),
-             color="blue", linetype="dashed", size=1)
-OAbootPlot<-OAbootPlot+theme_classic()
+             color="darkblue", linetype="dashed", size=1)+
+    geom_label(label="Observed OA Diversity", x=16,y=115,
+             label.padding = unit(0.55, "lines"), # Rectangle size around label
+             label.size = 0.5,color = "darkblue", fill="white")+
+  xlab("National Diversity (Inv. Simpson's) of First Authors") + ylab("Frequency")+
+  # xlab("Richness (No. of Countries)") + ylab("Frequency")+
+  scale_y_continuous(expand = c(0,0),limits = c(0,120))
+OAbootPlot<-OAbootPlot+
+  theme_classic()+
+  theme(
+    axis.text.x = element_text(size=18),
+    axis.text.y = element_text(size=18),
+    axis.title.x=element_text(colour="black", size = 24, vjust=-0.5),
+    axis.title.y=element_text(colour="black", size = 24, hjust=0.5,vjust=0.5,angle = 0),
+   plot.margin =unit(c(1,1,1,1.5), "lines")  
+  )
 OAbootPlot
+dev.off()
+
+
+
+png(file="./tables_figs/plot4b.png",width=1000, height=700)
+OAbootPlot2<-ggplot(bootstrap.OA.1st, aes(x=Richness)) + 
+  geom_histogram(bins=25, colour="black", fill="white")+
+  geom_vline(aes(xintercept=OARich),
+             color="darkblue", linetype="dashed", size=1)+
+  geom_label(label="Observed\nOA Richness", x=68,y=160,
+             label.padding = unit(0.55, "lines"), # Rectangle size around label
+             label.size = 0.5,color = "darkblue", fill="white")+
+  xlab("No. of Countries - First Authors") + ylab("Frequency")+
+    scale_y_continuous(expand = c(0,0),limits = c(0,170))
+OAbootPlot2<-OAbootPlot2+
+  theme_classic()+
+  theme(
+    axis.text.x = element_text(size=18),
+    axis.text.y = element_text(size=18),
+    axis.title.x=element_text(colour="black", size = 24, vjust=-0.5),
+    axis.title.y=element_text(colour="black", size = 24, hjust=0.5,vjust=0.5,angle = 0),
+    plot.margin =unit(c(1,1,1,1.5), "lines")  
+  )
+OAbootPlot2
+dev.off()
 
 #################################################################
 # calculate diversity indices BY CAT AND JOURNAL
@@ -334,12 +552,13 @@ DivMetricsOA_wide<-DivMetricsOA %>%
 DivMetricsALL<-left_join(DivMetricsPW_wide,DivMetricsOA_wide,by="pair_key")
 # Add Difference in diversity score (DeltaDiv)
 DivMetricsALL$DeltaDiv <- DivMetricsALL$PW_DivSimpson - DivMetricsALL$OA_DivSimpson
-DivMetrics$DeltaRich <- DivMetricsALL$PW_rich - DivMetricsALL$OA_rich
+DivMetricsALL$DeltaRich <- DivMetricsALL$PW_rich - DivMetricsALL$OA_rich
 str(DivMetricsALL)
 boxplot(DivMetricsALL$DeltaDiv)
 median(DivMetricsALL$DeltaDiv,na.rm=TRUE)
-write.csv(DivMetrics, "CleanData/FirstDivMetricsByJrnl.csv", row.names = FALSE)
-
+save_name<-paste('output/DivMetricsALL_', Sys.Date(), '.csv') #to add the date of output to filename
+write.csv(DivMetricsALL, save_name, row.names = FALSE)
+rm(save_name)
 #############################################
 # DIVERSITY & RICHNESS of ENTIRE POOL 
 # By FIRST AUTHOR, LAST AUTHOR, or ALL AUTHORS
@@ -387,6 +606,22 @@ DivMetricsPooled_all <-DivMetricsPooled_all %>% dplyr::rename(OA_richness=V1,PW_
 rownames(DivMetricsPooled_all)<-nrow(DivMetricsPooled_all)
 # write.csv(DivMetricsPooled_all, "CleanData/DivMetricsPooled_all.csv", row.names = FALSE)
 
+#######################################
+# Table Div and Richness Pooled
+#######################################
+
+
+
+Table2<-bind_rows(unlist(DivMetricsPooled_first),
+                  unlist(DivMetricsPooled_last),
+                         unlist(DivMetricsPooled_all))
+Table2$Authors<-c("First","Last","All")
+# Table2$OA_invSimp<-round(as.numeric(Table2$OA_invSimp))
+# Table2$PW_invSimp<-round(as.numeric(Table2$PW_invSimp))
+Table2<- Table2 %>% select("Authors","OA_richness.Richness","PW_richness.Richness","OA_invSimp.Richness","PW_invSimp.Richness")  
+names(Table2)<-c("Authors","OA Richness","PW Richness","OA Diversity","PW Diversity")
+write.csv(Table2, "./tables_figs/Table2.csv", row.names = FALSE)
+
 #############################################################################################
 # DIV OF PW SUBSAMPLES MATCHING OA BY NUMBER OF ARTICLES
 ###################################################################################################
@@ -404,7 +639,7 @@ FirstAuthOA<-AllData %>%
   filter(AuthorNum==1)
 FirstAuthOA$Journal<-droplevels(FirstAuthOA$Journal)
 
-# number oif journals, make sure they are the same!
+# number of journals, make sure they are the same!
 nlevels(FirstAuthPW$Journal)==nlevels(FirstAuthOA$Journal)
 
 # How to sample different amounts from different groups is very nicely laid out in this post:
@@ -495,9 +730,64 @@ n = as.data.frame(OA_sample$n)
 str(n)
 
 ############################################
-
 # now sample and iterate!
-# THIS IS FOR MATCHED SUBSAMPLING - FIRST
+# THIS IS FOR MATCHED SUBSAMPLING - FIRST AUTHOR
+# 1<-Richness  2<-InvSimpsons 3<-Countries
+############################################
+source("./Rscript/functions/samplePW.R")
+library(tictoc)
+tic()   
+nboot <-1000 #number of bootstra p samples
+InvSimp <-rep(NA, nboot)
+Richness<-rep(NA, nboot)
+SubsampledPW.results_First <- data.frame(Richness,InvSimp)
+rm(InvSimp,Richness)
+set.seed(10)
+for(i in 1:nboot){
+  PW_sample<-samplePW(PW_papers,n)
+  results<-DivCalcPooledFirst(PW_sample)
+  SubsampledPW.results_First[i,1]<-(results)[1]
+  SubsampledPW.results_First[i,2]<-(results)[2]
+  }
+SubsampledPW.results_First
+toc()
+
+write.csv(SubsampledPW.results_First, 
+          'output/SubsampledPW.results_FIRST_AUTHOR.csv', 
+          row.names = FALSE)
+
+
+
+probFirst<-sum(SubsampledPW.results_First$InvSimp>OAdiv)/1000
+probFirst
+
+png(file="./tables_figs/plot5a.png",width=1000, height=700)
+OAdiv_First<-as.numeric(DivCalcPooledFirst(OA_papers)[2])
+pDiv_first<-ggplot(SubsampledPW.results_First, aes(x=InvSimp)) + 
+  geom_histogram(bins=25, colour="black", fill="white")+
+  geom_vline(aes(xintercept=OAdiv_First),
+               color="darkblue", linetype="dashed", size=1)+
+  geom_label(label="0% bootstrap PW values >\nObserved OA Diversity", x=13,y=175,
+             label.padding = unit(0.55, "lines"), # Rectangle size around label
+             label.size = 0.5,color = "darkblue", fill="white")+
+  xlab("Bootstrapped PW Diversity - First Authors") + ylab("Frequency")+
+  scale_y_continuous(expand = c(0,0),limits = c(0,200))+
+    scale_x_continuous(breaks = c(1:16),limits=c(5,16))
+  pDiv_first<-pDiv_first+
+  theme_classic()+ 
+  theme(
+    axis.text.x = element_text(size=18),
+    axis.text.y = element_text(size=18),
+    axis.title.x=element_text(colour="black", size = 24, vjust=-0.5),
+    axis.title.y=element_text(colour="black", size = 24, hjust=0.5,),
+    plot.margin =unit(c(1,1,1,1.5), "lines")  
+  )
+pDiv_first
+dev.off()
+
+############################################
+# now sample and iterate!
+# THIS IS FOR MATCHED SUBSAMPLING - LAST AUTHOR
 # 1<-Richness  2<-InvSimpsons 3<-Countries
 ############################################
 source("./Rscript/functions/samplePW.R")
@@ -506,74 +796,435 @@ tic()
 nboot <-1000 #number of bootstrap samples
 InvSimp <-rep(NA, nboot)
 Richness<-rep(NA, nboot)
-SubsampledPW.results <- data.frame(Richness,InvSimp)
+SubsampledPW.results_Last <- data.frame(Richness,InvSimp)
 rm(InvSimp,Richness)
 set.seed(10)
 for(i in 1:nboot){
   PW_sample<-samplePW(PW_papers,n)
-  results<-DivCalcPooledFirst(PW_sample)
-  SubsampledPW.results[i,1]<-(results)[1]
-  SubsampledPW.results[i,2]<-(results)[2]
-  }
-SubsampledPW.results
+  results<-DivCalcPooledLast(PW_sample)
+  SubsampledPW.results_Last[i,1]<-(results)[1]
+  SubsampledPW.results_Last[i,2]<-(results)[2]
+}
+SubsampledPW.results_Last
 toc()
 
+write.csv(SubsampledPW.results_Last, 
+          'output/SubsampledPW.results_LAST_AUTHOR.csv', 
+          row.names = FALSE)
 
-OAdiv<-as.numeric(DivCalcPooledFirst(OA_papers)[2])
-pDiv<-ggplot(SubsampledPW.results, aes(x=InvSimp)) + 
+
+
+probLast<-sum(SubsampledPW.results_Last$InvSimp>OAdiv_Last)/1000
+probLast
+
+
+png(file="./tables_figs/plot5b.png",width=1000, height=700)
+OAdiv_Last<-as.numeric(DivCalcPooledLast(OA_papers)[2])
+pDiv_last<-ggplot(SubsampledPW.results_Last, aes(x=InvSimp)) + 
   geom_histogram(bins=25, colour="black", fill="white")+
-  geom_vline(aes(xintercept=OAdiv),
-               color="blue", linetype="dashed", size=1)
-pDiv<-pDiv+theme_classic() 
+  geom_vline(aes(xintercept=OAdiv_Last),
+             color="darkblue", linetype="dashed", size=1)+
+geom_label(label="96% bootstrap PW values >\nObserved OA Diversity",
+    x=8.5,y=135,label.padding = unit(0.55, "lines"), # Rectangle size around label
+    label.size = 0.5,color = "darkblue", fill="white")+
+  xlab("Bootstrapped PW Diversity - Last Authors") + ylab("Frequency")+
+  # scale_x_continuous(breaks = c(3:14),limits=c(3,14))+
+  scale_y_continuous(expand = c(0,0),limits = c(0,150))
+pDiv_last<-pDiv_last+
+  theme_classic()+ 
+  theme(
+    axis.text.x = element_text(size=18),
+    axis.text.y = element_text(size=18),
+    axis.title.x=element_text(colour="black", size = 24, vjust=-0.5),
+    axis.title.y=element_text(colour="black", size = 24, hjust=0.5),
+    plot.margin =unit(c(1,1,1,1.5), "lines")  
+  )
+pDiv_last
+dev.off()
+
+
+
 
 
 ############################################
-
 # now sample and iterate!
-# THIS IS FOR NO SUBSAMPLING - FIRST AUTHOR, ALL ARTICLES POOLED
+# THIS IS FOR MATCHED SUBSAMPLING - LAST AUTHOR
 # 1<-Richness  2<-InvSimpsons 3<-Countries
 ############################################
-
+source("./Rscript/functions/samplePW.R")
 library(tictoc)
 tic()
 nboot <-1000 #number of bootstrap samples
 InvSimp <-rep(NA, nboot)
 Richness<-rep(NA, nboot)
-SubsampledPW.pooled.results <- data.frame(Richness,InvSimp)
+SubsampledPW.results_ALL <- data.frame(Richness,InvSimp)
 rm(InvSimp,Richness)
 set.seed(10)
 for(i in 1:nboot){
-  PW_sample<-samplePW(PW_papers,nrow(OA_papers))
-  results<-DivCalcPooledFirst(PW_sample)
-  SubsampledPW.pooled.results[i,1]<-(results)[1]
-  SubsampledPW.pooled.results[i,2]<-(results)[2]
+  PW_sample<-samplePW(PW_papers,n)
+  results<-DivCalcPooledAll(PW_sample)
+  SubsampledPW.results_ALL[i,1]<-(results)[1]
+  SubsampledPW.results_ALL[i,2]<-(results)[2]
 }
-SubsampledPW.pooled.results
+SubsampledPW.results_ALL
 toc()
-head(SubsampledPW.pooled.results) 
-write.csv(SubsampledPW.pooled.results, "CleanData/SubsampledPW.pooled.results.csv", row.names = FALSE)
-# SubsampledPW.pooled.results<-read_csv("CleanData/SubsampledPW.pooled.results.csv")
-source("./Rscript/functions/DivCalcPooledFirst.R") 
-OAdiv<-as.numeric(DivCalcPooledFirst(OA_papers)[2])
-PWdiv<-as.numeric(DivCalcPooledFirst(PW_papers)[2])
-# SubsampledPW.pooled.results<-read.csv("CleanData/SubsampledPW.pooled.results.csv")
 
-pDiv<-ggplot(SubsampledPW.pooled.results, aes(x=InvSimp)) + 
+write.csv(SubsampledPW.results_ALL, 
+          'output/SubsampledPW.results_ALL_AUTHOR.csv', 
+          row.names = FALSE)
+
+
+
+probAll<-sum(SubsampledPW.results_ALL$InvSimp>OAdiv_All)/1000
+probAll
+
+png(file="./tables_figs/plot5c.png",width=1000, height=700)
+OAdiv_All<-as.numeric(DivCalcPooledAll(OA_papers)[2])
+pDiv_all<-ggplot(SubsampledPW.results_ALL, aes(x=InvSimp)) + 
   geom_histogram(bins=25, colour="black", fill="white")+
-  geom_vline(aes(xintercept=OAdiv),
-             color="blue", linetype="dashed", size=1)+
-  geom_label(label="OA InvSimp", x=13.5,y=170,
-             # label.padding = unit(0.55, "lines"), # Rectangle size around label
-    label.size = 0.15,color = "blue")+
-  geom_vline(aes(xintercept=PWdiv),
-           color="red", linetype="dashed", size=1)+
-  geom_label(label="PW InvSimp", x=6,y=150,
-             # label.padding = unit(0.55, "lines"), # Rectangle size around label
-             label.size = 0.15,color = "red")
-pDiv<-pDiv+theme_classic() 
-pDiv
-
+  geom_vline(aes(xintercept=OAdiv_All),
+             color="darkblue", linetype="dashed", size=1)+
+  geom_label(label="0% bootstrap PW values >\nObserved OA Diversity",
+             x=11.5,y=135,label.padding = unit(0.55, "lines"), # Rectangle size around label
+             label.size = 0.5,color = "darkblue", fill="white")+
+  xlab("Bootstrapped PW Diversity - All Authors") + ylab("Frequency")+
+  # scale_x_continuous(breaks = c(3:14),limits=c(3,14))+
+  scale_y_continuous(expand = c(0,0),limits = c(0,150))
+  pDiv_all<-pDiv_all+
+  theme_classic()+ 
+  theme(
+    axis.text.x = element_text(size=18),
+    axis.text.y = element_text(size=18),
+    axis.title.x=element_text(colour="black", size = 24, vjust=-0.5),
+    axis.title.y=element_text(colour="black", size = 24, hjust=0.5),
+    plot.margin =unit(c(1,1,1,1.5), "lines")  
+  )
+pDiv_all
 dev.off()
+
+
+
+
+############################################
+
+############################################
+# Richness OA vs Boot PW
+# FIRST Authors
+############################################
+# SubsampledPW.results_First<-read_csv('./output/SubsampledPW.results_FIRST_AUTHOR.csv')
+
+probFirst<-sum(SubsampledPW.results_First$Richness>OArich_First)/1000
+probFirst
+
+png(file="./tables_figs/plot6a.png",width=1000, height=700)
+OArich_First<-as.numeric(DivCalcPooledFirst(OA_papers)[1])
+prich_first<-ggplot(SubsampledPW.results_First, aes(x=Richness)) +
+  geom_histogram(bins=25, colour="black", fill="white")+
+  geom_vline(aes(xintercept=OArich_First),
+             color="darkblue", linetype="dashed", size=1)+
+  geom_label(label="0% bootstrap PW values >\nObserved OA Richness", x=65,y=240,
+             label.padding = unit(0.55, "lines"), # Rectangle size around label
+             label.size = 0.5,color = "darkblue", fill="white")+
+  xlab("Bootstrapped PW Richness - First Authors") + ylab("Frequency")+
+  scale_y_continuous(expand = c(0,0),limits = c(0,250))+
+  scale_x_continuous(breaks = seq(30,70, by=10),limits=c(30,70))
+prich_first<-prich_first+
+  theme_classic()+ 
+  theme(
+    axis.text.x = element_text(size=18),
+    axis.text.y = element_text(size=18),
+    axis.title.x=element_text(colour="black", size = 24, vjust=-0.5),
+    axis.title.y=element_text(colour="black", size = 24, hjust=0.5,),
+    plot.margin =unit(c(1,1,1,1.5), "lines")  
+  )
+prich_first
+dev.off()
+
+
+
+
+############################################
+# Richness OA vs Boot PW
+# LAST Authors
+############################################
+# SubsampledPW.results_Last<-read_csv('./output/SubsampledPW.results_LAST_AUTHOR.csv')
+
+problast<-sum(SubsampledPW.results_Last$Richness>OArich_last)/1000
+problast
+
+
+png(file="./tables_figs/plot6b.png",width=1000, height=700)
+OArich_last<-as.numeric(DivCalcPooledLast(OA_papers)[1])
+prich_last<-ggplot(SubsampledPW.results_Last, aes(x=Richness)) +
+  geom_histogram(bins=25, colour="black", fill="white")+
+  geom_vline(aes(xintercept=OArich_last),
+             color="darkblue", linetype="dashed", size=1)+
+  geom_label(label="99.9% bootstrap PW values >\nObserved OA Richness", x=58,y=230,
+             label.padding = unit(0.55, "lines"), # Rectangle size around label
+             label.size = 0.5,color = "darkblue", fill="white")+
+  xlab("Bootstrapped PW Richness - Last Authors") + ylab("Frequency")+
+  scale_y_continuous(expand = c(0,0),limits = c(0,250))+
+  scale_x_continuous(breaks = seq(50,80, by=10),limits=c(50,80))
+prich_last<-prich_last+
+  theme_classic()+ 
+  theme(
+    axis.text.x = element_text(size=18),
+    axis.text.y = element_text(size=18),
+    axis.title.x=element_text(colour="black", size = 24, vjust=-0.5),
+    axis.title.y=element_text(colour="black", size = 24, hjust=0.5,),
+    plot.margin =unit(c(1,1,1,1.5), "lines")  
+  )
+prich_last
+dev.off()
+
+
+
+
+############################################
+# Richness OA vs Boot PW
+# ALL Authors
+############################################
+# SubsampledPW.results_All<-read_csv('./output/SubsampledPW.results_ALL_AUTHOR.csv')
+probAll<-sum(SubsampledPW.results_All$Richness>OArich_All)/1000
+probAll
+
+
+png(file="./tables_figs/plot6c.png",width=1000, height=700)
+OArich_All<-as.numeric(DivCalcPooledAll(OA_papers)[1])
+prich_All<-ggplot(SubsampledPW.results_All, aes(x=Richness)) +
+  geom_histogram(bins=25, colour="black", fill="white")+
+  geom_vline(aes(xintercept=OArich_All),
+             color="darkblue", linetype="dashed", size=1)+
+  geom_label(label="0% bootstrap PW values >\nObserved OA Richness", x=85,y=230,
+             label.padding = unit(0.55, "lines"), # Rectangle size around label
+             label.size = 0.5,color = "darkblue", fill="white")+
+  xlab("Bootstrapped PW Richness - All Authors") + ylab("Frequency")+
+  scale_y_continuous(expand = c(0,0),limits = c(0,250))+
+  scale_x_continuous(breaks = seq(50,90, by=10),limits=c(50,90))
+prich_All<-prich_All+
+  theme_classic()+ 
+  theme(
+    axis.text.x = element_text(size=18),
+    axis.text.y = element_text(size=18),
+    axis.title.x=element_text(colour="black", size = 24, vjust=-0.5),
+    axis.title.y=element_text(colour="black", size = 24, hjust=0.5,),
+    plot.margin =unit(c(1,1,1,1.5), "lines")  
+  )
+prich_All
+dev.off()
+
+
+
+###############################################
+# how often is first author and last author from same country?  region?
+
+
+LastAuthors <- AllData %>%
+  group_by(DOI) %>% 
+  filter(AuthorNum == max(AuthorNum)) %>%
+  filter(AuthorNum>1) %>% 
+  distinct(DOI, .keep_all = TRUE) %>% 
+  ungroup()
+colnames(LastAuthors)
+names(LastAuthors)<-c("Code_last","DOI","Journal","Year","AuthorNum_last","Country_last","JrnlType",
+                       "pair_key","Region_last","IncomeGroup_last")
+
+summarize(LastAuthors,n_distinct(DOI))
+nrow(LastAuthors)
+
+dupes<-duplicated(LastAuthors$DOI)
+summary(dupes)
+
+# eliminate the duplicates
+LastAuthors<-LastAuthors[!duplicated(LastAuthors$DOI), ]
+dupes<-duplicated(LastAuthors$DOI)
+summary(dupes)
+
+
+FirstAuthors <- AllData %>%
+  group_by(DOI) %>% 
+  filter(AuthorNum == 1) %>% 
+  distinct(DOI, .keep_all = TRUE) %>% 
+  ungroup()
+
+dupes<-duplicated(FirstAuthors$DOI)
+summary(dupes)
+
+# eliminate the duplicates
+FirstAuthors<-FirstAuthors[!duplicated(FirstAuthors$DOI), ]
+dupes<-duplicated(FirstAuthors$DOI)
+summary(dupes)
+
+
+colnames(FirstAuthors)
+names(FirstAuthors)<-c("Code_first","DOI","Journal","Year","AuthorNum_first","Country_first","JrnlType",
+                       "pair_key","Region_first","IncomeGroup_first")
+
+
+# Do a left join by last author, because only papers that have 
+# an author greater than 1, ie, two or more auth9ors, should be considered
+FirstLast<-left_join(LastAuthors,FirstAuthors,by=c("DOI","Journal", "Year", "JrnlType","pair_key"))
+
+summarize(FirstLast,n_distinct(DOI))
+nrow(FirstLast)
+dupes<-FirstLast %>% 
+  group_by(DOI) %>% 
+  filter(n()>1) %>% 
+  arrange(DOI)
+dupes
+
+dupes<-duplicated(FirstLast$DOI)
+summary(dupes)
+
+# eliminate the duplicates
+FirstLast<-FirstLast[!duplicated(FirstLast$DOI), ]
+dupes<-duplicated(FirstLast$DOI)
+summary(dupes)
+
+
+
+
+FirstLast$FirstLastRegion<-paste(FirstLast$Region_first,FirstLast$Region_last,sep="+")
+FirstLast$FirstLastIncome<-paste(FirstLast$IncomeGroup_first,FirstLast$IncomeGroup_last,sep="+")
+FirstLast$FirstLastCountry<-paste(FirstLast$Country_first,FirstLast$Country_last,sep="+")
+FirstLast$FirstLastCode<-paste(FirstLast$Code_first,FirstLast$Code_last,sep="+")
+
+summary(FirstLast$Region_first==FirstLast$Region_last)
+19298/(19298+6244)
+
+summary(FirstLast$IncomeGroup_first==FirstLast$IncomeGroup_last)
+20298/(20298+5244)
+
+summary(FirstLast$Country_first==FirstLast$Country_last)
+16473/(16473+9069)
+
+
+#####################
+# Region
+
+FirstLast$FirstLastRegion<-as.factor(FirstLast$FirstLastRegion)
+FirstLast_RegionSummary<-FirstLast %>%
+  ungroup() %>% 
+  select(JrnlType,FirstLastRegion) %>% 
+  group_by(JrnlType,FirstLastRegion) %>%
+  summarize(N=n()) %>% 
+  group_by(JrnlType) %>%
+  arrange(desc(N)) %>% 
+  mutate(Pcnt=(N/sum(N)*100)) %>%
+  mutate(cumPcnt=cumsum(Pcnt)) %>% 
+  arrange(JrnlType,cumPcnt)
+FirstLast_RegionSummary
+  
+write.csv(FirstLast_RegionSummary, 
+          'tables_figs/Table4_FirstLast_RegionSummary.csv', 
+          row.names = FALSE)
+#####################
+# Country 
+
+FirstLast$FirstLastCountry<-as.factor(FirstLast$FirstLastCountry)
+FirstLast_CountrySummary<-FirstLast %>%
+  ungroup() %>% 
+  select(JrnlType,FirstLastCountry) %>% 
+  group_by(JrnlType,FirstLastCountry) %>%
+  summarize(N=n()) %>% 
+  group_by(JrnlType) %>%
+  arrange(desc(N)) %>% 
+  mutate(Pcnt=(N/sum(N)*100)) %>%
+  mutate(cumPcnt=cumsum(Pcnt)) %>% 
+  arrange(JrnlType,cumPcnt)
+FirstLast_CountrySummary
+
+write.csv(FirstLast_CountrySummary, 
+          'tables_figs/Table5_FirstLast_CountrySummary.csv', 
+          row.names = FALSE)
+
+
+
+
+#####################
+# Income 
+
+FirstLast$FirstLastIncome<-as.factor(FirstLast$FirstLastIncome)
+FirstLast_IncomeSummary<-FirstLast %>%
+  ungroup() %>% 
+  select(JrnlType,FirstLastIncome) %>% 
+  group_by(JrnlType,FirstLastIncome) %>%
+  summarize(N=n()) %>% 
+  group_by(JrnlType) %>%
+  arrange(desc(N)) %>% 
+  mutate(Pcnt=(N/sum(N)*100)) %>%
+  mutate(cumPcnt=cumsum(Pcnt)) %>% 
+  arrange(JrnlType,cumPcnt)
+FirstLast_IncomeSummary
+
+write.csv(FirstLast_IncomeSummary, 
+          'tables_figs/Table6_FirstLast_IncomeSummary.csv', 
+          row.names = FALSE)
+
+
+
+
+
+
+
+# now sample and iterate!
+# THIS IS FOR NO SUBSAMPLING - FIRST AUTHOR, ALL ARTICLES POOLED
+# 1<-Richness  2<-InvSimpsons 3<-Countries
+############################################
+# 
+# library(tictoc)
+# tic()
+# nboot <-1000 #number of bootstrap samples
+# InvSimp <-rep(NA, nboot)
+# Richness<-rep(NA, nboot)
+# SubsampledPW.pooled.results <- data.frame(Richness,InvSimp)
+# rm(InvSimp,Richness)
+# set.seed(10)
+# for(i in 1:nboot){
+#   PW_sample<-samplePW(PW_papers,nrow(OA_papers))
+#   results<-DivCalcPooledFirst(PW_sample)
+#   SubsampledPW.pooled.results[i,1]<-(results)[1]
+#   SubsampledPW.pooled.results[i,2]<-(results)[2]
+# }
+# SubsampledPW.pooled.results
+# toc()
+# head(SubsampledPW.pooled.results) 
+# save_name<-paste('output/SubsampledPW.pooled.results_', Sys.Date(), '.csv') #to add the date of output to filename
+# write.csv(SubsampledPW.pooled.results, save_name, row.names = FALSE)
+# rm(save_name)
+# # SubsampledPW.pooled.results<-read_csv("CleanData/SubsampledPW.pooled.results.csv")
+# source("./Rscript/functions/DivCalcPooledFirst.R") 
+# OAdiv<-as.numeric(DivCalcPooledFirst(OA_papers)[2])
+# PWdiv<-as.numeric(DivCalcPooledFirst(PW_papers)[2])
+# # SubsampledPW.pooled.results<-read.csv("CleanData/SubsampledPW.pooled.results.csv")
+# 
+# pDiv<-ggplot(SubsampledPW.pooled.results, aes(x=InvSimp)) + 
+#   geom_histogram(bins=25, colour="black", fill="white")+
+#   geom_vline(aes(xintercept=OAdiv),
+#              color="blue", linetype="dashed", size=1)+
+#   geom_label(label="OA InvSimp", x=13.5,y=170,
+#              # label.padding = unit(0.55, "lines"), # Rectangle size around label
+#     label.size = 0.15,color = "blue")+
+#   geom_vline(aes(xintercept=PWdiv),
+#            color="red", linetype="dashed", size=1)+
+#   geom_label(label="PW InvSimp", x=6,y=150,
+#              # label.padding = unit(0.55, "lines"), # Rectangle size around label
+#              label.size = 0.15,color = "red")
+# pDiv<-pDiv+theme_classic() 
+# pDiv
+# 
+# dev.off()
+
+
+
+
+
+
+
+
+
+
+
 
 
 
