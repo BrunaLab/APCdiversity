@@ -146,7 +146,9 @@ rm(all_articles_df,
    articles_wos,
    articles_scopus,
    articles_scopus_df,
-   articles_wos_df)
+   articles_wos_df,
+   AuGeo_scopus,
+   AuGeo_wos)
 
 ################################################################
 # select columns: article DOI, journal, year published, author country.
