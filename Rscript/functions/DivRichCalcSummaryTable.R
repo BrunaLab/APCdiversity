@@ -112,9 +112,15 @@ DivRichCalcSummaryTable<-function(DataSet) {
                              "OA_invSimp.Richness",
                              "PW_invSimp.Richness",
                              "ALL_invSimp.Richness")  
+  
+  Table2<-mutate(Table2, OA_Evenness = OA_invSimp.Richness/OA_richness.Richness)
+  Table2<-mutate(Table2, PW_Evenness = PW_invSimp.Richness/PW_richness.Richness)
+  Table2<-mutate(Table2, ALL_Evenness = ALL_invSimp.Richness/ALL_richness.Richness)
+  
   names(Table2)<-c("Authors",
                    "OA Richness","PW Richness","All Richness",
-                   "OA Diversity","PW Diversity","All Diversity")
+                   "OA Diversity","PW Diversity","All Diversity",
+                   "OA Evenness","PW Evenness","All Evenness")
   
   
   return(Table2)

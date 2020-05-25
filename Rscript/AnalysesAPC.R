@@ -21,6 +21,19 @@ AllData<-read_csv(file="./data_clean/AllData.csv")
 #   filter(Code!="CHN")
 # AllData<-AllData_noCHN
 
+# for analyses without China
+# AllData_noUSA<-AllData %>%
+#   filter(Code!="CHN")
+# AllData<-AllData_noUSA
+
+# for analyses without China
+AllData_noUSAorCHN<-AllData %>%
+  filter(Code!="CHN") %>%
+  filter(Code!="USA") 
+AllData<-AllData_noUSAorCHN
+
+
+
 ############################################################
 # Total number of journals
 ############################################################
