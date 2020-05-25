@@ -16,6 +16,11 @@ library(tidyverse)
 # load the data to be used in analyses
 AllData<-read_csv(file="./data_clean/AllData.csv")
 
+# for analyses without China
+# AllData_noCHN<-AllData %>% 
+#   filter(Code!="CHN")
+# AllData<-AllData_noCHN
+
 ############################################################
 # Total number of journals
 ############################################################
@@ -37,6 +42,47 @@ NumbArticles_JrnlType <- AllData %>% #number of papers per journal
   group_by(JrnlType) %>% 
   summarize(n=n_distinct(DOI))
 NumbArticles_JrnlType
+
+n_counrtries<-AllData %>% 
+  group_by(JrnlType) %>% 
+  summarize(n_distinct(Code))
+n_counrtries
+
+counrtriesOA<-AllData %>% 
+  filter(AuthorNum==1&JrnlType=="OA") %>% 
+  group_by(Code) %>% 
+  select(Code,IncomeGroup,Region) %>% 
+  slice(1)
+
+counrtriesPW<-AllData %>% 
+  filter(AuthorNum==1&JrnlType=="PW") %>% 
+  group_by(Code) %>% 
+  select(Code,IncomeGroup,Region) %>% 
+  slice(1)
+
+
+intersecting_countries<-intersect(counrtriesOA, counrtriesPW)
+OAnotPW<-setdiff(counrtriesOA, counrtriesPW)
+OAnotPW$Code<-as.factor(OAnotPW$Code)
+OAnotPW$IncomeGroup<-as.factor(OAnotPW$IncomeGroup)
+OAnotPW$Region<-as.factor(OAnotPW$Region)
+OAnotPW$set<-"in OA but not PW"
+OAnotPW$set<-as.factor(OAnotPW$set)
+OAnotPW_summary<-summary(OAnotPW)
+
+PWnotOA<-setdiff(counrtriesPW,counrtriesOA)
+PWnotOA$set<-"in PW but not OA"
+PWnotOA$Code<-as.factor(PWnotOA$Code)
+PWnotOA$IncomeGroup<-as.factor(PWnotOA$IncomeGroup)
+PWnotOA$Region<-as.factor(PWnotOA$Region)
+PWnotOA$set<-as.factor(PWnotOA$set)
+PWnotOA_summary<-summary(PWnotOA)
+Table_setdiffs<-bind_rows(OAnotPW,PWnotOA)
+Table_setdiffs.2<-Table_setdiffs %>% 
+  select(set,IncomeGroup) %>% 
+  group_by(set,IncomeGroup) %>% 
+  summarize(n())
+
 
 ############################################################
 # Summary Table: PAPERS PER JOURNAL 
