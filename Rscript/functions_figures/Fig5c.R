@@ -12,7 +12,7 @@ Fig5c<-function(SampledData,OriginalData) {
   OAdiv<-DivRichCalc(OriginalData,"author_all","OA")
   OAdiv_All<-as.numeric(OAdiv[2])
   
-  probAll<-sum(SampledData$InvSimp>OAdiv_All)/10000*100
+  probAll<-sum(SampledData$InvSimp>OAdiv_All)/1000*100
   probAll
   
   pDiv_all<-ggplot(SampledData, aes(x=InvSimp)) + 
@@ -26,7 +26,7 @@ Fig5c<-function(SampledData,OriginalData) {
     xlab("Resampled national diversity:\nAll authors of paywalled articles")+
     ylab("Frequency")+
     scale_x_continuous(breaks = c(7:13),limits=c(7,13))+
-    scale_y_continuous(expand = c(0,0),limits = c(0,1500))
+    scale_y_continuous(expand = c(0,0),limits = c(0,150))
   pDiv_all<-pDiv_all+
     theme_classic()+ 
     theme(

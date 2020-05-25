@@ -13,7 +13,7 @@ Fig5b<-function(SampledData,OriginalData) {
   OAdiv_Last<-as.numeric(OAdiv[2])
   
   
-  div_Last<-sum(SampledData$InvSimp>OAdiv_Last)/10000*100
+  div_Last<-sum(SampledData$InvSimp>OAdiv_Last)/1000*100
   div_Last
   
   
@@ -28,7 +28,7 @@ Fig5b<-function(SampledData,OriginalData) {
     xlab("Resampled national diversity:\nLast authors of paywalled articles")+
     ylab("Frequency")+
     scale_x_continuous(breaks = c(6:11),limits=c(6,11))+
-    scale_y_continuous(expand = c(0,0),limits = c(0,2000))
+    scale_y_continuous(expand = c(0,0),limits = c(0,200))
   pDiv_last<-pDiv_last+
     theme_classic()+ 
     theme(

@@ -11,7 +11,7 @@ Fig5e<-function(SampledData,OriginalData) {
   OAdiv<-DivRichCalc(AllData,"author_last","OA")
   OArich_Last<-as.numeric(OAdiv[1])
   
-  problast<-sum(SubsampledPW.results_Last$Richness>OArich_Last)/10000*100
+  problast<-sum(SubsampledPW.results_Last$Richness>OArich_Last)/1000*100
   problast
   
   prich_last<-ggplot(SubsampledPW.results_Last, aes(x=Richness)) +
@@ -24,7 +24,7 @@ Fig5e<-function(SampledData,OriginalData) {
     #            label.size = 0.5,color = "darkblue", fill="white")+
     xlab("Resampled national richness:\nLast authors of paywalled articles")+
     ylab("Frequency")+
-    scale_y_continuous(expand = c(0,0),limits = c(0,1500))+
+    scale_y_continuous(expand = c(0,0),limits = c(0,150))+
     scale_x_continuous(breaks = seq(50,80, by=10),limits=c(50,80))
   prich_last<-prich_last+
     theme_classic()+ 

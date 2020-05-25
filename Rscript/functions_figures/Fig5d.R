@@ -12,7 +12,7 @@ Fig5d<-function(SampledData,OriginalData) {
   OAdiv<-DivRichCalc(AllData,"author_first","OA")
   OArich_First<-as.numeric(OAdiv[1])
   
-  probFirst<-sum(SubsampledPW.results_First$Richness>OArich_First)/10000*100
+  probFirst<-sum(SubsampledPW.results_First$Richness>OArich_First)/1000*100
   
   prich_first<-ggplot(SubsampledPW.results_First, aes(x=Richness)) +
     geom_histogram(bins=30, colour="black", fill="white")+
@@ -24,7 +24,7 @@ Fig5d<-function(SampledData,OriginalData) {
     #            label.size = 0.5,color = "darkblue", fill="white")+
     xlab("Resampled national richness:\nFirst authors of paywalled articles")+
     ylab("Frequency")+
-    scale_y_continuous(expand = c(0,0),limits = c(0,2500))+
+    scale_y_continuous(expand = c(0,0),limits = c(0,250))+
     scale_x_continuous(breaks = seq(40,80, by=10),limits=c(40,80))
   prich_first<-prich_first+
     theme_classic()+ 

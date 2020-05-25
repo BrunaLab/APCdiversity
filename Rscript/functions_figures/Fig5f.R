@@ -12,7 +12,7 @@ Fig5f<-function(SampledData,OriginalData) {
   OAdiv<-DivRichCalc(OriginalData,"author_all","OA")
   OArich_All<-as.numeric(OAdiv[1])
   
-  probAll<-sum(SampledData$Richness>OArich_All)/10000*100
+  probAll<-sum(SampledData$Richness>OArich_All)/1000*100
   probAll
   
   prich_All<-ggplot(SampledData, aes(x=Richness)) +
@@ -25,7 +25,7 @@ Fig5f<-function(SampledData,OriginalData) {
     #            label.size = 0.5,color = "darkblue", fill="white")+
     xlab("Resampled national richness:\nAll authors of paywalled articles")+
     ylab("Frequency")+
-    scale_y_continuous(expand = c(0,0),limits = c(0,2500))+
+    scale_y_continuous(expand = c(0,0),limits = c(0,250))+
     scale_x_continuous(breaks = seq(50,90, by=10),limits=c(50,90))
   prich_All<-prich_All+
     theme_classic()+ 
