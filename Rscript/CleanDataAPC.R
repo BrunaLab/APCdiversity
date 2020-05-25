@@ -240,7 +240,22 @@ AllData$DOI<- as.character(AllData$DOI)
 AllData$DOI<- AllData$DOI %>% replace_na("missing_DOI")
 AllData$DOI<- as.factor(AllData$DOI)
 AllData<-AllData %>% arrange(DOI,AuthorNum)
+AllData$IncomeGroup <- as.factor(AllData$IncomeGroup)
+AllData$IncomeGroup <- ordered(AllData$IncomeGroup, levels = c("High", "Upper middle","Lower middle","Low"))
 # head(AllData)
+
+############################################################
+# Remove any journal pairs for whihc data re incomplete
+############################################################
+# TODO: no articles for "Clinics and Research in Hepatology and
+# Gastroenterology: X (9)" so exclude it and mirror
+# Diabetes and Metabolism: X (13) is missing (no info on page) 
+# Europ. J Obsterics, Gynecology: X (16) none published) 
+missing_jrnls<-c(9,13,16)
+AllData<-AllData %>% filter(!pair_key%in% missing_jrnls)
+rm(missing_jrnls)
+
+
 # save the csv
 write.csv(AllData,"./data_clean/AllData.csv", row.names = FALSE)
 
