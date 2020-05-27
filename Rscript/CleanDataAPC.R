@@ -282,7 +282,6 @@ missing_jrnls<-c(9,13,16)
 AllData<-AllData %>% filter(!pair_key%in% missing_jrnls)
 rm(missing_jrnls)
 
-
 # save the csv
 write.csv(AllData,"./data_clean/AllData.csv", row.names = FALSE)
 
