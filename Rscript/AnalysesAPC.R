@@ -16,6 +16,11 @@ library(tidyverse)
 # load the data to be used in analyses
 AllData<-read_csv(file="./data_clean/AllData.csv")
 
+WaiverCountries<-read_csv(file="./data_clean/WaiverCountries.csv")
+
+MirrorPairs<-read_csv(file="./data_clean/MirrorPairs.csv")
+
+
 # for analyses without China
 # AllData_noCHN<-AllData %>% 
 #   filter(Code!="CHN")
@@ -33,6 +38,19 @@ AllData_noUSAorCHN<-AllData %>%
 AllData<-AllData_noUSAorCHN
 
 
+
+
+############################################################
+# APC CHARGES
+############################################################
+
+Median_APC<-MirrorPairs %>% 
+  filter(JrnlType=="OA") %>% 
+  summarize(medianAPC=median(APC), 
+            meanAPC=mean(APC),
+            sdAPC=sd(APC),
+            maxAPC=max(APC),
+            minAPC=min(APC))
 
 ############################################################
 # Total number of journals
