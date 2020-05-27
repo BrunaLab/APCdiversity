@@ -9,10 +9,41 @@
 library(tidyverse)
 library(bibliometrix)
 library(countrycode) 
+
+
+################################################################
+# load and add World Bank data on national income categories
+CountryData <- read.csv("data_raw/CLASS.csv", header = TRUE)
+CountryData <- CountryData[-1,]
+CountryData <- CountryData %>%
+   select(Code,Region, IncomeGroup = Income.group)
+
+
 ################################################################
 # Load the list of Pawall Journals and their OA mirrors 
 ################################################################
 MirrorPairs<-read_csv(file="./data_raw/MirrorPairs.csv")
+
+
+################################################################
+# Load the list of Waiver Countries
+################################################################
+WaiverCountries<-read_csv(file="./data_raw/ElsevierWaivers.csv")
+# add to the waiver
+WaiverCountries$Code<-countrycode(WaiverCountries$Country,
+                                  "country.name",
+                                  "iso3c", warn = TRUE)
+left_join(WaiverCountries, CountryData,by=Country)
+
+# Note: Kosovo is not listed as an ISO standard country. 'XKX' is the unofficial code 
+# used by the European Commission and others until Kosovo is assigned an ISO code.
+
+WaiverCountries$Code[WaiverCountries$Country=="Kosovo"]<-"XKX"
+WaiverCountries<- WaiverCountries %>% select(-notes)
+# save the df as .csv file in "data_clean" folder
+write.csv(WaiverCountries,"./data_clean/WaiverCountries.csv", row.names = FALSE)
+# remove from the environment
+
 
 ################################################################
 # Load and process publication records. These were downloaded
@@ -211,13 +242,9 @@ AllData <- AllData %>%
 
 
 
+
 ################################################################
-# load and add World Bank data on national income categories
-CountryData <- read.csv("data_raw/CLASS.csv", header = TRUE)
-CountryData <- CountryData[-1,]
-CountryData <- CountryData %>%
-  select(Code,Region, IncomeGroup = Income.group)
-# add it to the dataframe
+# ADD DATA ON COUNTRIES REGION AND INCOME TO AllData
 AllData <- merge(AllData, CountryData, by="Code", all.x=TRUE) # merge 
 # remove CountryData from the environment
 rm(CountryData)
@@ -264,10 +291,13 @@ write.csv(AllData,"./data_clean/AllData.csv", row.names = FALSE)
 # Change column names of Mirror Pairs and save csv to 'data_clean'
 ################################################################
 MirrorPairs <- MirrorPairs%>%
-  select(Journal = SO, JrnlType = journal_cat, pair_key) %>% 
-  filter(pair_key>0)
+  select(Journal = SO, JrnlType = journal_cat, APC=apc, pair_key) %>% 
+  filter(pair_key>0) %>% 
+   arrange(pair_key,JrnlType)
+
 # save the df as .csv file in "data_clean" folder
 write.csv(MirrorPairs,"./data_clean/MirrorPairs.csv", row.names = FALSE)
 # remove from the environment
 rm(MirrorPairs)
 ################################################################
+
