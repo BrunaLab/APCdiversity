@@ -2,16 +2,15 @@ Fig5b<-function(SampledData,OriginalData) {
   library(ggplot2)
   library(tidyr)
   library(dplyr)
-  # SampledData<-SubsampledPW.results_First
+  # SampledData<-SubsampledPW.results_Last
   # OriginalData<-AllData
-  vars<-list(SampledData,OriginalData)
+  vars<-list(SampledData[1],OriginalData)
   SampledData<-as.data.frame(vars[1])
   OriginalData<-as.data.frame(vars[2])
   
   source("./Rscript/functions/DivRichCalc.R")
   OAdiv<-DivRichCalc(AllData,"author_last","OA")
   OAdiv_Last<-as.numeric(OAdiv[2])
-  
   
   div_Last<-sum(SampledData$InvSimp>OAdiv_Last)/1000*100
   div_Last

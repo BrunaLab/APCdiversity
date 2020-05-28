@@ -4,7 +4,7 @@ Fig5d<-function(SampledData,OriginalData) {
   library(dplyr)
   # SampledData<-SubsampledPW.results_First
   # OriginalData<-AllData
-  vars<-list(SampledData,OriginalData)
+  vars<-list(SampledData[1],OriginalData)
   SampledData<-as.data.frame(vars[1])
   OriginalData<-as.data.frame(vars[2])
   
@@ -12,9 +12,9 @@ Fig5d<-function(SampledData,OriginalData) {
   OAdiv<-DivRichCalc(AllData,"author_first","OA")
   OArich_First<-as.numeric(OAdiv[1])
   
-  probFirst<-sum(SubsampledPW.results_First$Richness>OArich_First)/1000*100
+  probFirst<-sum(SampledData$Richness>OArich_First)/1000*100
   
-  prich_first<-ggplot(SubsampledPW.results_First, aes(x=Richness)) +
+  prich_first<-ggplot(SampledData[1], aes(x=Richness)) +
     geom_histogram(bins=30, colour="black", fill="white")+
     annotate("text", x = 45, y = 200,label =(paste(probFirst,"%",sep="")))+
     geom_vline(aes(xintercept=OArich_First),

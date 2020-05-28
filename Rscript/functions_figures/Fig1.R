@@ -1,5 +1,6 @@
 Fig1<-function(DataSet,AuPosition) {
-  
+  # DataSet<-AllData
+  # AuPosition<-"author_first"
     vars<-list(DataSet,AuPosition)
     DataSet<-as.data.frame(DataSet)
     DataSet$IncomeGroup <-as.factor(DataSet$IncomeGroup)

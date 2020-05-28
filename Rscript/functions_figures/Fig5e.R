@@ -4,17 +4,17 @@ Fig5e<-function(SampledData,OriginalData) {
   library(dplyr)
   # SampledData<-SubsampledPW.results_First
   # OriginalData<-AllData
-  vars<-list(SampledData,OriginalData)
+  vars<-list(SampledData[1],OriginalData)
   SampledData<-as.data.frame(vars[1])
   OriginalData<-as.data.frame(vars[2])
   source("./Rscript/functions/DivRichCalc.R")
   OAdiv<-DivRichCalc(AllData,"author_last","OA")
   OArich_Last<-as.numeric(OAdiv[1])
   
-  problast<-sum(SubsampledPW.results_Last$Richness>OArich_Last)/1000*100
+  problast<-sum(SampledData$Richness>OArich_Last)/1000*100
   problast
   
-  prich_last<-ggplot(SubsampledPW.results_Last, aes(x=Richness)) +
+  prich_last<-ggplot(SampledData, aes(x=Richness)) +
     geom_histogram(bins=30, colour="black", fill="white")+
     geom_vline(aes(xintercept=OArich_Last),
                color="darkblue", linetype="dashed", size=1)+

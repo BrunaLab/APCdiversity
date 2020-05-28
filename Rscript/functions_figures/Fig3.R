@@ -105,18 +105,23 @@ Fig3<-function(DataSet,AuPosition,JrnlType) {
       xlab(label_x) +
       ylab("Percentage of Articles")+
       coord_flip()+
-      ggtitle(title_text)+
       scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73"), 
                          name="National Income Category",
                          breaks=c("High", "Upper middle","Lower middle","Low"))
       # 
     
-    plot3<-plot3+theme_light()+
+    plot3<-plot3+
+      theme_light()+
+      # labs(title = “Main title”, subtitle = “My subtitle”, caption = title_text)+
+      labs(title = title_text,size=10)+
       theme(
-        axis.text.x = element_text(size=18),
-        axis.text.y = element_text(size=18),
-        axis.title.x=element_text(colour="black", size = 24, vjust=-0.5),
-        axis.title.y=element_text(colour="black", size = 24, hjust=0.5,vjust=0.5,angle = 90),
+        axis.text.x = element_text(size=8),
+        axis.text.y = element_text(size=8),
+        axis.title.x=element_text(colour="black", size = 12, vjust=-0.5),
+        axis.title.y=element_text(colour="black", size = 12, hjust=0.5,vjust=0.5,angle = 90),
+        plot.title = element_text(size=8),
+        legend.text = element_text(colour="black", size = 8, vjust=-0.5),
+        legend.title = element_text(size=8),
         legend.position="right",
         plot.margin =unit(c(1,1,1,1.5), "lines")  
       )

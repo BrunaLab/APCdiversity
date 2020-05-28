@@ -40,9 +40,14 @@ tic()
 nboot <-1000 #number of bootstra p samples
 InvSimp <-rep(NA, nboot)
 Richness<-rep(NA, nboot)
+Countries<-rep(NA, nboot)
+replicate<-data.frame(replicate=as.numeric())
+
 SubsampledPW.results_First <- data.frame(Richness,InvSimp)
+# replicate<-data.frame(replicate)
+
 rm(InvSimp,Richness)
-set.seed(10)
+set.seed(1000)
 for(i in 1:nboot){
   PW_sample<-samplePW(PW_papers,n)
   # The first element of the list is the list of papers. 
@@ -58,9 +63,50 @@ for(i in 1:nboot){
   results<-DivRichCalc(PW_sample,AuPosition,JrnlType)
   SubsampledPW.results_First[i,1]<-(results)[1]
   SubsampledPW.results_First[i,2]<-(results)[2]
+  Countries[i]<-(results)[3]
+  # nCountries[i,1]<-i
+  # nCountries[i,2]<-(nrow(Countries[[i]]))
+  # count<-data.frame(replicate=rep(nCountries[i,1], each=nCountries[i,2]))
+  count<-data.frame(replicate=rep(i, each=SubsampledPW.results_First[i,1]))
+  replicate<- bind_rows(replicate,count)
+  # replicate<-bind_rows(replicate,count)
+    # bind_rows(counter,counter=rep(i, each=nCountries))
+  # nCountries[i]<-nrow(Countries[[i]])
+  
 }
+
+SubsampledPW.results_First$author<-AuPosition
 SubsampledPW.results_First
+
+########################################
+# CALC AND SAVE A DF OF THE COUNTRIES SAMPLED
+# EACH RUN
+########################################
+
+
+# Use the AllData df to get the basic info on each country (code, region, etc)
+CountryInfo<-AllData %>% 
+  select(Country,Region,IncomeGroup,Code) %>% 
+  group_by(Country) %>% 
+  slice(1)
+head(CountryInfo,10)
+
+
+Countries<-bind_rows(Countries)
+Countries<-bind_cols(Countries,replicate)
+Subsampled_Countries<-as.data.frame(Countries)
+# str(Subsampled_Countries)
+Subsampled_Countries<-Subsampled_Countries %>% 
+  inner_join(CountryInfo,Subsampled_Countries,by="Country") 
+# head(Subsampled_Countries,10)
+Subsampled_Countries$IncomeGroup<-as.factor(Subsampled_Countries$IncomeGroup) 
+Subsampled_Countries$Region<-as.factor(Subsampled_Countries$Region) 
+Subsampled_Countries$Code<-as.factor(Subsampled_Countries$Code) 
+Subsampled_Countries$Country<-as.factor(Subsampled_Countries$Country) 
+Subsampled_Countries$author<-AuPosition
+
+SubsampledPW.results<-list(SubsampledPW.results_First,Subsampled_Countries)
 toc()
 
-return(SubsampledPW.results_First)
+return(SubsampledPW.results)
 }

@@ -2,15 +2,16 @@ Fig5a<-function(SampledData,OriginalData) {
   library(ggplot2)
   library(tidyr)
   library(dplyr)
-  # SampledData<-SubsampledPW.results_First
+  # SampledData<-SubsampledPW.results_First[1]
   # OriginalData<-AllData
-  vars<-list(SampledData,OriginalData)
+  vars<-list(SampledData[1],OriginalData)
   SampledData<-as.data.frame(vars[1])
   OriginalData<-as.data.frame(vars[2])
   
   source("./Rscript/functions/DivRichCalc.R")
   OAdiv<-DivRichCalc(OriginalData,"author_first","OA")
   OAdiv_First<-as.numeric(OAdiv[2])
+  
   probFirst<-sum(SampledData$InvSimp>OAdiv_First)/1000*100
   probFirst
   
