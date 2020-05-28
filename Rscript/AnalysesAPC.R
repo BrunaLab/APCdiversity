@@ -12,45 +12,47 @@
 # library(vegan)
 library(tidyverse)
 
-
 # load the data to be used in analyses
+
 AllData<-read_csv(file="./data_clean/AllData.csv")
 
-WaiverCountries<-read_csv(file="./data_clean/WaiverCountries.csv")
+MirrorPairs<-read.csv("./data_clean/MirrorPairs.csv")
 
-MirrorPairs<-read_csv(file="./data_clean/MirrorPairs.csv")
-
-
-# for analyses without China
-# AllData_noCHN<-AllData %>% 
-#   filter(Code!="CHN")
-# AllData<-AllData_noCHN
-
-# for analyses without China
-# AllData_noUSA<-AllData %>%
-#   filter(Code!="CHN")
-# AllData<-AllData_noUSA
-
-# for analyses without China
-AllData_noUSAorCHN<-AllData %>%
-  filter(Code!="CHN") %>%
-  filter(Code!="USA") 
-AllData<-AllData_noUSAorCHN
+WaiverCountries<-read.csv("./data_clean/WaiverCountries.csv")
 
 
+# papers with a first author in USA or CHN
+first_author_USA_CHN<-AllData %>%
+  group_by(DOI) %>% 
+  filter(AuthorNum==1 & (Country=="CHINA"| Country=="USA"))
+# papers with a last author in USA or CHN
+last_author_USA_CHN<-AllData %>%
+  group_by(DOI) %>% 
+  filter(AuthorNum == max(AuthorNum)) %>%
+  filter(Country=="CHINA"| Country=="USA")
+# bind them together, select only DOI column
+  papers_CHN_USA<-bind_rows(last_author_USA_CHN,first_author_USA_CHN) %>% 
+    select(DOI)
+# take all data, and keep only papers NOT having 
+# first/last author in USA or CHN
+  AllData_noUSAorCHN<-anti_join(AllData,papers_CHN_USA)
+# verfiy they sum
+  (AllData_noUSAorCHN %>% summarise(n_distinct(DOI))+
+      papers_CHN_USA %>% 
+      ungroup(papers_CHN_USA) %>% 
+      summarise(n_distinct(DOI)))==
+    AllData %>% summarise(n_distinct(DOI))
 
+AllData_noUSAorCHN
 
 ############################################################
-# APC CHARGES
+# APCs
 ############################################################
-
-Median_APC<-MirrorPairs %>% 
+APC<-MirrorPairs %>% 
   filter(JrnlType=="OA") %>% 
-  summarize(medianAPC=median(APC), 
-            meanAPC=mean(APC),
-            sdAPC=sd(APC),
-            maxAPC=max(APC),
-            minAPC=min(APC))
+  summarize(medianAPC=median(APC),avg_APC=mean(APC),sd_APC=sd(APC),maxAPC=max(APC),minAPC=min(APC))
+APC<-round(APC,2)
+APC
 
 ############################################################
 # Total number of journals
@@ -152,6 +154,20 @@ source("./Rscript/functions_figures/Fig1waffle.R")
 Fig1wafflePlot<-Fig1waffle(AllData)
 # Fig1wafflePlot
 
+
+
+################
+# Fig 1 with sampled distributions of PW 
+################
+
+
+
+
+
+
+
+
+
 ############################################################
 # Fig. 2: For 1st authors from each national income class,
 # the % of articles that were in PW vs OA journals
@@ -172,7 +188,6 @@ Fig2b
 png(file="./tables_figs/Fig2b.png",width=1000, height=700)
 Fig2b
 dev.off()
-
 
 ############################################################
 # FIG 3: for articles in OA journals: the number of articles 
@@ -207,7 +222,7 @@ dev.off()
 
 
 ##################################################
-# FIG4: Compare the obsered author diverseity and 
+# FIG4: Compare the obsered author diversity and 
 # richness in OA Journals with an identically sized 
 # bootstrapped sample of OA articles
 # ie, where the does the observed lie relative to the bootstrap? 
@@ -254,7 +269,7 @@ dev.off()
 #################################################################
 # calculate diversity indices of 
 # FIRST AUTHORS FOR EACH INDIVIDUAL JOURNAL
-# Returns in WIDE format to include diff between OA and PW mirrors
+# Returns in WIDE format to include diff between OA and PW mirors
 #################################################################
 
 source("./Rscript/functions/DivCalcJrnl.R") # enter as divCalc(df,JrnlType,Author)
@@ -274,30 +289,171 @@ DivRichCalc_result
 # Returns results for first authors, last authors, 
 # and all authors in a df 
 #################################################
+
+# TODO:need to add the table with the bootstraop values
+
 source("./Rscript/functions/DivRichCalcSummaryTable.R") # enter as divCalc(df,JrnlType,Author)
 Table2<-DivRichCalcSummaryTable(AllData)
 Table2
 write.csv(Table2, "./tables_figs/Table2.csv", row.names = FALSE)
 
 ###############################################################################
-# COMPARE OBSERVED OA DIV/RICH with MATCHED NO. OF RANDOMLY SAMPLED PW ARTICLES
+# COMPARE OBSERVED OA DIV/RICH with SUBSAMPLE PW ARTICLES
+# PW ARTICLES WERE SAMPLED IN FREQUENCY BY JOURNAL MATCHING
+# OA JOURNALS
+
+# RETURNS 2 DF: 
+# [1]: a value of div and rich from each bootstrp run
+# [2]: df of each country slected in each run (with freq)
+
 ###############################################################################
 
 ########################################
-# DIVERSITY/RICHNESS FIRST AUTHORS
+# ALL COUNTRIES (WITH CHN AND USA)
 ########################################
+
+########################################
+# SAMPLED DIV/RICH: FIRST AUTHORS
 source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
 SubsampledPW.results_First<-SubSamplePWvsOA_comparison(AllData,"author_first")
-
-write.csv(SubsampledPW.results_First, 
-          'output/SubsampledPW.results_FIRST_AUTHOR.csv', 
+# Save df of Div and Rich results 
+write.csv(SubsampledPW.results_First[1], 
+          'output/SubsampledPW.results_RichDiv_FIRST_AUTHOR.csv', 
           row.names = FALSE)
+write.csv(SubsampledPW.results_First[2], 
+          'output/SubsampledPW.results_Countries_FIRST_AUTHOR.csv', 
+          row.names = FALSE)
+
+
+########################################
+# SAMPLED DIV/RICH: LAST AUTHORS
+source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
+SubsampledPW.results_Last<-SubSamplePWvsOA_comparison(AllData,"author_last")
+
+# Save df of Div and Rich results
+write.csv(SubsampledPW.results_Last[1], 
+          'output/SubsampledPW.results_RichDiv_LAST_AUTHOR.csv', 
+          row.names = FALSE)
+write.csv(SubsampledPW.results_Last[2], 
+          'output/SubsampledPW.results_Countries_LAST_AUTHOR.csv', 
+          row.names = FALSE)
+
+
+########################################
+# SAMPLED DIV/RICH: ALL AUTHORS
+source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
+SubsampledPW.results_All<-SubSamplePWvsOA_comparison(AllData,"author_all")
+
+# Save df of Div and Rich results
+write.csv(SubsampledPW.results_All[1], 
+          'output/SubsampledPW.results_RichDiv_ALL_AUTHOR.csv', 
+          row.names = FALSE)
+
+write.csv(SubsampledPW.results_All[2], 
+          'output/SubsampledPW.results_Countries_ALL_AUTHOR.csv', 
+          row.names = FALSE)
+
+
+
+########################################
+# NO CHN AND USA
+# REQUIRES SAMPLING WITH REPLACEMENT DUE TO SMALLER SAMPLE SIZES
+########################################
+
+########################################
+# SAMPLED DIV/RICH: FIRST AUTHORS
+source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
+SubsampledPW.results_First_NOUSACHN<-SubSamplePWvsOA_comparison(AllData_noUSAorCHN,"author_first")
+# Save df of Div and Rich results 
+write.csv(SubsampledPW.results_First_NOUSACHN[1], 
+          'output/SubsampledPW.results_RichDiv_FIRST_AUTHOR_NOUSACHN.csv', 
+          row.names = FALSE)
+write.csv(SubsampledPW.results_First_NOUSACHN[2], 
+          'output/SubsampledPW.results_Countries_FIRST_AUTHOR_NOUSACHN.csv', 
+          row.names = FALSE)
+
+
+########################################
+# SAMPLED DIV/RICH: LAST AUTHORS
+source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
+SubsampledPW.results_Last_NOUSACHN<-SubSamplePWvsOA_comparison(AllData_noUSAorCHN,"author_last")
+
+# Save df of Div and Rich results
+write.csv(SubsampledPW.results_Last_NOUSACHN[1], 
+          'output/SubsampledPW.results_RichDiv_LAST_AUTHOR_NOUSACHN.csv', 
+          row.names = FALSE)
+write.csv(SubsampledPW.results_Last_NOUSACHN[2], 
+          'output/SubsampledPW.results_Countries_LAST_AUTHOR_NOUSACHN.csv', 
+          row.names = FALSE)
+
+
+########################################
+# SAMPLED DIV/RICH: ALL AUTHORS
+source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
+SubsampledPW.results_All_NOUSACHN<-SubSamplePWvsOA_comparison(AllData_noUSAorCHN,"author_all")
+
+# Save df of Div and Rich results
+write.csv(SubsampledPW.results_All_NOUSACHN[1], 
+          'output/SubsampledPW.results_RichDiv_ALL_AUTHOR_NOUSACHN.csv', 
+          row.names = FALSE)
+
+write.csv(SubsampledPW.results_All_NOUSACHN[2], 
+          'output/SubsampledPW.results_Countries_ALL_AUTHOR_NOUSACHN.csv', 
+          row.names = FALSE)
+
+###############################################
+
+# 
+# Subsampled_Income_summary<-Subsampled_Countries %>% 
+#   group_by(replicate,IncomeGroup) %>% 
+#   summarize(n=n()) %>% 
+#   mutate(perc=n/sum(n)*100) %>% 
+#   group_by(IncomeGroup) %>% 
+#   summarize(avg_n=mean(n),
+#             sd_n=sd(n),
+#             avg_perc=mean(perc),
+#             sd_perc=sd(perc)) %>% 
+#   ungroup()
+# 
+# Subsampled_Income_summary$JrnlType<-"PW_sampled"
+# Subsampled_Income_summary$AuthorNum<-1
+# # Subsampled_Income_summary$var<-"Region"
+# 
+# Subsampled_Income_withoutRep<-Subsampled_Income_summary
+# Subsampled_Region_summary<-Subsampled_Countries %>% 
+#   group_by(replicate,Region) %>% 
+#   summarize(n=n()) %>% 
+#   mutate(perc=n/sum(n)*100) %>% 
+#   group_by(Region) %>% 
+#   summarize(avg=mean(perc),sd=sd(perc)) %>% 
+#   ungroup()
+# Subsampled_Region_summary$AuthorNum<-1
+# # Subsampled_Region_summary$var<-"Region"
+# Subsampled_Region_summary
+# 
+# source("./Rscript/functions_figures/Fig2_AvgofSampled.R") 
+# # OPTIONS: "author_first"   "author_last" "author_all"
+# Fig2a_Avg<-Fig2_AvgofSampled(Subsampled_Income_summary,"author_first")
+# Fig2a_Avg
+# 
+# source("./Rscript/functions_figures/Fig2b_AvgofSampled.R") 
+# # OPTIONS: "author_first"   "author_last" "author_all"
+# Fig2b_Avg<-Fig2b_AvgofSampled(Subsampled_Region_summary,"author_first")
+# Fig2b_Avg
 
 
 # FIG DIV FIRST AUTHOR
 # SubsampledPW.results_First<-read_csv('output/SubsampledPW.results_FIRST_AUTHOR.csv')
 # hist(SubsampledPW.results_First$InvSimp)
 # summary(SubsampledPW.results_First)
+
+#
+
+########################################
+# FIGURES
+########################################
+
+# FIG DIVERSITY FIRST AUTHOR
 source("./Rscript/functions_figures/Fig5a.R")
 Fig5a<-Fig5a(SubsampledPW.results_First,AllData)
 Fig5a
@@ -312,17 +468,6 @@ Fig5d
 png(file="./tables_figs/plot5d.png",width=1000, height=700)
 Fig5d
 dev.off()
-
-
-########################################
-# DIVERSITY/RICHNESS LAST AUTHORS
-########################################
-source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
-SubsampledPW.results_Last<-SubSamplePWvsOA_comparison(AllData,"author_last")
-
-write.csv(SubsampledPW.results_Last, 
-          'output/SubsampledPW.results_LAST_AUTHOR.csv', 
-          row.names = FALSE)
 
 
 # FIG DIV LAST AUTHOR
@@ -342,12 +487,7 @@ Fig5e
 dev.off()
 
 ########################################
-# DIVERSITY/RICHNESS ALL AUTHORS
-########################################
-source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
-SubsampledPW.results_All<-SubSamplePWvsOA_comparison(AllData,"author_all")
-
-# FIG DIV LAST AUTHOR
+# FIG DIV ALL AUTHOR
 source("./Rscript/functions_figures/Fig5c.R")
 Plot5c<-Fig5c(SubsampledPW.results_All,AllData)
 Plot5c
@@ -355,7 +495,7 @@ png(file="./tables_figs/plot5c.png",width=1000, height=700)
 Plot5c
 dev.off()
 
-# FIG RICHNESS LAST AUTHOR
+# FIG RICHNESS AL AUTHOR
 source("./Rscript/functions_figures/Fig5f.R")
 Fig5f<-Fig5f(SubsampledPW.results_First,AllData)
 Fig5f
@@ -364,6 +504,20 @@ Fig5f
 dev.off()
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+# TODO: NOT YET IN FUNCTION FORM, NEEDS CLEAN UP AND ANNOTATION
 
 ###############################################
 ###############################################
@@ -439,15 +593,26 @@ FirstLast$FirstLastIncome<-paste(FirstLast$IncomeGroup_first,FirstLast$IncomeGro
 FirstLast$FirstLastCountry<-paste(FirstLast$Country_first,FirstLast$Country_last,sep="+")
 FirstLast$FirstLastCode<-paste(FirstLast$Code_first,FirstLast$Code_last,sep="+")
 
-summary(FirstLast$Region_first==FirstLast$Region_last)
-19298/(19298+6244)
+colnames(FirstLast)
 
+FirstLast_Region<-summary(FirstLast$Region_first==FirstLast$Region_last)
+19301/(19301+6240)
+# 75%
 summary(FirstLast$IncomeGroup_first==FirstLast$IncomeGroup_last)
-20298/(20298+5244)
+20300/(20300+5241)
+# 80%
 
 summary(FirstLast$Country_first==FirstLast$Country_last)
-16473/(16473+9069)
-
+16477/(16477+9064)
+# 65%
+FirstLast$Country_check<-(FirstLast$Country_first==FirstLast$Country_last)
+FirstLast_diff<-FirstLast %>% 
+  filter(Country_check=="FALSE") %>% 
+  arrange(FirstLastCode) %>% 
+  group_by(FirstLastCountry) %>% 
+  summarise(n=n()) %>% 
+  arrange(desc(n))
+FirstLast_diff
 
 #####################
 # Region
