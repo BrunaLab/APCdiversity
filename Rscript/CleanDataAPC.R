@@ -298,5 +298,31 @@ MirrorPairs <- MirrorPairs%>%
 write.csv(MirrorPairs,"./data_clean/MirrorPairs.csv", row.names = FALSE)
 # remove from the environment
 rm(MirrorPairs)
-################################################################
 
+################################################################
+# ALL DATA without papers that have a USA or CHN first or last author
+
+# papers with a first author in USA or CHN
+first_author_USA_CHN<-AllData %>%
+   group_by(DOI) %>% 
+   filter(AuthorNum==1 & (Country=="CHINA"| Country=="USA"))
+# papers with a last author in USA or CHN
+last_author_USA_CHN<-AllData %>%
+   group_by(DOI) %>% 
+   filter(AuthorNum == max(AuthorNum)) %>%
+   filter(Country=="CHINA"| Country=="USA")
+# bind them together, select only DOI column
+papers_CHN_USA<-bind_rows(last_author_USA_CHN,first_author_USA_CHN) %>% 
+   select(DOI)
+# take all data, and keep only papers NOT having 
+# first/last author in USA or CHN
+AllData_noUSAorCHN<-anti_join(AllData,papers_CHN_USA)
+# verfiy they sum
+(AllData_noUSAorCHN %>% summarise(n_distinct(DOI))+
+      papers_CHN_USA %>% 
+      ungroup(papers_CHN_USA) %>% 
+      summarise(n_distinct(DOI)))==
+   AllData %>% summarise(n_distinct(DOI))
+
+
+write.csv(AllData_noUSAorCHN,"./data_clean/AllData_noUSAorCHN.csv", row.names = FALSE)

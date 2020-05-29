@@ -20,30 +20,8 @@ MirrorPairs<-read.csv("./data_clean/MirrorPairs.csv")
 
 WaiverCountries<-read.csv("./data_clean/WaiverCountries.csv")
 
+AllData_noUSAorCHN<-read_csv(file="./data_clean/AllData_noUSAorCHN.csv")
 
-# papers with a first author in USA or CHN
-first_author_USA_CHN<-AllData %>%
-  group_by(DOI) %>% 
-  filter(AuthorNum==1 & (Country=="CHINA"| Country=="USA"))
-# papers with a last author in USA or CHN
-last_author_USA_CHN<-AllData %>%
-  group_by(DOI) %>% 
-  filter(AuthorNum == max(AuthorNum)) %>%
-  filter(Country=="CHINA"| Country=="USA")
-# bind them together, select only DOI column
-  papers_CHN_USA<-bind_rows(last_author_USA_CHN,first_author_USA_CHN) %>% 
-    select(DOI)
-# take all data, and keep only papers NOT having 
-# first/last author in USA or CHN
-  AllData_noUSAorCHN<-anti_join(AllData,papers_CHN_USA)
-# verfiy they sum
-  (AllData_noUSAorCHN %>% summarise(n_distinct(DOI))+
-      papers_CHN_USA %>% 
-      ungroup(papers_CHN_USA) %>% 
-      summarise(n_distinct(DOI)))==
-    AllData %>% summarise(n_distinct(DOI))
-
-AllData_noUSAorCHN
 
 ############################################################
 # APCs
@@ -284,18 +262,29 @@ source("./Rscript/functions/DivRichCalc.R")
 # DivRichCalc<-function(DataSet,AuPosition,JrnlType)
 DivRichCalc_result<-DivRichCalc(AllData,"author_last","OA")
 DivRichCalc_result
+
 #############################################
 # AUTHOR DIVERSITY & RICHNESS: ALL PAPERS POOLED
 # Returns results for first authors, last authors, 
 # and all authors in a df 
 #################################################
-
-# TODO:need to add the table with the bootstraop values
-
-source("./Rscript/functions/DivRichCalcSummaryTable.R") # enter as divCalc(df,JrnlType,Author)
-Table2<-DivRichCalcSummaryTable(AllData)
+source("./Rscript/functions/DivRichCalcSummaryTable_sampled.R")
+Table2<-DivRichCalcSummaryTable_sampled(AllData,
+                                          AllData_noUSAorCHN,
+                                          SubsampledPW.results_First,
+                                          SubsampledPW.results_Last,
+                                          SubsampledPW.results_All,
+                                          SubsampledPW.results_First_NOUSACHN,
+                                          SubsampledPW.results_Last_NOUSACHN,
+                                          SubsampledPW.results_All_NOUSACHN)
 Table2
 write.csv(Table2, "./tables_figs/Table2.csv", row.names = FALSE)
+
+  
+# source("./Rscript/functions/DivRichCalcSummaryTable.R") # enter as divCalc(df,JrnlType,Author)
+# Table2<-DivRichCalcSummaryTable(AllData)
+# Table2
+# write.csv(Table2, "./tables_figs/Table2.csv", row.names = FALSE)
 
 ###############################################################################
 # COMPARE OBSERVED OA DIV/RICH with SUBSAMPLE PW ARTICLES
@@ -469,7 +458,6 @@ png(file="./tables_figs/plot5d.png",width=1000, height=700)
 Fig5d
 dev.off()
 
-
 # FIG DIV LAST AUTHOR
 source("./Rscript/functions_figures/Fig5b.R")
 Fig5b<-Fig5b(SubsampledPW.results_Last,AllData)
@@ -503,6 +491,58 @@ png(file="./tables_figs/plot5f.png",width=1000, height=700)
 Fig5f
 dev.off()
 
+
+######################################
+# FIGS NO CHINA
+######################################
+# FIG DIVERSITY FIRST AUTHOR
+source("./Rscript/functions_figures/Fig5a_noCHNorUSA.R")
+Fig5a_NOUSACHN<-Fig5a_noCHNorUSA(SubsampledPW.results_First_NOUSACHN,AllData_noUSAorCHN)
+Fig5a_NOUSACHN
+png(file="./tables_figs/plot5a_NOUSACHN.png",width=1000, height=700)
+Fig5a_NOUSACHN
+dev.off()
+
+# FIG RICHNESS FIRST AUTHOR
+source("./Rscript/functions_figures/Fig5d_noCHNorUSA.R")
+Fig5d_noCHNorUSA<-Fig5d_noCHNorUSA(SubsampledPW.results_First_NOUSACHN,AllData_noUSAorCHN)
+Fig5d_noCHNorUSA
+png(file="./tables_figs/plot5d_NOUSACHN.png",width=1000, height=700)
+Fig5d_NOUSACHN
+dev.off()
+
+# FIG DIV LAST AUTHOR
+source("./Rscript/functions_figures/Fig5b_noCHNorUSA.R")
+Fig5b_NOUSACHN<-Fig5b_noCHNorUSA(SubsampledPW.results_Last_NOUSACHN,AllData_noUSAorCHN)
+Fig5b_NOUSACHN
+png(file="./tables_figs/plot5b_NOUSACHN.png",width=1000, height=700)
+Fig5b_NOUSACHN
+dev.off()
+
+# FIG RICHNESS LAST AUTHOR
+source("./Rscript/functions_figures/Fig5e_noCHNorUSA.R")
+Fig5e_NOUSACHN<-Fig5e_noCHNorUSA(SubsampledPW.results_First_NOUSACHN,AllData_noUSAorCHN)
+Fig5e_NOUSACHN
+png(file="./tables_figs/plot5e_NOUSACHN.png",width=1000, height=700)
+Fig5e_NOUSACHN
+dev.off()
+
+########################################
+# FIG DIV ALL AUTHOR
+source("./Rscript/functions_figures/Fig5c_noCHNorUSA.R")
+Plot5c_NOUSACHN<-Fig5c_noCHNorUSA(SubsampledPW.results_All_NOUSACHN,AllData_noUSAorCHN)
+Plot5c_NOUSACHN
+png(file="./tables_figs/plot5c_NOUSACHN.png",width=1000, height=700)
+Plot5c_NOUSACHN
+dev.off()
+
+# FIG RICHNESS AL AUTHOR
+source("./Rscript/functions_figures/Fig5f_noCHNorUSA.R")
+Fig5f_NOUSACHN<-Fig5f_noCHNorUSA(SubsampledPW.results_First_NOUSACHN,AllData_noUSAorCHN)
+Fig5f_NOUSACHN
+png(file="./tables_figs/plot5f_NOUSACHN.png",width=1000, height=700)
+Fig5f_NOUSACHN
+dev.off()
 
 
 

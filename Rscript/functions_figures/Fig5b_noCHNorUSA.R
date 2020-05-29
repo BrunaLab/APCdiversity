@@ -1,9 +1,9 @@
-Fig5b<-function(SampledData,OriginalData) {
+Fig5b_noCHNorUSA<-function(SampledData,OriginalData) {
   library(ggplot2)
   library(tidyr)
   library(dplyr)
-  # SampledData<-SubsampledPW.results_Last
-  # OriginalData<-AllData
+  # SampledData<-SubsampledPW.results_Last_NOUSACHN
+  # OriginalData<-AllData_noUSAorCHN
   vars<-list(SampledData,OriginalData)
   SampledData<-as.data.frame(vars[1])
   OriginalData<-as.data.frame(vars[2])
@@ -11,7 +11,7 @@ Fig5b<-function(SampledData,OriginalData) {
   source("./Rscript/functions/DivRichCalc.R")
   OAdiv<-DivRichCalc(AllData,"author_last","OA")
   OAdiv_Last<-as.numeric(OAdiv[2])
-  
+  OAdiv_Last
   div_Last<-sum(SampledData$InvSimp>OAdiv_Last)/1000*100
   div_Last
   
@@ -26,8 +26,8 @@ Fig5b<-function(SampledData,OriginalData) {
     #            label.size = 0.5,color = "darkblue", fill="white")+
     xlab("Resampled national diversity:\nLast authors of paywalled articles")+
     ylab("Frequency")+
-    scale_x_continuous(breaks = c(6:11),limits=c(6,11))+
-    scale_y_continuous(expand = c(0,0),limits = c(0,200))
+    scale_x_continuous(breaks = c(6:30),limits=c(6,30))+
+    scale_y_continuous(expand = c(0,0),limits = c(0,300))
   pDiv_last<-pDiv_last+
     theme_classic()+ 
     theme(

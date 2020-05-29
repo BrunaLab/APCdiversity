@@ -14,7 +14,7 @@ Fig5d<-function(SampledData,OriginalData) {
   
   probFirst<-sum(SampledData$Richness>OArich_First)/1000*100
   
-  prich_first<-ggplot(SampledData[1], aes(x=Richness)) +
+  prich_first<-ggplot(SampledData, aes(x=Richness)) +
     geom_histogram(bins=30, colour="black", fill="white")+
     annotate("text", x = 45, y = 200,label =(paste(probFirst,"%",sep="")))+
     geom_vline(aes(xintercept=OArich_First),

@@ -1,9 +1,9 @@
-Fig5f<-function(SampledData,OriginalData) {
+Fig5f_noCHNorUSA<-function(SampledData,OriginalData) {
   library(ggplot2)
   library(tidyr)
   library(dplyr)
-  # SampledData<-SubsampledPW.results_First
-  # OriginalData<-OriginalData
+  # SampledData<-SubsampledPW.results_First_NOUSACHN
+  # OriginalData<-AllData_noUSAorCHN
   vars<-list(SampledData,OriginalData)
   SampledData<-as.data.frame(vars[1])
   OriginalData<-as.data.frame(vars[2])
@@ -12,6 +12,7 @@ Fig5f<-function(SampledData,OriginalData) {
   OAdiv<-DivRichCalc(OriginalData,"author_all","OA")
   OArich_All<-as.numeric(OAdiv[1])
   OArich_All
+  
   probAll<-sum(SampledData$Richness>OArich_All)/1000*100
   probAll
   
@@ -25,8 +26,8 @@ Fig5f<-function(SampledData,OriginalData) {
     #            label.size = 0.5,color = "darkblue", fill="white")+
     xlab("Resampled national richness:\nAll authors of paywalled articles")+
     ylab("Frequency")+
-    scale_y_continuous(expand = c(0,0),limits = c(0,250))+
-    scale_x_continuous(breaks = seq(50,90, by=10),limits=c(50,90))
+    scale_y_continuous(expand = c(0,0),limits = c(0,300))+
+    scale_x_continuous(breaks = seq(45,90, by=10),limits=c(45,90))
   prich_All<-prich_All+
     theme_classic()+ 
     theme(

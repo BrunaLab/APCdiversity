@@ -2,31 +2,31 @@ Fig5a<-function(SampledData,OriginalData) {
   library(ggplot2)
   library(tidyr)
   library(dplyr)
-  # SampledData<-SubsampledPW.results_First[1]
+  # SampledData<-SubsampledPW.results_First
   # OriginalData<-AllData
-  vars<-list(SampledData[1],OriginalData)
+  vars<-list(SampledData,OriginalData)
   SampledData<-as.data.frame(vars[1])
   OriginalData<-as.data.frame(vars[2])
   
   source("./Rscript/functions/DivRichCalc.R")
   OAdiv<-DivRichCalc(OriginalData,"author_first","OA")
-  OAdiv_First<-as.numeric(OAdiv[2])
-  
+  OADiv_First<-as.numeric(OAdiv[2])
+  OADiv_First
   probFirst<-sum(SampledData$InvSimp>OAdiv_First)/1000*100
   probFirst
   
   pDiv_first<-ggplot(SampledData, aes(x=InvSimp)) + 
     geom_histogram(bins=30, colour="black", fill="white")+
-    geom_vline(aes(xintercept=OAdiv_First),
+    geom_vline(aes(xintercept=OADiv_First),
                color="darkblue", linetype="dashed", size=1)+
-    annotate("text", x = 8, y = 275,label =(paste(probFirst,"%",sep="")))+
+    annotate("text", x = 8, y = 245,label =(paste(probFirst,"%",sep="")))+
     # geom_label(label="Observed OA Diversity (0%)", x=13,y=275,
     #            label.padding = unit(0.55, "lines"), # Rectangle size around label
     #            label.size = 0.5,color = "darkblue", fill="white")+
     xlab("Resampled national diversity:\nfirst authors of paywalled articles")+
     ylab("Frequency")+
-    scale_y_continuous(expand = c(0,0),limits = c(0,300))+
-    scale_x_continuous(breaks = c(6:16),limits=c(6,16))
+    # scale_x_continuous(breaks = c(6:16),limits=c(6:16))+
+    scale_y_continuous(expand = c(0,0),limits = c(0,250))
   pDiv_first<-pDiv_first+
     theme_classic()+ 
     theme(

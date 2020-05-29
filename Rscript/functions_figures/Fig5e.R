@@ -4,13 +4,13 @@ Fig5e<-function(SampledData,OriginalData) {
   library(dplyr)
   # SampledData<-SubsampledPW.results_First
   # OriginalData<-AllData
-  vars<-list(SampledData[1],OriginalData)
+  vars<-list(SampledData,OriginalData)
   SampledData<-as.data.frame(vars[1])
   OriginalData<-as.data.frame(vars[2])
   source("./Rscript/functions/DivRichCalc.R")
   OAdiv<-DivRichCalc(AllData,"author_last","OA")
   OArich_Last<-as.numeric(OAdiv[1])
-  
+  OArich_Last
   problast<-sum(SampledData$Richness>OArich_Last)/1000*100
   problast
   
