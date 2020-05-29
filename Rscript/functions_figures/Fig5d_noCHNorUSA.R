@@ -4,7 +4,7 @@ Fig5d_noCHNorUSA<-function(SampledData,OriginalData) {
   library(dplyr)
   # SampledData<-SubsampledPW.results_First
   # OriginalData<-AllData
-  vars<-list(SampledData,OriginalData)
+  vars<-list(SampledData[1],OriginalData)
   SampledData<-as.data.frame(vars[1])
   OriginalData<-as.data.frame(vars[2])
   
