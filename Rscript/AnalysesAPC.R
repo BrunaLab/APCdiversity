@@ -99,13 +99,12 @@ Table_setdiffs.2<-Table_setdiffs %>%
 # Summary Table: PAPERS PER JOURNAL 
 ############################################################
 source("./Rscript/functions/SummaryTable.R") 
-Table1<-SummaryTable(AllData)
-Table1<-Table1[1]
+Tables<-SummaryTable(AllData)
+Table1<-Tables[1]
 write.csv(Table1, "./tables_figs/Table1.csv", row.names = FALSE)
 # Alternative version
-Table1v2<-Table1[2]
+Table1v2<-Tables[2]
 write.csv(Table1v2, "./tables_figs/Table1v2.csv", row.names = FALSE)
-
 
 
 ############################################################################
@@ -139,7 +138,9 @@ Fig1wafflePlot<-Fig1waffle(AllData)
 ################
 
 
-
+source("./Rscript/functions_figures/AltFig1.R") 
+Fig1_alt<-AltFig1(Subsampled_Countries,"author_first")
+Fig1_alt
 
 
 
@@ -166,6 +167,8 @@ Fig2b
 png(file="./tables_figs/Fig2b.png",width=1000, height=700)
 Fig2b
 dev.off()
+
+
 
 ############################################################
 # FIG 3: for articles in OA journals: the number of articles 
@@ -262,29 +265,6 @@ source("./Rscript/functions/DivRichCalc.R")
 # DivRichCalc<-function(DataSet,AuPosition,JrnlType)
 DivRichCalc_result<-DivRichCalc(AllData,"author_last","OA")
 DivRichCalc_result
-
-#############################################
-# AUTHOR DIVERSITY & RICHNESS: ALL PAPERS POOLED
-# Returns results for first authors, last authors, 
-# and all authors in a df 
-#################################################
-source("./Rscript/functions/DivRichCalcSummaryTable_sampled.R")
-Table2<-DivRichCalcSummaryTable_sampled(AllData,
-                                          AllData_noUSAorCHN,
-                                          SubsampledPW.results_First,
-                                          SubsampledPW.results_Last,
-                                          SubsampledPW.results_All,
-                                          SubsampledPW.results_First_NOUSACHN,
-                                          SubsampledPW.results_Last_NOUSACHN,
-                                          SubsampledPW.results_All_NOUSACHN)
-Table2
-write.csv(Table2, "./tables_figs/Table2.csv", row.names = FALSE)
-
-  
-# source("./Rscript/functions/DivRichCalcSummaryTable.R") # enter as divCalc(df,JrnlType,Author)
-# Table2<-DivRichCalcSummaryTable(AllData)
-# Table2
-# write.csv(Table2, "./tables_figs/Table2.csv", row.names = FALSE)
 
 ###############################################################################
 # COMPARE OBSERVED OA DIV/RICH with SUBSAMPLE PW ARTICLES
@@ -389,6 +369,34 @@ write.csv(SubsampledPW.results_All_NOUSACHN[1],
 write.csv(SubsampledPW.results_All_NOUSACHN[2], 
           'output/SubsampledPW.results_Countries_ALL_AUTHOR_NOUSACHN.csv', 
           row.names = FALSE)
+
+
+
+
+#############################################
+# AUTHOR DIVERSITY & RICHNESS: ALL PAPERS POOLED
+# Returns results for first authors, last authors, 
+# and all authors in a df 
+#################################################
+source("./Rscript/functions/DivRichCalcSummaryTable_sampled.R")
+Table2<-DivRichCalcSummaryTable_sampled(AllData,
+                                        AllData_noUSAorCHN,
+                                        SubsampledPW.results_First,
+                                        SubsampledPW.results_Last,
+                                        SubsampledPW.results_All,
+                                        SubsampledPW.results_First_NOUSACHN,
+                                        SubsampledPW.results_Last_NOUSACHN,
+                                        SubsampledPW.results_All_NOUSACHN)
+Table2
+write.csv(Table2, "./tables_figs/Table2.csv", row.names = FALSE)
+
+
+# source("./Rscript/functions/DivRichCalcSummaryTable.R") # enter as divCalc(df,JrnlType,Author)
+# Table2<-DivRichCalcSummaryTable(AllData)
+# Table2
+# write.csv(Table2, "./tables_figs/Table2.csv", row.names = FALSE)
+
+
 
 ###############################################
 

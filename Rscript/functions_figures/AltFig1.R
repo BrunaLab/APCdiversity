@@ -1,4 +1,4 @@
-# Fig1hist<-function(DataSet,AuPosition) {
+AltFig1<-function(DataSet,AuPosition) {
   # DataSet<-Subsampled_Countries_summary
   # AuPosition<-"author_first"
   library(ggplot2)
@@ -12,7 +12,7 @@
   #   slice(1)
   # head(CountryInfo,10)
   
-  Subsampled_Countries<-read.csv( 'output/SubsampledPW.results_Countries_FIRST_AUTHOR.csv')
+  # Subsampled_Countries<-read.csv( 'output/SubsampledPW.results_Countries_FIRST_AUTHOR.csv')
   
   # Subsampled_Countries<-Subsampled_Countries %>% 
   #   inner_join(CountryInfo,Subsampled_Countries,by="Country") 
@@ -124,11 +124,11 @@
       plot.margin =unit(c(1,3,1,1.5), "lines")   #plot margin - top, right, bottom, left
     )    
   fig1alt   
-  
-  
-  png(file="./tables_figs/plot1A_alt2.png",width=1000, height=700)
-  fig1alt   
-  dev.off()
+  plot1<-fig1alt
+  # 
+  # png(file="./tables_figs/plot1A_alt2.png",width=1000, height=700)
+  # fig1alt   
+  # dev.off()
   
   
   # # # # # # # # # # # # # # # # # # # # # 
@@ -200,59 +200,59 @@
   
   ####################################3
   
-  
-  DataSet$IncomeGroup <- ordered(DataSet$IncomeGroup, levels = c("High", "Upper middle","Lower middle","Low"))
-  # levels(DataSet$IncomeGroup)
-  # DataSet<-AllData
-  # AuPosition<-"author_first"
-  if ((AuPosition=="author_first")==TRUE) {
-    first_author_income_cats<-as.data.frame(DataSet) %>% 
-      filter(AuthorNum==1) %>% 
-      group_by(JrnlType,IncomeGroup) %>% 
-      tally() %>% 
-      mutate(percentage=n/sum(n)*100)
-    
-    xlabeltext="First Author National Income Category"
-    title_text=paste("Fig. 1a: Percentage of each article type with first", 
-                     "authors in different national income categories.", sep= " ")
-    
-  } else if ((AuPosition=="author_last")==TRUE) {
-    first_author_income_cats<-as.data.frame(DataSet) %>% 
-      group_by(DOI) %>% 
-      filter(AuthorNum == max(AuthorNum)) %>% 
-      group_by(JrnlType,IncomeGroup) %>% 
-      tally() %>% 
-      mutate(percentage=n/sum(n)*100)
-    
-    xlabeltext="Last Author National Income Category"
-    title_text=paste("Fig. 1b: Percentage of each article type with last",
-                     "authors in different national income categories.",sep= " ")
-    
-  } else {
-    stop("Please enter 'author_first' or 'author_last'")
-    
-  }
-plot1alt2<-ggplot(Subsampled_Income_summary, aes(y=perc,x=IncomeGroup)) + 
-geom_boxplot() +
-scale_y_continuous(expand = c(0,0),limits = c(0,100))
-ggMarginal(plot1alt, type = "boxplot", fill="transparent")
-    # scale_x_discrete(limits = bar_order)+
-    # facet_grid(cols = vars(JrnlType),labeller=labeller(JrnlType = labels))+
-    # ggtitle(title_text)
-plot1alt<-plot1alt+
-    theme_classic()+
-    theme(
-      axis.text.x = element_text(size=18,angle = 45, vjust = 1, hjust = 1),
-      axis.text.y = element_text(size=18),
-      axis.title.x=element_text(colour="black", size = 24, vjust=-0.5),
-      axis.title.y=element_text(colour="black", size = 24, vjust=2),
-      strip.text.x = element_text(size = 18),
-      panel.spacing.x =unit(2.5, "lines") , panel.spacing.y=unit(1,"lines"),
-      plot.margin =unit(c(1,1,1,1.5), "lines")   #plot margin - top, right, bottom, left
-      
-      
-    )
-  plot1alt
+#   
+#   DataSet$IncomeGroup <- ordered(DataSet$IncomeGroup, levels = c("High", "Upper middle","Lower middle","Low"))
+#   # levels(DataSet$IncomeGroup)
+#   # DataSet<-AllData
+#   # AuPosition<-"author_first"
+#   if ((AuPosition=="author_first")==TRUE) {
+#     first_author_income_cats<-as.data.frame(DataSet) %>% 
+#       filter(AuthorNum==1) %>% 
+#       group_by(JrnlType,IncomeGroup) %>% 
+#       tally() %>% 
+#       mutate(percentage=n/sum(n)*100)
+#     
+#     xlabeltext="First Author National Income Category"
+#     title_text=paste("Fig. 1a: Percentage of each article type with first", 
+#                      "authors in different national income categories.", sep= " ")
+#     
+#   } else if ((AuPosition=="author_last")==TRUE) {
+#     first_author_income_cats<-as.data.frame(DataSet) %>% 
+#       group_by(DOI) %>% 
+#       filter(AuthorNum == max(AuthorNum)) %>% 
+#       group_by(JrnlType,IncomeGroup) %>% 
+#       tally() %>% 
+#       mutate(percentage=n/sum(n)*100)
+#     
+#     xlabeltext="Last Author National Income Category"
+#     title_text=paste("Fig. 1b: Percentage of each article type with last",
+#                      "authors in different national income categories.",sep= " ")
+#     
+#   } else {
+#     stop("Please enter 'author_first' or 'author_last'")
+#     
+#   }
+# plot1alt2<-ggplot(Subsampled_Income_summary, aes(y=perc,x=IncomeGroup)) + 
+# geom_boxplot() +
+# scale_y_continuous(expand = c(0,0),limits = c(0,100))
+# ggMarginal(plot1alt, type = "boxplot", fill="transparent")
+#     # scale_x_discrete(limits = bar_order)+
+#     # facet_grid(cols = vars(JrnlType),labeller=labeller(JrnlType = labels))+
+#     # ggtitle(title_text)
+# plot1alt<-plot1alt+
+#     theme_classic()+
+#     theme(
+#       axis.text.x = element_text(size=18,angle = 45, vjust = 1, hjust = 1),
+#       axis.text.y = element_text(size=18),
+#       axis.title.x=element_text(colour="black", size = 24, vjust=-0.5),
+#       axis.title.y=element_text(colour="black", size = 24, vjust=2),
+#       strip.text.x = element_text(size = 18),
+#       panel.spacing.x =unit(2.5, "lines") , panel.spacing.y=unit(1,"lines"),
+#       plot.margin =unit(c(1,1,1,1.5), "lines")   #plot margin - top, right, bottom, left
+#       
+#       
+#     )
+#   plot1alt
 
   return(plot1)
   

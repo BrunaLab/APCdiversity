@@ -56,6 +56,7 @@ DivRichCalc<-function(DataSet,AuPosition,JrnlType) {
   Richness<-nrow(SiteBySpec)
   SiteBySpec <- SiteBySpec %>% spread(Country, n)
   InvSimpsons <- diversity(SiteBySpec, index = "invsimpson")
+  # InvSimpsons <- diversity(SiteBySpec, index = "shannon")
   return(list(Richness=Richness,InvSimpsons=InvSimpsons,Countries=Countries))
   
 }

@@ -8,8 +8,8 @@ samplePW<-function(PW_papers,n) {
     nest() %>%            
     ungroup() %>% 
     mutate(n) %>%
-    mutate(samp = map2(data, n, sample_n, replace=FALSE)) %>% # This is sampling WITHOUT replacement
-    # mutate(samp = map2(data, n, sample_n, replace=TRUE)) %>% # This is sampling WITH replacement
+    # mutate(samp = map2(data, n, sample_n, replace=FALSE)) %>% # This is sampling WITHOUT replacement
+    mutate(samp = map2(data, n, sample_n, replace=TRUE)) %>% # This is sampling WITH replacement
     select(-data) %>%
     unnest(samp)
   
