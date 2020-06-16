@@ -13,14 +13,40 @@
 library(tidyverse)
 
 # load the data to be used in analyses
-
 AllData<-read_csv(file="./data_clean/AllData.csv")
-
 MirrorPairs<-read.csv("./data_clean/MirrorPairs.csv")
-
 WaiverCountries<-read.csv("./data_clean/WaiverCountries.csv")
-
 AllData_noUSAorCHN<-read_csv(file="./data_clean/AllData_noUSAorCHN.csv")
+
+one_author_pubs <- AllData %>%
+  group_by(DOI) %>% 
+  summarize(n=n_distinct(AuthorNum)) %>% 
+  filter(n==1) %>% 
+  select(-n) %>% 
+  left_join(AllData,by="DOI")
+
+coauthor_pubs<- AllData %>%
+  group_by(DOI) %>% 
+  summarize(n=n_distinct(AuthorNum)) %>% 
+  filter(n>=2) %>% 
+  left_join(AllData,by="DOI")
+
+one_author_pubsNOCHNUSA <- AllData %>%
+  group_by(DOI) %>% 
+  summarize(n=n_distinct(AuthorNum)) %>% 
+  filter(n==1) %>% 
+  select(-n) %>% 
+  left_join(AllData,by="DOI") %>% 
+  filter(Code!="CHN")
+
+coauthor_pubsNOCHNUSA<- AllData %>%
+  group_by(DOI) %>% 
+  summarize(n=n_distinct(AuthorNum)) %>% 
+  filter(n>=2) %>% 
+  left_join(AllData,by="DOI") %>% 
+  filter(Code!="CHN")
+
+
 
 
 ############################################################
@@ -54,26 +80,31 @@ NumbArticles_JrnlType <- AllData %>% #number of papers per journal
   summarize(n=n_distinct(DOI))
 NumbArticles_JrnlType
 
-n_counrtries<-AllData %>% 
+n_countries<-AllData %>% 
   group_by(JrnlType) %>% 
   summarize(n_distinct(Code))
-n_counrtries
+n_countries
 
-counrtriesOA<-AllData %>% 
+countriesOA1<-AllData %>% 
   filter(AuthorNum==1&JrnlType=="OA") %>% 
   group_by(Code) %>% 
   select(Code,IncomeGroup,Region) %>% 
   slice(1)
 
-counrtriesPW<-AllData %>% 
+ncountriesOA1<-ungroup(countriesOA1) %>% 
+  tally(n_distinct(Code))
+
+countriesPW1<-AllData %>% 
   filter(AuthorNum==1&JrnlType=="PW") %>% 
   group_by(Code) %>% 
   select(Code,IncomeGroup,Region) %>% 
   slice(1)
 
+ncountriesPW1<-ungroup(countriesPW1) %>% 
+  tally(n_distinct(Code))
 
-intersecting_countries<-intersect(counrtriesOA, counrtriesPW)
-OAnotPW<-setdiff(counrtriesOA, counrtriesPW)
+intersecting_countries<-intersect(countriesOA1, countriesPW1)
+OAnotPW<-setdiff(countriesOA1, countriesPW1)
 OAnotPW$Code<-as.factor(OAnotPW$Code)
 OAnotPW$IncomeGroup<-as.factor(OAnotPW$IncomeGroup)
 OAnotPW$Region<-as.factor(OAnotPW$Region)
@@ -81,7 +112,7 @@ OAnotPW$set<-"in OA but not PW"
 OAnotPW$set<-as.factor(OAnotPW$set)
 OAnotPW_summary<-summary(OAnotPW)
 
-PWnotOA<-setdiff(counrtriesPW,counrtriesOA)
+PWnotOA<-setdiff(countriesPW1,countriesOA1)
 PWnotOA$set<-"in PW but not OA"
 PWnotOA$Code<-as.factor(PWnotOA$Code)
 PWnotOA$IncomeGroup<-as.factor(PWnotOA$IncomeGroup)
@@ -93,6 +124,18 @@ Table_setdiffs.2<-Table_setdiffs %>%
   select(set,IncomeGroup) %>% 
   group_by(set,IncomeGroup) %>% 
   summarize(n())
+
+# Last authors 
+LastAuthors <- AllData %>%
+  group_by(DOI) %>% 
+  filter(AuthorNum == max(AuthorNum)) %>%
+  filter(AuthorNum>1) %>% # This filters outr last authors
+  distinct(DOI, .keep_all = TRUE) %>% 
+  ungroup()
+colnames(LastAuthors)
+
+
+
 
 
 ############################################################
@@ -176,29 +219,50 @@ dev.off()
 # 3a: OA-First  # 3b: PW-First
 # 3c: OA-Last   # 3d: PW-Last
 ############################################################
+
+# SOLO AUTHORED, PW
 source("./Rscript/functions_figures/Fig3.R") 
-Fig3a<-Fig3(AllData,"author_first","OA")
-Fig3a
-png(file="./tables_figs/Fig3a.png",width=1000, height=700)
-Fig3a
+Fig3bSoloPW<-Fig3(one_author_pubs,"author_first","PW")
+Fig3bSoloPW
+png(file="./tables_figs/Fig3bSoloPW.png",width=1000, height=700)
+Fig3bSoloPW
 dev.off()
 
-Fig3b<-Fig3(AllData,"author_first","PW")
-Fig3b
-png(file="./tables_figs/Fig3b.png",width=1000, height=700)
-Fig3b
+# SOLO AUTHORED, OA
+Fig3bSoloOA<-Fig3(one_author_pubs,"author_first","OA")
+Fig3bSoloOA
+png(file="./tables_figs/Fig3bSoloOA.png",width=1000, height=700)
+Fig3bSoloOA
 dev.off()
 
-Fig3c<-Fig3(AllData,"author_last","OA")
-Fig3c
-png(file="./tables_figs/Fig3c.png",width=1000, height=700)
-Fig3c
+# COAUTHORED, FIRST, PW
+source("./Rscript/functions_figures/Fig3.R") 
+Fig3bCoPW_First<-Fig3(coauthor_pubs,"author_first","PW")
+Fig3bCoPW_First
+png(file="./tables_figs/Fig3bCoauthoredPW_First.png",width=1000, height=700)
+Fig3bCoPW_First
 dev.off()
 
-Fig3d<-Fig3(AllData,"author_last","PW")
-Fig3d
-png(file="./tables_figs/Fig3d.png",width=1000, height=700)
-Fig3d
+# COAUTHORED, FIRST, OA
+source("./Rscript/functions_figures/Fig3.R") 
+Fig3aCoOA_First<-Fig3(coauthor_pubs,"author_first","OA")
+Fig3aCoOA_First
+png(file="./tables_figs/Fig3aCoAuthoredOA_First.png",width=1000, height=700)
+Fig3aCoOA_First
+dev.off()
+
+# COAUTHORED, LAST, PW
+Fig3dCoPW_Last<-Fig3(coauthor_pubs,"author_last","PW")
+Fig3dCoPW_Last
+png(file="./tables_figs/Fig3dCoAuthoredPW_Last.png",width=1000, height=700)
+Fig3dCoPW_Last
+dev.off()
+
+# COAUTHORED, LAST, OA
+Fig3cCoOA_Last<-Fig3(coauthor_pubs,"author_last","OA")
+Fig3cCoOA_Last
+png(file="./tables_figs/Fig3cCoAuthoredOA_Last.png",width=1000, height=700)
+Fig3cCoOA_Last
 dev.off()
 
 
@@ -209,7 +273,7 @@ dev.off()
 # ie, where the does the observed lie relative to the bootstrap? 
 ##################################################
 # DATA PREP
-OA_papers <- AllData %>% filter(JrnlType == "OA")
+OA_papers <- coauthor_pubs %>% filter(JrnlType == "OA")
 OA_papers_boot<-sample_n(OA_papers, nrow(OA_papers), replace = TRUE)
 source("./Rscript/functions/DivRichCalc.R") 
 nboot <-1000 #number of bootstrap samples
@@ -228,7 +292,7 @@ bootstrap.OA.1st<-arrange(bootstrap.OA.1st)
 hist(bootstrap.OA.1st$Richness)
 hist(bootstrap.OA.1st$InvSimp)
 summary(bootstrap.OA.1st)
-OADivRich<-DivRichCalc(AllData,"author_first","OA")
+OADivRich<-DivRichCalc(coauthor_pubs,"author_last","OA")
 OAdiv<-as.numeric((OADivRich)[2])
 OARich<-as.numeric((OADivRich)[1])
 
@@ -254,7 +318,7 @@ dev.off()
 #################################################################
 
 source("./Rscript/functions/DivCalcJrnl.R") # enter as divCalc(df,JrnlType,Author)
-DivMetrics<-DivCalcJrnl(AllData)
+DivMetrics<-DivCalcJrnl(coauthor_pubs)
 write.csv(DivMetrics, 'output/DivMetricsALL.csv', row.names = FALSE)
 
 boxplot(DivMetrics$DeltaDiv)
@@ -263,7 +327,7 @@ median(DivMetrics$DeltaDiv,na.rm=TRUE)
 # rm(save_name)
 source("./Rscript/functions/DivRichCalc.R")
 # DivRichCalc<-function(DataSet,AuPosition,JrnlType)
-DivRichCalc_result<-DivRichCalc(AllData,"author_last","OA")
+DivRichCalc_result<-DivRichCalc(coauthor_pubs,"author_last","OA")
 DivRichCalc_result
 
 ###############################################################################
@@ -282,9 +346,25 @@ DivRichCalc_result
 ########################################
 
 ########################################
-# SAMPLED DIV/RICH: FIRST AUTHORS
+########################################
+# SAMPLED DIV/RICH: SINGLE AUTHOR PUBS 
 source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
-SubsampledPW.results_First<-SubSamplePWvsOA_comparison(AllData,"author_first")
+SubsampledPW.results_Solo_First<-SubSamplePWvsOA_comparison(one_author_pubs,"author_first")
+
+# Save df of Div and Rich results 
+write.csv(SubsampledPW.results_Solo_First[1], 
+          'output/SubsampledPW.results_RichDiv_SOLOFIRST_AUTHOR.csv', 
+          row.names = FALSE)
+write.csv(SubsampledPW.results_Solo_First[2], 
+          'output/SubsampledPW.results_Countries_SOLO_FIRST_AUTHOR.csv', 
+          row.names = FALSE)
+
+########################################
+########################################
+# SAMPLED DIV/RICH: FIRST AUTHORS - COAUTHORED PUBS
+source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
+SubsampledPW.results_First<-SubSamplePWvsOA_comparison(coauthor_pubs,"author_first")
+
 # Save df of Div and Rich results 
 write.csv(SubsampledPW.results_First[1], 
           'output/SubsampledPW.results_RichDiv_FIRST_AUTHOR.csv', 
@@ -292,12 +372,12 @@ write.csv(SubsampledPW.results_First[1],
 write.csv(SubsampledPW.results_First[2], 
           'output/SubsampledPW.results_Countries_FIRST_AUTHOR.csv', 
           row.names = FALSE)
-
+# SubsampledPW.results_First<-read.csv('output/SubsampledPW.results_RichDiv_FIRST_AUTHOR.csv')
 
 ########################################
 # SAMPLED DIV/RICH: LAST AUTHORS
 source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
-SubsampledPW.results_Last<-SubSamplePWvsOA_comparison(AllData,"author_last")
+SubsampledPW.results_Last<-SubSamplePWvsOA_comparison(coauthor_pubs,"author_last")
 
 # Save df of Div and Rich results
 write.csv(SubsampledPW.results_Last[1], 
@@ -307,11 +387,12 @@ write.csv(SubsampledPW.results_Last[2],
           'output/SubsampledPW.results_Countries_LAST_AUTHOR.csv', 
           row.names = FALSE)
 
+# SubsampledPW.results_Last<-read.csv('output/SubsampledPW.results_RichDiv_LAST_AUTHOR.csv')
 
 ########################################
 # SAMPLED DIV/RICH: ALL AUTHORS
 source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
-SubsampledPW.results_All<-SubSamplePWvsOA_comparison(AllData,"author_all")
+SubsampledPW.results_All<-SubSamplePWvsOA_comparison(coauthor_pubs,"author_all")
 
 # Save df of Div and Rich results
 write.csv(SubsampledPW.results_All[1], 
@@ -322,6 +403,7 @@ write.csv(SubsampledPW.results_All[2],
           'output/SubsampledPW.results_Countries_ALL_AUTHOR.csv', 
           row.names = FALSE)
 
+# SubsampledPW.results_All<-read.csv('output/SubsampledPW.results_RichDiv_ALL_AUTHOR.csv')
 
 
 ########################################
@@ -332,7 +414,8 @@ write.csv(SubsampledPW.results_All[2],
 ########################################
 # SAMPLED DIV/RICH: FIRST AUTHORS
 source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
-SubsampledPW.results_First_NOUSACHN<-SubSamplePWvsOA_comparison(AllData_noUSAorCHN,"author_first")
+SubsampledPW.results_First_NOUSACHN<-SubSamplePWvsOA_comparison(coauthor_pubsNOCHNUSA,"author_first")
+
 # Save df of Div and Rich results 
 write.csv(SubsampledPW.results_First_NOUSACHN[1], 
           'output/SubsampledPW.results_RichDiv_FIRST_AUTHOR_NOUSACHN.csv', 
@@ -341,11 +424,11 @@ write.csv(SubsampledPW.results_First_NOUSACHN[2],
           'output/SubsampledPW.results_Countries_FIRST_AUTHOR_NOUSACHN.csv', 
           row.names = FALSE)
 
-
+# SubsampledPW.results_First_NOUSACHN<-read.csv('output/SubsampledPW.results_RichDiv_FIRST_AUTHOR_NOUSACHN.csv')
 ########################################
 # SAMPLED DIV/RICH: LAST AUTHORS
 source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
-SubsampledPW.results_Last_NOUSACHN<-SubSamplePWvsOA_comparison(AllData_noUSAorCHN,"author_last")
+SubsampledPW.results_Last_NOUSACHN<-SubSamplePWvsOA_comparison(coauthor_pubsNOCHNUSA,"author_last")
 
 # Save df of Div and Rich results
 write.csv(SubsampledPW.results_Last_NOUSACHN[1], 
@@ -354,12 +437,12 @@ write.csv(SubsampledPW.results_Last_NOUSACHN[1],
 write.csv(SubsampledPW.results_Last_NOUSACHN[2], 
           'output/SubsampledPW.results_Countries_LAST_AUTHOR_NOUSACHN.csv', 
           row.names = FALSE)
-
+# SubsampledPW.results_Last_NOUSACHN<-read.csv('output/SubsampledPW.results_RichDiv_LAST_AUTHOR_NOUSACHN.csv')
 
 ########################################
 # SAMPLED DIV/RICH: ALL AUTHORS
 source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
-SubsampledPW.results_All_NOUSACHN<-SubSamplePWvsOA_comparison(AllData_noUSAorCHN,"author_all")
+SubsampledPW.results_All_NOUSACHN<-SubSamplePWvsOA_comparison(coauthor_pubsNOCHNUSA,"author_all")
 
 # Save df of Div and Rich results
 write.csv(SubsampledPW.results_All_NOUSACHN[1], 
@@ -369,8 +452,9 @@ write.csv(SubsampledPW.results_All_NOUSACHN[1],
 write.csv(SubsampledPW.results_All_NOUSACHN[2], 
           'output/SubsampledPW.results_Countries_ALL_AUTHOR_NOUSACHN.csv', 
           row.names = FALSE)
+SubsampledPW.results_All_NOUSACHN<-read.csv( 'output/SubsampledPW.results_RichDiv_ALL_AUTHOR_NOUSACHN.csv')
 
-
+##########################
 
 
 #############################################
@@ -379,8 +463,8 @@ write.csv(SubsampledPW.results_All_NOUSACHN[2],
 # and all authors in a df 
 #################################################
 source("./Rscript/functions/DivRichCalcSummaryTable_sampled.R")
-Table2<-DivRichCalcSummaryTable_sampled(AllData,
-                                        AllData_noUSAorCHN,
+Table2<-DivRichCalcSummaryTable_sampled(coauthor_pubs,
+                                        coauthor_pubsNOCHNUSA,
                                         SubsampledPW.results_First,
                                         SubsampledPW.results_Last,
                                         SubsampledPW.results_All,
@@ -391,10 +475,454 @@ Table2
 write.csv(Table2, "./tables_figs/Table2.csv", row.names = FALSE)
 
 
-# source("./Rscript/functions/DivRichCalcSummaryTable.R") # enter as divCalc(df,JrnlType,Author)
-# Table2<-DivRichCalcSummaryTable(AllData)
-# Table2
-# write.csv(Table2, "./tables_figs/Table2.csv", row.names = FALSE)
+##################################################
+# OA Bootstrapped results
+# TODO: CONVERT THIS TO A FUNCTIONS!
+##################################################
+# DATA PREP
+# OA_papers <- coauthor_pubs %>% filter(JrnlType == "OA")
+OA_papers <- coauthor_pubsNOCHNUSA %>% filter(JrnlType == "OA")
+OA_papers_boot<-sample_n(OA_papers, nrow(OA_papers), replace = TRUE)
+source("./Rscript/functions/DivRichCalc.R") 
+nboot <-1000 #number of bootstrap samples
+Richness <-rep(NA, nboot)
+InvSimp <-rep(NA, nboot)
+bootstrap.OA.1st<-data.frame(Richness,InvSimp)
+rm(Richness,InvSimp)
+set.seed(10)
+for(i in 1:nboot){
+  # bootOA<-DivRichCalc(sample_n(OA_papers, nrow(OA_papers), replace = TRUE),"author_first","OA")
+  # bootOA<-DivRichCalc(sample_n(OA_papers, nrow(OA_papers), replace = TRUE),"author_last","OA")
+  bootOA<-DivRichCalc(sample_n(OA_papers, nrow(OA_papers), replace = TRUE),"author_all","OA")
+  bootstrap.OA.1st[i,1]<-bootOA[1]
+  bootstrap.OA.1st[i,2]<-bootOA[2]
+}
+bootstrap.OA.1st<-arrange(bootstrap.OA.1st)
+bootstrap.OA.1st$Dataset<-"All Countries"
+bootstrap.OA.1st$author<-"author_first"
+bootstrapOA_First<-bootstrap.OA.1st
+hist(bootstrap.OA.1st$Richness)
+# bootstrap.OA.1st$Dataset<-"All Countries"
+# bootstrap.OA.1st$author<-"author_last"
+# bootstrapOA_Last<-bootstrap.OA.1st
+
+# bootstrap.OA.1st$Dataset<-"All Countries"
+# bootstrap.OA.1st$author<-"author_all"
+# bootstrapOA_All<-bootstrap.OA.1st
+# 
+# 
+# bootstrap.OA.1st$Dataset<-"Without CHN & USA"
+# bootstrap.OA.1st$author<-"author_first"
+# bootstrapOA_noUSACHN_First<-bootstrap.OA.1st
+
+# bootstrap.OA.1st$Dataset<-"Without CHN & USA"
+# bootstrap.OA.1st$author<-"author_last"
+# bootstrapOA_noUSACHN_Last<-bootstrap.OA.1st
+
+# bootstrap.OA.1st$Dataset<-"Without CHN & USA"
+# bootstrap.OA.1st$author<-"author_all"
+# bootstrapOA_noUSACHN_All<-bootstrap.OA.1st
+
+
+bootstrapped_OA_combined<-bind_rows(bootstrapOA_noUSACHN_All,
+                                    bootstrapOA_noUSACHN_First,
+                                    bootstrapOA_noUSACHN_Last,
+                                    bootstrapOA_All,
+                                    bootstrapOA_First,
+                                    bootstrapOA_Last)
+
+bootstrapped_OA_combined$JrnlType<-"OA"
+bootstrapped_OA_combined<-as.data.frame(bootstrapped_OA_combined)
+# hist(bootstrapOA_noUSACHN_Last$Richness)
+
+
+# OADivRich<-DivRichCalc(AllData,"author_first","OA")
+# OAdiv<-as.numeric((OADivRich)[2])
+# OARich<-as.numeric((OADivRich)[1])
+
+
+bootstrapped_PW_combined<-bind_rows(SubsampledPW.results_First[1],
+                                    SubsampledPW.results_Last[1],
+                                    SubsampledPW.results_All[1],
+                                    SubsampledPW.results_First_NOUSACHN[1],
+                                    SubsampledPW.results_Last_NOUSACHN[1],
+                                    SubsampledPW.results_All_NOUSACHN[1])
+
+bootstrapped_PW_combined$JrnlType<-"PW"
+bootstrapped_PW_combined<-as.data.frame(bootstrapped_PW_combined)
+bootstrap_results<-bind_rows(bootstrapped_PW_combined,
+                             bootstrapped_OA_combined)
+
+
+
+
+################
+OADivRichFA<-DivRichCalc(coauthor_pubs,"author_first","OA")
+OAdivFA<-as.numeric((OADivRichFA)[2])
+OARichFA<-as.numeric((OADivRichFA)[1])
+OADivRichLA<-DivRichCalc(coauthor_pubs,"author_last","OA")
+OAdivLA<-as.numeric((OADivRichLA)[2])
+OARichLA<-as.numeric((OADivRichLA)[1])
+
+
+OADivRichFN<-DivRichCalc(coauthor_pubsNOCHNUSA,"author_first","OA")
+OAdivFN<-as.numeric((OADivRichFN)[2])
+OARichFN<-as.numeric((OADivRichFN)[1])
+OADivRichLN<-DivRichCalc(coauthor_pubsNOCHNUSA,"author_last","OA")
+OAdivLN<-as.numeric((OADivRichLN)[2])
+OARichLN<-as.numeric((OADivRichLN)[1])
+
+summary(bootstrap_results)
+###################
+# Figure
+
+  library(ggplot2)
+  library(tidyr)
+  library(dplyr)
+  library(RColorBrewer)
+  
+bootstrap_results_fig_data<-bootstrap_results %>% 
+  filter(author!="author_all") %>% 
+  filter(JrnlType=="PW")
+
+  # SampledData<-SubsampledPW.results_First
+  # OriginalData<-AllData
+  # summary(as.factor(OriginalData$JrnlType))
+# New facet label names for author variable
+
+# dose.labs <- c("D0.5", "D1", "D2")
+# names(dose.labs) <- c("0.5", "1", "2")
+
+# New facet label names for country variable
+# not needed 
+Table2<-ungroup(Table2)
+colnames(Table2)
+colnames(bootstrap_results_fig_data)
+
+author<-rep(Table2$author,1,strings.as.factors=TRUE)
+# metric<-rep(c("Richness","Richness","Richness","Diversity","Diversity","Diversity"),4)
+
+CIlow_Rich<-c(rep(NA,6),Table2$CIlow[1:3],Table2$CIlow1[1:3])
+CIlow_Div<-c(rep(NA,6),Table2$CIlow[4:6],Table2$CIlow1[4:6])
+CIhigh_Rich<-c(rep(NA,6),Table2$CIhigh[1:3],Table2$CIhigh1[1:3])
+CIhigh_Div<-c(rep(NA,6),Table2$CIhigh[4:6],Table2$CIhigh1[4:6])
+
+RichnessOA<-c(as.numeric(Table2$OA_AllCountries[1:3]),as.numeric(Table2$OA_noCHNorUSA[1:3]),
+            rep(NA,6))
+InvSimpOA<-c(as.numeric(Table2$OA_AllCountries[4:6]),as.numeric(Table2$OA_noCHNorUSA[4:6]),
+           rep(NA,6))
+
+JrnlType<-c(rep("OA",6),rep("PW",6))
+labeltext <- rep(c("OA['obs']","PW['boot. mean']"), each=6)
+# labeltext <- paste("labeltext"," == ","InvSimp",sep="")
+dataset<-rep((rep(c("All Countries","Without CHN & USA"),each=3)),2)
+Table2.2<-as.data.frame(cbind(author=as.character(author),Dataset=as.character(dataset),
+                    JrnlType,InvSimpOA,RichnessOA,CIlow_Rich,CIhigh_Rich,CIlow_Div,CIhigh_Div,labeltext),stringsAsFactors = TRUE)
+Table2.2$author<-gsub("first","author_first",Table2.2$author)
+Table2.2$author<-gsub("last","author_last",Table2.2$author)
+Table2.2$author<-gsub("all","author_all",Table2.2$author)
+colnames(bootstrap_results_fig_data)
+str(Table2.2)
+Table2.2$RichnessOA<-as.integer(as.character(Table2.2$RichnessOA))
+Table2.2$InvSimpOA<-as.integer(as.character(Table2.2$InvSimpOA))
+# bootstrap_results_fig_data<-left_join(bootstrap_results_fig_data,Table2.2,by=c("author","Dataset","JrnlType"))
+
+# bootstrap_results_fig_data$CIhigh_Div<-as.integer(bootstrap_results_fig_data$CIhigh_Div)
+
+# brewer.pal(3, "Set1") gets the hex codes from palette
+# [1] "#E41A1C" "#377EB8" "#4DAF4A"
+author.labels <- c(author_first = "First Authors", author_last = "Last Authors")
+str(Table2.2)
+Table2.2$CIlow_Div<-as.integer(as.character(Table2.2$CIlow_Div))
+Table2.2$CIlow_Rich<-as.integer(as.character(Table2.2$CIlow_Rich))
+Table2.2$CIhigh_Div<-as.integer(as.character(Table2.2$CIhigh_Div))
+Table2.2$CIhigh_Rich<-as.integer(as.character(Table2.2$CIhigh_Rich))
+Table2.2$facet_title<-paste(Table2.2$author,Table2.2$Dataset,sep=' , ')
+Table2.2$facet_title<-gsub("author_first", "First Authors", Table2.2$facet_title)
+Table2.2$facet_title<-gsub("author_last", "Last Authors", Table2.2$facet_title)
+Table2.2$facet_title<-gsub("author_all", "All Authors", Table2.2$facet_title)
+yWO_div<-135
+yALL_div<-300
+pDiv<-
+  ggplot(bootstrap_results_fig_data, aes(x=InvSimp,fill=JrnlType)) +
+  geom_histogram(bins=60,color="black", alpha=0.8, position = 'identity') +
+  scale_fill_brewer(palette = "Set1")+
+  facet_grid(cols = vars(Dataset), rows=vars(author),
+             labeller=labeller(author = author.labels),
+             scales="free_y")+
+  
+  geom_segment(data = subset(filter(Table2.2,JrnlType=="PW"),
+                           author == "author_first" & Dataset == "Without CHN & USA"),
+             aes(x = CIhigh_Div , y = 0, xend = CIhigh_Div, yend = yWO_div),linetype="dotted")+
+  geom_segment(data = subset(filter(Table2.2,JrnlType=="PW"),
+                             author == "author_first" & Dataset == "Without CHN & USA"),
+               aes(x = CIlow_Div , y = 0, xend = CIlow_Div, yend = yWO_div), linetype="dotted")+
+  geom_segment(data = subset(filter(Table2.2,JrnlType=="OA"),
+                             author == "author_first" & Dataset == "Without CHN & USA"),
+               aes(x = InvSimpOA, y = 0, xend = InvSimpOA, yend = yWO_div), 
+               colour = "#E41A1C",linetype="solid")+
+  geom_text(data = subset(filter(Table2.2,JrnlType=="OA"),
+                          author == "author_first" & Dataset == "Without CHN & USA"),
+            aes(x=InvSimpOA, y=yWO_div+15, label=(paste(labeltext,as.character(InvSimpOA),sep=" == "))), 
+            parse=TRUE,color="#E41A1C")+
+  # geom_text(data = subset(filter(Table2.2,JrnlType=="OA"),
+  #                         author == "author_first" & Dataset == "Without CHN & USA"),
+  #           aes(x=11, y=300, label=facet_title),color="black")+
+  
+  geom_segment(data = subset(filter(Table2.2,JrnlType=="PW"),
+                             author == "author_last" & Dataset == "Without CHN & USA"),
+               aes(x = CIhigh_Div , y = 0, xend = CIhigh_Div, yend = yWO_div),linetype="dotted")+
+  geom_segment(data = subset(filter(Table2.2,JrnlType=="PW"),
+                             author == "author_last" & Dataset == "Without CHN & USA"),
+               aes(x = CIlow_Div , y = 0, xend = CIlow_Div, yend = yWO_div), linetype="dotted")+
+  geom_segment(data = subset(filter(Table2.2,JrnlType=="OA"),
+                             author == "author_last" & Dataset == "Without CHN & USA"),
+               aes(x = InvSimpOA , y = 0, xend = InvSimpOA, yend = yWO_div), 
+               parse=TRUE,color="#E41A1C")+
+  geom_text(data = subset(filter(Table2.2,JrnlType=="OA"),
+                          author == "author_last" & Dataset == "Without CHN & USA"),
+            aes(x=InvSimpOA, y=yWO_div+15, label=(paste(labeltext,as.character(InvSimpOA),sep=" == "))),
+            parse=TRUE,color="#E41A1C")+
+  
+  geom_segment(data = subset(filter(Table2.2,JrnlType=="PW"),
+                             author == "author_first" & Dataset == "All Countries"),
+               aes(x = CIhigh_Div , y = 0, xend = CIhigh_Div, yend = yALL_div),linetype="dotted")+
+  geom_segment(data = subset(filter(Table2.2,JrnlType=="PW"),
+                             author == "author_first" & Dataset == "All Countries"),
+               aes(x = CIlow_Div , y = 0, xend = CIlow_Div, yend = yALL_div), 
+               linetype="dotted")+
+  geom_segment(data = subset(filter(Table2.2,JrnlType=="OA"),
+                             author == "author_first" & Dataset == "All Countries"),
+               aes(x = InvSimpOA , y = 0, xend = InvSimpOA, yend = yALL_div), 
+               colour = "#E41A1C",linetype="solid")+
+  geom_text(data = subset(filter(Table2.2,JrnlType=="OA"),
+                          author == "author_first" & Dataset == "All Countries"),
+            aes(x=InvSimpOA, y=yALL_div+15, label=(paste(labeltext,as.character(InvSimpOA),sep=" == "))),
+            parse=TRUE,color="#E41A1C")+
+  
+  
+  geom_segment(data = subset(filter(Table2.2,JrnlType=="PW"),
+                             author == "author_last" & Dataset == "All Countries"),
+               aes(x = CIhigh_Div , y = 0, xend = CIhigh_Div, yend = yALL_div),linetype="dotted")+
+  geom_segment(data = subset(filter(Table2.2,JrnlType=="PW"),
+                             author == "author_last" & Dataset == "All Countries"),
+               aes(x = CIlow_Div , y = 0, xend = CIlow_Div, yend = yALL_div), 
+               linetype="dotted")+
+  geom_segment(data = subset(filter(Table2.2,JrnlType=="OA"),
+                             author == "author_last" & Dataset == "All Countries"),
+               aes(x = InvSimpOA , y = 0, xend = InvSimpOA, yend = yALL_div), 
+               colour = "#E41A1C",linetype="solid")+
+  geom_text(data = subset(filter(Table2.2,JrnlType=="OA"),
+                          author == "author_last" & Dataset == "All Countries"),
+            aes(x=InvSimpOA, y=yALL_div+15, label=(paste(labeltext,as.character(InvSimpOA),sep=" == "))),
+            parse=TRUE,color="#E41A1C")+
+  
+  
+    guides(fill=guide_legend("Journal\nCategory"))+
+    scale_x_continuous(breaks = seq(0,27, by=3),expand=c(0.1,0.02))+
+    scale_y_continuous(limits = c(0, 325),breaks = seq(0,325, by=50),expand=c(0,0.1))+
+    # scale_y_continuous(expand = c(0,0))+
+    xlab("Author Geographic Diversity: Paywalled Journals")+
+    ylab("Frequency")
+  
+  pDiv<-pDiv+
+    theme_classic()+ 
+    theme(
+      axis.text.x = element_text(size=18),
+      axis.text.y = element_text(size=18),
+      axis.title.x=element_text(colour="black", size = 24, vjust=-0.5),
+      axis.title.y=element_text(colour="black", size = 24, hjust=0.5,),
+      strip.text.x = element_text(size = 18,face="bold"),
+      strip.text.y = element_text(size = 18,face="bold"),
+      legend.title = element_text(colour="black", size=18, 
+                                  face="bold"),
+      legend.text = element_text(colour="black", size=14),
+      legend.position = ("none"),
+      panel.spacing.x =unit(1.5, "lines"), 
+      panel.spacing.y=unit(3,"lines"),
+      # strip.text.y.right = element_text(angle = 0),
+      plot.margin =unit(c(1,1,1,1.5), "lines")  
+    )
+  pDiv
+  
+
+  
+  
+  
+  
+  
+  
+  yWO_Rich<-155
+  yALL_Rich<-300
+  pRich<-
+    ggplot(bootstrap_results_fig_data, aes(x=Richness,fill=JrnlType)) +
+    geom_histogram(bins=60,color="black", alpha=0.8, position = 'identity') +
+    scale_fill_brewer(palette = "Set1")+
+    facet_grid(cols = vars(Dataset), rows=vars(author),
+               labeller=labeller(author = author.labels),
+               scales="free_y")+
+    
+    geom_segment(data = subset(filter(Table2.2,JrnlType=="PW"),
+                               author == "author_first" & Dataset == "Without CHN & USA"),
+                 aes(x = CIhigh_Rich , y = 0, xend = CIhigh_Rich, yend = yWO_Rich),linetype="dotted")+
+    geom_segment(data = subset(filter(Table2.2,JrnlType=="PW"),
+                               author == "author_first" & Dataset == "Without CHN & USA"),
+                 aes(x = CIlow_Rich , y = 0, xend = CIlow_Rich, yend = yWO_Rich), linetype="dotted")+
+    geom_segment(data = subset(filter(Table2.2,JrnlType=="OA"),
+                               author == "author_first" & Dataset == "Without CHN & USA"),
+                 aes(x = RichnessOA, y = 0, xend = RichnessOA, yend = yWO_Rich), 
+                 colour = "#E41A1C",linetype="solid")+
+    geom_text(data = subset(filter(Table2.2,JrnlType=="OA"),
+                            author == "author_first" & Dataset == "Without CHN & USA"),
+              aes(x=RichnessOA, y=yWO_Rich+15, label=(paste(labeltext,as.character(RichnessOA),sep=" == "))), 
+              parse=TRUE,color="#E41A1C")+
+    # geom_text(data = subset(filter(Table2.2,JrnlType=="OA"),
+    #                         author == "author_first" & Dataset == "Without CHN & USA"),
+    #           aes(x=11, y=300, label=facet_title),color="black")+
+    
+    geom_segment(data = subset(filter(Table2.2,JrnlType=="PW"),
+                               author == "author_last" & Dataset == "Without CHN & USA"),
+                 aes(x = CIhigh_Rich , y = 0, xend = CIhigh_Rich, yend = yWO_Rich),linetype="dotted")+
+    geom_segment(data = subset(filter(Table2.2,JrnlType=="PW"),
+                               author == "author_last" & Dataset == "Without CHN & USA"),
+                 aes(x = CIlow_Rich , y = 0, xend = CIlow_Rich, yend = yWO_Rich), linetype="dotted")+
+    geom_segment(data = subset(filter(Table2.2,JrnlType=="OA"),
+                               author == "author_last" & Dataset == "Without CHN & USA"),
+                 aes(x = RichnessOA , y = 0, xend = RichnessOA, yend = yWO_Rich), 
+                 parse=TRUE,color="#E41A1C")+
+    geom_text(data = subset(filter(Table2.2,JrnlType=="OA"),
+                            author == "author_last" & Dataset == "Without CHN & USA"),
+              aes(x=RichnessOA, y=yWO_Rich+15, label=(paste(labeltext,as.character(RichnessOA),sep=" == "))),
+              parse=TRUE,color="#E41A1C")+
+    
+    geom_segment(data = subset(filter(Table2.2,JrnlType=="PW"),
+                               author == "author_first" & Dataset == "All Countries"),
+                 aes(x = CIhigh_Rich , y = 0, xend = CIhigh_Rich, yend = yALL_Rich),linetype="dotted")+
+    geom_segment(data = subset(filter(Table2.2,JrnlType=="PW"),
+                               author == "author_first" & Dataset == "All Countries"),
+                 aes(x = CIlow_Rich , y = 0, xend = CIlow_Rich, yend = yALL_Rich), linetype="dotted")+
+    geom_segment(data = subset(filter(Table2.2,JrnlType=="OA"),
+                               author == "author_first" & Dataset == "All Countries"),
+                 aes(x = RichnessOA , y = 0, xend = RichnessOA, yend = yALL_Rich), 
+                 colour = "#E41A1C",linetype="solid")+
+    geom_text(data = subset(filter(Table2.2,JrnlType=="OA"),
+                            author == "author_first" & Dataset == "All Countries"),
+              aes(x=RichnessOA, y=yALL_Rich+15, label=(paste(labeltext,as.character(RichnessOA),sep=" == "))),
+              parse=TRUE,color="#E41A1C")+
+    
+    
+    geom_segment(data = subset(filter(Table2.2,JrnlType=="PW"),
+                               author == "author_last" & Dataset == "All Countries"),
+                 aes(x = CIhigh_Rich , y = 0, xend = CIhigh_Rich, yend = yALL_Rich),linetype="dotted")+
+    geom_segment(data = subset(filter(Table2.2,JrnlType=="PW"),
+                               author == "author_last" & Dataset == "All Countries"),
+                 aes(x = CIlow_Rich , y = 0, xend = CIlow_Rich, yend = yALL_Rich), linetype="dotted")+
+    geom_segment(data = subset(filter(Table2.2,JrnlType=="OA"),
+                               author == "author_last" & Dataset == "All Countries"),
+                 aes(x = RichnessOA , y = 0, xend = RichnessOA, yend = yALL_Rich), 
+                 colour = "#E41A1C",linetype="solid")+
+    geom_text(data = subset(filter(Table2.2,JrnlType=="OA"),
+                            author == "author_last" & Dataset == "All Countries"),
+              aes(x=RichnessOA, y=yALL_Rich+15, label=(paste(labeltext,as.character(RichnessOA),sep=" == "))),
+              parse=TRUE,color="#E41A1C")+
+    
+    
+    guides(fill=guide_legend("Journal\nCategory"))+
+    scale_x_continuous(breaks = seq(0,27, by=3),expand=c(0.1,0.02))+
+    scale_y_continuous(limits = c(0, 325),breaks = seq(0,325, by=50),expand=c(0,0.1))+
+    # scale_y_continuous(expand = c(0,0))+
+    xlab("Author Geographic Richness: Paywalled Journals")+
+    ylab("Frequency")
+  
+  pRich<-pRich+
+    theme_classic()+ 
+    theme(
+      axis.text.x = element_text(size=18),
+      axis.text.y = element_text(size=18),
+      axis.title.x=element_text(colour="black", size = 24, vjust=-0.5),
+      axis.title.y=element_text(colour="black", size = 24, hjust=0.5,),
+      strip.text.x = element_text(size = 18,face="bold"),
+      strip.text.y = element_text(size = 18,face="bold"),
+      legend.title = element_text(colour="black", size=18, 
+                                  face="bold"),
+      legend.text = element_text(colour="black", size=14),
+      legend.position = ("none"),
+      panel.spacing.x =unit(1.5, "lines"), 
+      panel.spacing.y=unit(3,"lines"),
+      # strip.text.y.right = element_text(angle = 0),
+      plot.margin =unit(c(1,1,1,1.5), "lines")  
+    )
+  pRich
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  # brewer.pal(3, "Set1") gets the hex codes from palette
+  # [1] "#E41A1C" "#377EB8" "#4DAF4A"
+  author.labels <- c(author_first = "First Authors", author_last = "Last Authors")
+  pRich<-
+    ggplot(bootstrap_results_fig_data, aes(x=Richness,fill=JrnlType)) + 
+    geom_histogram(bins=40,color="black", alpha=0.8, position = 'identity') +
+    scale_fill_brewer(palette = "Set1")+
+    facet_grid(cols = vars(author), rows=vars(Dataset),labeller=labeller(author = author.labels))+
+    # geom_vline(aes(xintercept=OADiv_First),
+    #            color="darkblue", linetype="dashed", size=1)+
+    geom_vline(data = subset(bootstrap_results_fig_data, 
+                             Dataset == "Without CHN & USA" & author=="author_first"),
+               aes(xintercept = OARichFN),
+               color="#E41A1C", linetype="dashed", size=1)+
+    geom_vline(data = subset(bootstrap_results_fig_data, 
+                             Dataset == "Without CHN & USA" & author=="author_last"),
+               aes(xintercept = OARichLN),
+               color="#E41A1C", linetype="dashed", size=1)+
+    geom_vline(data = subset(bootstrap_results_fig_data, 
+                             Dataset == "All Countries" & author=="author_first"),
+               aes(xintercept = OARichFA),
+               color="#E41A1C", linetype="dashed", size=1)+
+    geom_vline(data = subset(bootstrap_results_fig_data, 
+                             Dataset == "All Countries" & author=="author_last"),
+               aes(xintercept = OARichLA),
+               color="#E41A1C", linetype="dashed", size=1)+
+    # annotate("text", x = 14.2, y = 105,label =(paste(probFirst,"%",sep="")))+
+    # # geom_label(label="Observed OA Diversity (0%)", x=13,y=275,
+    # #            label.padding = unit(0.55, "lines"), # Rectangle size around label
+    # #            label.size = 0.5,color = "darkblue", fill="white")+
+    xlab("Author Geographic Richness")+
+    ylab("Frequency")+
+    guides(fill=guide_legend("Journal\nCategory"))+
+    # scale_x_continuous(expand = c(0,0),limits = c(0,35))+
+    scale_y_continuous(expand = c(0,0),limits = c(0,200))
+  
+  pRich<-pRich+
+    theme_classic()+ 
+    theme(
+      axis.text.x = element_text(size=18),
+      axis.text.y = element_text(size=18),
+      axis.title.x=element_text(colour="black", size = 24, vjust=-0.5),
+      axis.title.y=element_text(colour="black", size = 24, hjust=0.5,),
+      strip.text.x = element_text(size = 18,face="bold"),
+      strip.text.y = element_text(size = 18,face="bold"),
+      legend.title = element_text(colour="black", size=18, 
+                                  face="bold"),
+      legend.text = element_text(colour="black", size=14),
+      panel.spacing.x =unit(.5, "lines"), 
+      panel.spacing.y=unit(1,"lines"),
+      plot.margin =unit(c(1,1,1,1.5), "lines")  
+    )
+  pRich
+  
+  
+  
+  
+  
+  
+
 
 
 
@@ -485,10 +1013,10 @@ dev.off()
 ########################################
 # FIG DIV ALL AUTHOR
 source("./Rscript/functions_figures/Fig5c.R")
-Plot5c<-Fig5c(SubsampledPW.results_All,AllData)
-Plot5c
-png(file="./tables_figs/plot5c.png",width=1000, height=700)
-Plot5c
+Fig5c<-Fig5c(SubsampledPW.results_All,AllData)
+Fig5c
+png(file="./tables_figs/Fig5c.png",width=1000, height=700)
+Fig5c
 dev.off()
 
 # FIG RICHNESS AL AUTHOR
@@ -538,10 +1066,10 @@ dev.off()
 ########################################
 # FIG DIV ALL AUTHOR
 source("./Rscript/functions_figures/Fig5c_noCHNorUSA.R")
-Plot5c_NOUSACHN<-Fig5c_noCHNorUSA(SubsampledPW.results_All_NOUSACHN,AllData_noUSAorCHN)
-Plot5c_NOUSACHN
-png(file="./tables_figs/plot5c_NOUSACHN.png",width=1000, height=700)
-Plot5c_NOUSACHN
+Fig5c_NOUSACHN<-Fig5c_noCHNorUSA(SubsampledPW.results_All_NOUSACHN,AllData_noUSAorCHN)
+Fig5c_NOUSACHN
+png(file="./tables_figs/Fig5c_NOUSACHN.png",width=1000, height=700)
+Fig5c_NOUSACHN
 dev.off()
 
 # FIG RICHNESS AL AUTHOR
@@ -553,7 +1081,11 @@ Fig5f_NOUSACHN
 dev.off()
 
 
+# PUTTING PANELS TOGETHER IN A SINGLE FIGURE
+library(gridExtra)
 
+RICHNESS.FIG<-grid.arrange(Fig5d,Fig5e,Fig5f, Fig5d_noCHNorUSA,Fig5e_NOUSACHN,Fig5f_NOUSACHN, nrow = 2)
+DIV.FIG<-grid.arrange(Fig5a,Fig5b,Fig5c, Fig5a_NOUSACHN,Fig5b_NOUSACHN,Fig5c_NOUSACHN, nrow = 2)
 
 
 
@@ -652,6 +1184,15 @@ summary(FirstLast$IncomeGroup_first==FirstLast$IncomeGroup_last)
 
 summary(FirstLast$Country_first==FirstLast$Country_last)
 16477/(16477+9064)
+
+
+foo<-FirstLast %>% filter(JrnlType=="OA") 
+summary(foo$Country_first==foo$Country_last)
+
+foo2<-FirstLast %>% filter(JrnlType=="PW") 
+summary(foo2$Country_first==foo2$Country_last)
+
+
 # 65%
 FirstLast$Country_check<-(FirstLast$Country_first==FirstLast$Country_last)
 FirstLast_diff<-FirstLast %>% 
@@ -702,7 +1243,7 @@ write.csv(FirstLast_CountrySummary,
           row.names = FALSE)
 
 
-
+summary(FirstLast$Country_check)
 
 #####################
 # Income 
@@ -758,3 +1299,53 @@ summarize(AvgNumbAuthorsAll,avg_n=mean(AuthorNum),sd_n=sd(AuthorNum))
 
 
 
+###################################
+MiddleIncome_First<-FirstLast %>% 
+  filter(IncomeGroup_last=="Lower middle"| IncomeGroup_last=="Upper middle") %>% 
+  group_by(IncomeGroup_last,Country_last,JrnlType) %>% 
+  summarize(n=n()) %>% 
+  mutate(perc=n/sum(n)*100) %>% 
+  arrange(IncomeGroup_last,JrnlType,desc(perc))
+MiddleIncome_Last
+
+MiddleIncome_First<-FirstLast %>% 
+  filter(IncomeGroup_first=="Lower middle"| IncomeGroup_first=="Upper middle") %>% 
+  group_by(IncomeGroup_first,Country_first,JrnlType) %>% 
+  summarize(n=n()) %>% 
+  mutate(perc=n/sum(n)*100) %>% 
+  arrange(IncomeGroup_first,JrnlType,desc(perc)) %>% 
+  filter(perc>97)
+MiddleIncome_First
+
+Low_First<-FirstLast %>% 
+  filter(IncomeGroup_first=="Low") %>% 
+  group_by(IncomeGroup_first,Country_first,JrnlType) %>% 
+  summarize(n=n()) %>% 
+  mutate(perc=n/sum(n)*100) %>% 
+  arrange(IncomeGroup_first,JrnlType,desc(perc)) 
+    # filter(perc>97)
+Low_First
+sum(Low_First$n)
+
+
+
+Low_Last<-FirstLast %>% 
+  filter(IncomeGroup_last=="Low") %>% 
+  group_by(IncomeGroup_last,Country_last,JrnlType) %>% 
+  summarize(n=n()) %>% 
+  mutate(perc=n/sum(n)*100) %>% 
+  arrange(IncomeGroup_last,JrnlType,desc(perc)) 
+# filter(perc>97)
+Low_Last
+sum(Low_Last$n)
+
+
+High_Last<-FirstLast %>% 
+  filter(IncomeGroup_last=="High") %>% 
+  group_by(IncomeGroup_last,Country_last,JrnlType) %>% 
+  summarize(n=n()) %>% 
+  mutate(perc=n/sum(n)*100) %>% 
+  arrange(IncomeGroup_last,JrnlType,desc(perc)) 
+# filter(perc>97)
+High_Last
+sum(High_Last$n)
