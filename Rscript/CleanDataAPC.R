@@ -302,27 +302,28 @@ rm(MirrorPairs)
 ################################################################
 # ALL DATA without papers that have a USA or CHN first or last author
 
-# papers with a first author in USA or CHN
-first_author_USA_CHN<-AllData %>%
+# ID papers with a first author in USA or CHN
+first_author_no_USA_CHN<-AllData %>%
    group_by(DOI) %>% 
-   filter(AuthorNum==1 & (Country=="CHINA"| Country=="USA"))
-# papers with a last author in USA or CHN
-last_author_USA_CHN<-AllData %>%
+   filter(AuthorNum==1 & Country!="CHINA") %>% 
+   filter (AuthorNum==1 & Country!="USA") %>% 
+   select(DOI)
+
+# REMOVE THESE FROM THE AllData df
+NO_first_author_USA_CHN<-semi_join(AllData,first_author_no_USA_CHN) %>% 
+   arrange(Journal,DOI,AuthorNum)
+
+# Now find the ones in this new reduced df that have 
+# china or usa as last author
+last_author_no_USA_CHN<-NO_first_author_USA_CHN %>%
    group_by(DOI) %>% 
    filter(AuthorNum == max(AuthorNum)) %>%
-   filter(Country=="CHINA"| Country=="USA")
-# bind them together, select only DOI column
-papers_CHN_USA<-bind_rows(last_author_USA_CHN,first_author_USA_CHN) %>% 
+   filter(Country!="CHINA") %>% 
+   filter(Country!="USA") %>% 
    select(DOI)
-# take all data, and keep only papers NOT having 
-# first/last author in USA or CHN
-AllData_noUSAorCHN<-anti_join(AllData,papers_CHN_USA)
-# verfiy they sum
-(AllData_noUSAorCHN %>% summarise(n_distinct(DOI))+
-      papers_CHN_USA %>% 
-      ungroup(papers_CHN_USA) %>% 
-      summarise(n_distinct(DOI)))==
-   AllData %>% summarise(n_distinct(DOI))
 
+# Remove them from the reduced df
+NO_USA_CHN_FL<-semi_join(NO_first_author_USA_CHN,last_author_no_USA_CHN) %>% 
+   arrange(Journal,DOI,AuthorNum)
 
-write.csv(AllData_noUSAorCHN,"./data_clean/AllData_noUSAorCHN.csv", row.names = FALSE)
+write.csv(NO_USA_CHN_FL,"./data_clean/NO_USA_CHN_FL.csv", row.names = FALSE)
