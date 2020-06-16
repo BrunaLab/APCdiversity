@@ -1,0 +1,123 @@
+---
+title: "APC_Paper Figs"
+date: "6/13/2020"
+output: pdf_document
+
+author: |
+  | Author 1^[Corresponding author: embruna@ufl.edu] $^1$,$^2$, Author 2 $^1$, Author 3 $^2$
+  | $^1$WEC,  $^2$LAS
+
+
+abstract: |
+  Your abstract goes here...
+
+<!-- bibliography: Path to your .bib file -->
+<!-- csl: Path to your .csl file #sets the style of your bibliography -->
+
+fig_caption: yes
+
+always_allow_html: yes
+
+# These are LaTex settings to take care of floating figures/tables, line spacing, etc
+header-includes:
+  - \usepackage{endfloat}   
+  - \usepackage{setspace}\doublespacing
+  - \usepackage{lineno}
+  - \linenumbers
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Summary Stats
+
+```{r njournals, echo=FALSE, message=FALSE}
+library(tidyverse)
+AllData<-read_csv(file="./data_clean/AllData.csv")
+n_journals <- AllData %>% 
+  group_by(JrnlType) %>% 
+  summarize(n=n_distinct(Journal))
+tot_njournals<-sum(n_journals[2])
+```
+Total Journals: `r tot_njournals`.
+
+```{r npapers, echo=FALSE, message=FALSE}
+NumbArticles_JrnlType <- AllData %>% #number of papers per journal
+  group_by(JrnlType) %>% 
+  summarize(n=n_distinct(DOI))
+```
+Total Articles - Paywall: `r NumbArticles_JrnlType[2,2]`
+
+Total Articles - Open Access: `r NumbArticles_JrnlType[1,2]`
+
+
+```{r ncountries,echo=FALSE, message=FALSE}
+counrtriesOA1<-AllData %>% 
+  filter(AuthorNum==1&JrnlType=="OA") %>% 
+  group_by(Code) %>% 
+  select(Code,IncomeGroup,Region) %>% 
+  slice(1)
+
+ncounrtriesOA1<-ungroup(counrtriesOA1) %>% 
+  tally(n_distinct(Code))
+
+counrtriesPW1<-AllData %>% 
+  filter(AuthorNum==1&JrnlType=="PW") %>% 
+  group_by(Code) %>% 
+  select(Code,IncomeGroup,Region) %>% 
+  slice(1)
+
+ncounrtriesPW1<-ungroup(counrtriesPW1) %>% 
+  tally(n_distinct(Code))
+
+
+
+
+```
+Number of Countries in PW journals (First Authors): `r ncounrtriesPW1`
+
+Number of Countries in OA journals (First Authors): `r ncounrtriesOA1`
+
+
+
+```{r bootstrapping, echo=FALSE, message=FALSE}
+# source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
+# SubsampledPW.results_First<-SubSamplePWvsOA_comparison(AllData,"author_first")
+# source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
+# SubsampledPW.results_Last<-SubSamplePWvsOA_comparison(AllData,"author_last")
+# source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
+# SubsampledPW.results_All<-SubSamplePWvsOA_comparison(AllData,"author_all")
+# source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
+# SubsampledPW.results_First_NOUSACHN<-SubSamplePWvsOA_comparison(AllData_noUSAorCHN,"author_first")
+# source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
+# SubsampledPW.results_Last_NOUSACHN<-SubSamplePWvsOA_comparison(AllData_noUSAorCHN,"author_last")
+# source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
+# SubsampledPW.results_All_NOUSACHN<-SubSamplePWvsOA_comparison(AllData_noUSAorCHN,"author_all")
+```
+## Table1
+```{r Table1,echo=FALSE, message=FALSE}
+library(tidyverse)
+library(kableExtra)
+AllData<-read_csv(file="./data_clean/AllData.csv")
+AllData_noUSAorCHN<-read_csv(file="./data_clean/AllData_noUSAorCHN.csv")
+source("./Rscript/functions/SummaryTable.R") 
+Tables<-SummaryTable(AllData)
+Table1<-Tables[2]
+kable(head(Table1), digits = 2, format = "latex", row.names = FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"),full_width = F,
+                font_size = 12,position = "left")
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
