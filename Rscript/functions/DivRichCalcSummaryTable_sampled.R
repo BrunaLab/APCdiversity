@@ -5,8 +5,9 @@ DivRichCalcSummaryTable_sampled<-function(DataSet,
                                           SubPW_All,
                                           SubPW_First_NOUSACHN,
                                           SubPW_Last_NOUSACHN,
-                                          SubPW_All_NOUSACHN)
-  {
+                                          SubPW_All_NOUSACHN){
+  
+  # browser()
   # DataSet<-AllData
   # DataSet2<-AllData_noUSAorCHN
   vars<-list(DataSet,
@@ -17,8 +18,8 @@ DivRichCalcSummaryTable_sampled<-function(DataSet,
              SubPW_First_NOUSACHN[1],
              SubPW_Last_NOUSACHN[1],
              SubPW_All_NOUSACHN[1])
-  
-  
+  # browser()
+  # 
   SampledData<-as.data.frame(vars[1])
   OriginalData<-as.data.frame(vars[2])
   SubPW_First<-as.data.frame(vars[3])
@@ -174,7 +175,7 @@ DivRichCalcSummaryTable_sampled<-function(DataSet,
   PW_Richness$author <-as.factor(PW_Richness$author)
   PW_Richness$author <- ordered(PW_Richness$author, levels = c("first", "last","all"))
   PW_Richness<-PW_Richness %>% 
-    select(author,metric,PW_AllCountries=PW_avg_richness,CIs_AllCountries=CIs) %>% 
+    select(author,metric,PW_AllCountries=PW_avg_richness,CIs_AllCountries=CIs,CIlow,CIhigh) %>% 
     arrange((author))
   PW_Richness
   
@@ -201,7 +202,7 @@ DivRichCalcSummaryTable_sampled<-function(DataSet,
   PW_Diversity$author <-as.factor(PW_Diversity$author)
   PW_Diversity$author <- ordered(PW_Diversity$author, levels = c("first", "last","all"))
   PW_Diversity<-PW_Diversity %>% 
-    select(author,metric,PW_AllCountries=PW_avg_richness,CIs_AllCountries=CIs) %>% 
+    select(author,metric,PW_AllCountries=PW_avg_richness,CIs_AllCountries=CIs,CIlow,CIhigh) %>% 
     arrange((author))
   PW_Diversity
   
@@ -235,7 +236,7 @@ DivRichCalcSummaryTable_sampled<-function(DataSet,
   PW_Richness_noUSACHN$author <-as.factor(PW_Richness_noUSACHN$author)
   PW_Richness_noUSACHN$author <- ordered(PW_Richness_noUSACHN$author, levels = c("first", "last","all"))
   PW_Richness_noUSACHN<-PW_Richness_noUSACHN %>% 
-    select(author,metric,PW_noUSAorCHN=PW_avg_richness,CIs_noUSAorCHN=CIs) %>% 
+    select(author,metric,PW_noUSAorCHN=PW_avg_richness,CIs_noUSAorCHN=CIs,CIlow,CIhigh) %>% 
     arrange((author))
   PW_Richness_noUSACHN
   
@@ -264,7 +265,7 @@ DivRichCalcSummaryTable_sampled<-function(DataSet,
   PW_Diversity_noUSACHN$author <-as.factor(PW_Diversity_noUSACHN$author)
   PW_Diversity_noUSACHN$author <- ordered(PW_Diversity_noUSACHN$author, levels = c("first", "last","all"))
   PW_Diversity_noUSACHN<-PW_Diversity_noUSACHN %>% 
-    select(author,metric,PW_noUSAorCHN=PW_avg_richness,CIs_noUSAorCHN=CIs) %>% 
+    select(author,metric,PW_noUSAorCHN=PW_avg_richness,CIs_noUSAorCHN=CIs,CIlow,CIhigh) %>% 
     arrange((author))
   
   PW_Stats_ALL<-bind_rows(PW_Richness,PW_Diversity)
@@ -279,9 +280,9 @@ DivRichCalcSummaryTable_sampled<-function(DataSet,
   DivMetricsPubsPooled_OA_noCHNorUSA<-round(DivMetricsPubsPooled_OA_noCHNorUSA,1)
     PW_Stats_ALL$OA_noCHNorUSA<-DivMetricsPubsPooled_OA_noCHNorUSA
   RichDiv_Stats_ALL <- PW_Stats_ALL %>% 
-    select(author,metric,OA_AllCountries,PW_AllCountries,CIs_AllCountries,OA_noCHNorUSA,PW_noUSAorCHN,CIs_noUSAorCHN)
+    select(author,metric,OA_AllCountries,PW_AllCountries,CIs_AllCountries,CIlow,CIhigh,OA_noCHNorUSA,PW_noUSAorCHN,CIs_noUSAorCHN,CIlow1,CIhigh1)
   colnames(RichDiv_Stats_ALL)
-  RichDiv_Stats_ALL
+  
   
   
   #######################################
