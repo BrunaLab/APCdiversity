@@ -20,12 +20,13 @@ Fig5c<-function(SampledData,OriginalData) {
     geom_histogram(bins=30, colour="black", fill="white")+
     geom_vline(aes(xintercept=OAdiv_All),
                color="darkblue", linetype="dashed", size=1)+
-    annotate("text", x = 8, y = 140,label =(paste(probAll,"%",sep="")))+
+    annotate("text", x = 11.5, y = 145,label =(paste(probAll,"%",sep="")))+
     # geom_label(label="0% bootstrap PW values >\nObserved OA Diversity",
     #            x=11.5,y=135,label.padding = unit(0.55, "lines"), # Rectangle size around label
     #            label.size = 0.5,color = "darkblue", fill="white")+
-    xlab("Resampled national diversity:\nAll authors of paywalled articles")+
+    xlab("Author Geographic Diversity")+
     ylab("Frequency")+
+    ggtitle("C) all authors")+
     scale_x_continuous(breaks = c(7:13),limits=c(7,13))+
     scale_y_continuous(expand = c(0,0),limits = c(0,150))
   pDiv_all<-pDiv_all+
@@ -35,6 +36,7 @@ Fig5c<-function(SampledData,OriginalData) {
       axis.text.y = element_text(size=18),
       axis.title.x=element_text(colour="black", size = 24, vjust=-0.5),
       axis.title.y=element_text(colour="black", size = 24, hjust=0.5),
+      plot.title = element_text(colour="black", size = 24, vjust=3),
       plot.margin =unit(c(1,1,1,1.5), "lines")  
     )
   pDiv_all

@@ -18,14 +18,15 @@ Fig5e<-function(SampledData,OriginalData) {
     geom_histogram(bins=30, colour="black", fill="white")+
     geom_vline(aes(xintercept=OArich_Last),
                color="darkblue", linetype="dashed", size=1)+
-    annotate("text", x = 52, y = 130,label =(paste(problast,"%",sep="")))+
+    annotate("text", x = 55, y = 140,label =(paste(problast,"%",sep="")))+
     # geom_label(label="Observed OA Richness(--%)", x=58,y=230,
     #            label.padding = unit(0.55, "lines"), # Rectangle size around label
     #            label.size = 0.5,color = "darkblue", fill="white")+
-    xlab("Resampled national richness:\nLast authors of paywalled articles")+
+    xlab("Author Geographic Richness")+
     ylab("Frequency")+
+    ggtitle("E) last authors")+
     scale_y_continuous(expand = c(0,0),limits = c(0,150))+
-    scale_x_continuous(breaks = seq(50,80, by=10),limits=c(50,80))
+    scale_x_continuous(breaks = seq(50,80, by=5),limits=c(50,80))
   prich_last<-prich_last+
     theme_classic()+ 
     theme(
@@ -33,6 +34,7 @@ Fig5e<-function(SampledData,OriginalData) {
       axis.text.y = element_text(size=18),
       axis.title.x=element_text(colour="black", size = 24, vjust=-0.5),
       axis.title.y=element_text(colour="black", size = 24, hjust=0.5,),
+      plot.title = element_text(colour="black", size = 24, vjust=3),
       plot.margin =unit(c(1,1,1,1.5), "lines")  
     )
   prich_last

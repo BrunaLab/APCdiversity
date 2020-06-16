@@ -16,16 +16,17 @@ Fig5d<-function(SampledData,OriginalData) {
   
   prich_first<-ggplot(SampledData, aes(x=Richness)) +
     geom_histogram(bins=30, colour="black", fill="white")+
-    annotate("text", x = 45, y = 200,label =(paste(probFirst,"%",sep="")))+
+    annotate("text", x = 68, y = 240,label =(paste(probFirst,"%",sep="")))+
     geom_vline(aes(xintercept=OArich_First),
                color="darkblue", linetype="dashed", size=1)+
     # geom_label(label="Observed OA Richness (--%)", x=65,y=240,
     #            label.padding = unit(0.55, "lines"), # Rectangle size around label
     #            label.size = 0.5,color = "darkblue", fill="white")+
-    xlab("Resampled national richness:\nFirst authors of paywalled articles")+
+    xlab("Author Geographic Richness")+
     ylab("Frequency")+
+    ggtitle("D) first authors")+
     scale_y_continuous(expand = c(0,0),limits = c(0,250))+
-    scale_x_continuous(breaks = seq(40,80, by=10),limits=c(40,80))
+    scale_x_continuous(breaks = seq(50,75, by=5),limits=c(50,75))
   prich_first<-prich_first+
     theme_classic()+ 
     theme(
@@ -33,6 +34,7 @@ Fig5d<-function(SampledData,OriginalData) {
       axis.text.y = element_text(size=18),
       axis.title.x=element_text(colour="black", size = 24, vjust=-0.5),
       axis.title.y=element_text(colour="black", size = 24, hjust=0.5,),
+      plot.title = element_text(colour="black", size = 24, vjust=3),
       plot.margin =unit(c(1,1,1,1.5), "lines")  
     )
   prich_first
