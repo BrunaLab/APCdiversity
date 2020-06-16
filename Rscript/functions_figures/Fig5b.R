@@ -20,14 +20,16 @@ Fig5b<-function(SampledData,OriginalData) {
     geom_histogram(bins=30, colour="black", fill="white")+
     geom_vline(aes(xintercept=OAdiv_Last),
                color="darkblue", linetype="dashed", size=1)+
-    annotate("text", x = 6.5, y = 175,label =(paste(div_Last,"%",sep="")))+
+    annotate("text", x = 7.5, y = 165,label =(paste(div_Last,"%",sep="")))+
     # geom_label(label="96% bootstrap PW values >\nObserved OA Diversity",
     #            x=8.5,y=135,label.padding = unit(0.55, "lines"), # Rectangle size around label
     #            label.size = 0.5,color = "darkblue", fill="white")+
-    xlab("Resampled national diversity:\nLast authors of paywalled articles")+
+    xlab("Author Geographic Diversity")+
     ylab("Frequency")+
+    ggtitle("B) last authors")+
     scale_x_continuous(breaks = c(6:11),limits=c(6,11))+
-    scale_y_continuous(expand = c(0,0),limits = c(0,200))
+    # scale_y_continuous(expand = c(0,0),limits = c(0,175))+
+    scale_y_continuous(breaks = seq(0,175, by=25),limits=c(0,175),expand = c(0,0))
   pDiv_last<-pDiv_last+
     theme_classic()+ 
     theme(
@@ -35,6 +37,7 @@ Fig5b<-function(SampledData,OriginalData) {
       axis.text.y = element_text(size=18),
       axis.title.x=element_text(colour="black", size = 24, vjust=-0.5),
       axis.title.y=element_text(colour="black", size = 24, hjust=0.5),
+      plot.title = element_text(colour="black", size = 24, vjust=3),
       plot.margin =unit(c(1,1,1,1.5), "lines")  
     )
   pDiv_last
