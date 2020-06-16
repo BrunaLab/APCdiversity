@@ -12,7 +12,9 @@ DivRichCalc<-function(DataSet,AuPosition,JrnlType) {
     
     DataSet <-DataSet %>%
       group_by(DOI) %>%
-      filter(AuthorNum == max(AuthorNum))
+      filter(AuthorNum == max(AuthorNum)) %>% 
+      filter(AuthorNum>1)  # This removes any single authior papers
+    
     
   } else if ((vars[2]=="author_all")==TRUE) {
     

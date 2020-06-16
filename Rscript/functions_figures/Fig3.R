@@ -1,21 +1,23 @@
 Fig3<-function(DataSet,AuPosition,JrnlType) {
   # DataSet<-AllData
+  # DataSet<-sole_author_pubs
   # AuPosition<-"author_first"
   # JrnlType<-"OA"
   vars<-list(DataSet,AuPosition,JrnlType)
   #   
     if ((vars[2]=="author_first")==TRUE & (vars[3]=="OA"|vars[3]=="PW")==TRUE) {
     
-      AllGeo<-AllData %>%
+      AllGeo<-DataSet %>%
         group_by(DOI) %>% 
         filter(AuthorNum == 1) %>%
         filter(JrnlType==vars[3]) 
   
   } else if ((vars[2]=="author_last")==TRUE & (vars[3]=="OA"|vars[3]=="PW")==TRUE) {
     
-    AllGeo <-AllData %>%
+    AllGeo <-DataSet %>%
       group_by(DOI) %>%
       filter(AuthorNum == max(AuthorNum)) %>%
+      filter(AuthorNum>1) %>% 
       # filter(JrnlType=="OA")
       filter(JrnlType==vars[3])
     
