@@ -9,7 +9,7 @@ author: |
 
 
 abstract: |
-  Your abstract goes here...
+  Text of abstract.
 
 <!-- bibliography: Path to your .bib file -->
 <!-- csl: Path to your .csl file #sets the style of your bibliography -->
@@ -34,70 +34,151 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Summary Stats
 
-```{r njournals, echo=FALSE, message=FALSE}
+```{r PUBLISTS, echo=FALSE, message=FALSE,warning=FALSE}
 library(tidyverse)
 AllData<-read_csv(file="./data_clean/AllData.csv")
+one_author_pubs <- AllData %>%
+  group_by(DOI) %>% 
+  summarize(n=n_distinct(AuthorNum)) %>% 
+  filter(n==1) %>% 
+  select(-n) %>% 
+  left_join(AllData,by="DOI")
+coauthor_pubs<- AllData %>%
+  group_by(DOI) %>% 
+  summarize(n=n_distinct(AuthorNum)) %>% 
+  filter(n>=2) %>% 
+  left_join(AllData,by="DOI")
+
+NO_USA_CHN_FL<-read_csv(file="./data_clean/NO_USA_CHN_FL.csv")
+one_author_pubsNOCHNUSA <- NO_USA_CHN_FL %>%
+  group_by(DOI) %>% 
+  summarize(n=n_distinct(AuthorNum)) %>% 
+  filter(n==1) %>% 
+  select(-n) %>% 
+  left_join(NO_USA_CHN_FL,by="DOI")
+coauthor_pubsNOCHNUSA<- NO_USA_CHN_FL %>%
+  group_by(DOI) %>% 
+  summarize(n=n_distinct(AuthorNum)) %>% 
+  filter(n>=2) %>% 
+  left_join(NO_USA_CHN_FL,by="DOI") 
+```
+
+```{r njournals, echo=FALSE, message=FALSE}
 n_journals <- AllData %>% 
   group_by(JrnlType) %>% 
   summarize(n=n_distinct(Journal))
 tot_njournals<-sum(n_journals[2])
 ```
-Total Journals: `r tot_njournals`.
+### Total Journals: N = `r tot_njournals`.
 
 ```{r npapers, echo=FALSE, message=FALSE}
 NumbArticles_JrnlType <- AllData %>% #number of papers per journal
   group_by(JrnlType) %>% 
   summarize(n=n_distinct(DOI))
+
+NumbSoloArticles_JrnlType<-one_author_pubs %>% 
+group_by(JrnlType) %>% 
+  summarize(n=n_distinct(DOI))
+
+NumbCoAuthoredArticles_JrnlType<-coauthor_pubs %>% 
+group_by(JrnlType) %>% 
+  summarize(n=n_distinct(DOI))
 ```
-Total Articles - Paywall: `r NumbArticles_JrnlType[2,2]`
+### Articles in Paywall journals: N = `r NumbArticles_JrnlType[2,2]`
+* single author: N = `r NumbSoloArticles_JrnlType[2,2]`
+* Co-authored: N = `r NumbCoAuthoredArticles_JrnlType[2,2]`
 
-Total Articles - Open Access: `r NumbArticles_JrnlType[1,2]`
-
+### Articles in Open Access journals: N = `r NumbArticles_JrnlType[1,2]` 
+* single author: N = `r NumbSoloArticles_JrnlType[1,2]`
+* Co-authored: N = `r NumbCoAuthoredArticles_JrnlType[1,2]`
 
 ```{r ncountries,echo=FALSE, message=FALSE}
-counrtriesOA1<-AllData %>% 
-  filter(AuthorNum==1&JrnlType=="OA") %>% 
-  group_by(Code) %>% 
-  select(Code,IncomeGroup,Region) %>% 
+# Total by Journal Type
+n_countries<-AllData %>% 
+  group_by(JrnlType) %>% 
+  summarize(n_distinct(Code))
+# Countries: First Authors by Jrnl Type (including solo authored pubs)
+countries_first<-AllData %>% 
+  filter(AuthorNum==1) %>% 
+  group_by(Code,JrnlType) %>% 
+  select(Code,IncomeGroup,Region,JrnlType) %>% 
   slice(1)
-
-ncounrtriesOA1<-ungroup(counrtriesOA1) %>% 
+ncountries_first<-ungroup(countries_first) %>% 
+  group_by(JrnlType) %>% 
   tally(n_distinct(Code))
-
-counrtriesPW1<-AllData %>% 
-  filter(AuthorNum==1&JrnlType=="PW") %>% 
-  group_by(Code) %>% 
-  select(Code,IncomeGroup,Region) %>% 
+# countries Last Authors by jrnl type
+countries_last<-AllData %>% 
+  group_by(DOI) %>% 
+  filter(AuthorNum == max(AuthorNum)) %>%
+  group_by(Code,JrnlType) %>% 
+  select(Code,IncomeGroup,Region,JrnlType) %>% 
   slice(1)
-
-ncounrtriesPW1<-ungroup(counrtriesPW1) %>% 
+ncountries_last<-ungroup(countries_last) %>% 
+  group_by(JrnlType) %>% 
   tally(n_distinct(Code))
-
-
-
-
 ```
-Number of Countries in PW journals (First Authors): `r ncounrtriesPW1`
+### Number of Countries in PW journals
+* All authors N = `r n_countries[2,2]` 
+* First Authors N = `r ncountries_first[2,2]`
+* Last Authors N = `r ncountries_last[2,2]`
 
-Number of Countries in OA journals (First Authors): `r ncounrtriesOA1`
+### Number of Countries in OA journals
+* All authors N = `r n_countries[1,2]` 
+* First Authors N = `r ncountries_first[1,2]`
+* Last Authors N = `r ncountries_last[1,2]`
 
-
-
-```{r bootstrapping, echo=FALSE, message=FALSE}
-# source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
-# SubsampledPW.results_First<-SubSamplePWvsOA_comparison(AllData,"author_first")
-# source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
-# SubsampledPW.results_Last<-SubSamplePWvsOA_comparison(AllData,"author_last")
-# source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
-# SubsampledPW.results_All<-SubSamplePWvsOA_comparison(AllData,"author_all")
-# source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
-# SubsampledPW.results_First_NOUSACHN<-SubSamplePWvsOA_comparison(AllData_noUSAorCHN,"author_first")
-# source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
-# SubsampledPW.results_Last_NOUSACHN<-SubSamplePWvsOA_comparison(AllData_noUSAorCHN,"author_last")
-# source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
-# SubsampledPW.results_All_NOUSACHN<-SubSamplePWvsOA_comparison(AllData_noUSAorCHN,"author_all")
+```{r geo_figs1, echo=FALSE, message=FALSE,warning=FALSE,fig.align='center',fig.cap="Single-author Publications, PW journals"}
+source("./Rscript/functions_figures/Fig3.R") 
+# single author pubs
+Fig3bSoloPW<-Fig3(one_author_pubs,"author_first","PW")
+Fig3bSoloPW
 ```
-## Table1
+```{r geo_figs2, echo=FALSE, message=FALSE,warning=FALSE, fig.align='center',fig.cap="Single-author Publications, OA journals"}
+Fig3bSoloOA<-Fig3(one_author_pubs,"author_first","OA")
+Fig3bSoloOA
+```
+```{r geo_figs3, echo=FALSE, message=FALSE,warning=FALSE, fig.align='center',fig.cap="co-author Publications, PW journals, First Authors"}
+# coauthored, first author, PW
+Fig3bCoPW_First<-Fig3(coauthor_pubs,"author_first","PW")
+Fig3bCoPW_First
+```
+```{r geo_figs4, echo=FALSE, message=FALSE,warning=FALSE, fig.align='center',fig.cap="co-author Publications, OA journals, First Authors"}
+# coauthored, first author, OA
+Fig3aCoOA_First<-Fig3(coauthor_pubs,"author_first","OA")
+Fig3aCoOA_First
+```
+```{r geo_figs5, echo=FALSE, message=FALSE,warning=FALSE, fig.align='center',fig.cap="co-author Publications, PW journals, Last Authors"}
+# coauthored, last author, PW
+Fig3dCoPW_Last<-Fig3(coauthor_pubs,"author_last","PW")
+Fig3dCoPW_Last
+```
+```{r geo_figs6, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap="co-author Publications, OA journals, First Authors"}
+# coauthored, last author, OA
+Fig3cCoOA_Last<-Fig3(coauthor_pubs,"author_last","OA")
+Fig3cCoOA_Last
+```
+
+
+```{r DivRichFigFiles, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Diversity (Bootstrap PW)"}
+bootstrap_results<-read.csv('./output/bootstrap_results.csv')
+Table2.2<-read.csv('./output/Table2.2.csv')
+source("./Rscript/functions_figures/DivBootFig.R")
+source("./Rscript/functions_figures/RichBootFig.R")
+```
+
+
+
+```{r RichFig, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Richness (Bootstrap PW)"}
+RichBootFig(bootstrap_results,Table2.2)
+```
+
+```{r DivFig, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Diversity (Bootstrap PW)"}
+DivBootFig(bootstrap_results,Table2.2)
+```
+
+
+
+### Table1
 ```{r Table1,echo=FALSE, message=FALSE}
 library(tidyverse)
 library(kableExtra)
@@ -109,15 +190,5 @@ Table1<-Tables[2]
 kable(head(Table1), digits = 2, format = "latex", row.names = FALSE) %>%
   kable_styling(bootstrap_options = c("striped", "hover"),full_width = F,
                 font_size = 12,position = "left")
-
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
