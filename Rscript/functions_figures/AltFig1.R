@@ -1,6 +1,7 @@
 AltFig1<-function(DataSet,AuPosition) {
-  # DataSet<-Subsampled_Countries_summary
+  # DataSet<-bootstrap_results
   # AuPosition<-"author_first"
+  Subsampled_Countries<-bootstrap_results_countries
   library(ggplot2)
   library(RColorBrewer)
   library(ggExtra)
@@ -25,29 +26,49 @@ AltFig1<-function(DataSet,AuPosition) {
                                  levels = c("High", "Upper middle","Lower middle","Low"))
   
   Subsampled_Income_summary<-Subsampled_Countries %>% 
-    group_by(replicate,IncomeGroup) %>% 
+    group_by(author,Dataset,replicate,IncomeGroup) %>% 
     summarize(n=n()) %>% 
     mutate(perc=n/sum(n)*100) 
   
   # Subsampled_Income_summary<-SubsampledPW.results_First[1]
   
-  #############################
-  #############################
   PW_medians<-Subsampled_Income_summary %>% 
-    group_by(IncomeGroup) %>% 
+    group_by(author,Dataset,replicate,IncomeGroup) %>% 
     summarise(median=median(perc))
   PW_medians$JrnlType<-"PW"
   
-  Subsampled_Income_summary$JrnlType<-"OA"
+  ###################################
+  ###################################
+  # OA 
+  ###################################
+  ###################################
+  one_author_pubs_ALL<-read_csv(file="./data_clean/one_author_pubs_ALL.csv")
+  coauthor_pubs_ALL<-read_csv(file="./data_clean/coauthor_pubs_ALL.csv")
+  one_author_pubsNOCHNUSA<-read_csv(file="./data_clean/one_author_pubsNOCHNUSA.csv")
+  coauthor_pubsNOCHNUSA<-read_csv(file="./data_clean/coauthor_pubsNOCHNUSA.csv")
   
-  OA_percs <- data.frame(IncomeGroup = c("High", 
-                                         "Upper middle", 
-                                         "Lower middle",
-                                         "Low"),
-                         OAPerc = c(80.4, 10.6, 7.98,0.939),
-                         OAlabel=c("OA: 80.4%","OA: 10.6%","OA: 8%","OA: 1%"),
-                         PWPerc=c(54.4,27.5,14.9,3.12),
-                         PWlabel=c("PW: 54.4%","PW: 27.5%","PW: 14.9%","PW: 3.12%"))
+  AllPubs<-bind_rows(one_author_pubs_ALL,
+                     coauthor_pubs_ALL,
+                     one_author_pubsNOCHNUSA,
+                     coauthor_pubsNOCHNUSA)
+  
+  OAData<-AllPubs %>% filter(JrnlType=="OA")
+  
+  OA_percs<-OAData %>% 
+    group_by(author,Dataset,IncomeGroup) %>% 
+    summarize(n=n()) %>% 
+    mutate(perc=n/sum(n)*100)
+  
+  
+  # 
+  # OA_percs <- data.frame(IncomeGroup = c("High", 
+  #                                        "Upper middle", 
+  #                                        "Lower middle",
+  #                                        "Low"),
+  #                        OAPerc = c(80.4, 10.6, 7.98,0.939),
+  #                        OAlabel=c("OA: 80.4%","OA: 10.6%","OA: 8%","OA: 1%"),
+  #                        PWPerc=c(54.4,27.5,14.9,3.12),
+  #                        PWlabel=c("PW: 54.4%","PW: 27.5%","PW: 14.9%","PW: 3.12%"))
   
   OA_percs$IncomeGroup <- 
     ordered(OA_percs$IncomeGroup, levels = c("High",
@@ -62,7 +83,7 @@ AltFig1<-function(DataSet,AuPosition) {
   #  bins = 100, 
   #  scale = 0.95, 
   #  draw_baseline = TRUE) +
-  
+  author.labels <- c(author_first = "First Authors", author_last = "Last Authors", solo= "Single Authors")
   fig1alt<-ggplot(Subsampled_Income_summary, 
                   aes(y=IncomeGroup, 
                       x=perc,
@@ -73,13 +94,20 @@ AltFig1<-function(DataSet,AuPosition) {
                                  quantiles = 2, 
                                  scale=0.9, 
                                  color='black') +
-    geom_segment(data = OA_percs,
-                 aes(x = OAPerc, xend = OAPerc,
-                     y = as.numeric(IncomeGroup),
-                     yend = as.numeric(IncomeGroup) + .6), color="blue")+
-    #ylabeltext<-"National Income Group"
     ylab("National Income Group") + 
     xlab("Percentage of Authors")+
+    facet_grid(cols = vars(Dataset), rows=vars(author),
+               labeller=labeller(author = author.labels),
+               scales="free_y")+
+    
+    
+    
+    # geom_segment(data = OA_percs,
+    #              aes(x = OAPerc, xend = OAPerc,
+    #                  y = as.numeric(IncomeGroup),
+    #                  yend = as.numeric(IncomeGroup) + .6), color="blue")+
+    #ylabeltext<-"National Income Group"
+    
     ## OA POINTS LINES AND LABELS
     # geom_segment(data = OA_percs,
     #              aes(x = OAPerc, xend = OAPerc,
@@ -88,9 +116,9 @@ AltFig1<-function(DataSet,AuPosition) {
     # geom_point(data = OA_percs,
     #              aes(x = OAPerc,
     #                  y = as.numeric(IncomeGroup) + .5))+
-    geom_text(data=OA_percs,aes(x=OAPerc+2.5,
-                                y=as.numeric(IncomeGroup)+.6,
-                                label = OAlabel),color="blue")+
+    # geom_text(data=OA_percs,aes(x=OAPerc+2.5,
+    #                             y=as.numeric(IncomeGroup)+.6,
+    #                             label = OAlabel),color="blue")+
     scale_y_discrete(expand = c(0.01, 0)) +
     theme_ridges(grid = FALSE, center = TRUE)+
     ## PW POINTS LINES AND LABELS
@@ -101,10 +129,10 @@ AltFig1<-function(DataSet,AuPosition) {
     # geom_point(data = OA_percs, 
     #            aes(x = PWPerc, 
     #                y = as.numeric(IncomeGroup) + .5))+
-  geom_text(data=OA_percs,
-            aes(x=PWPerc,
-                y=as.numeric(IncomeGroup)+.65,
-                label = PWlabel))+
+  # geom_text(data=OA_percs,
+  #           aes(x=PWPerc,
+  #               y=as.numeric(IncomeGroup)+.65,
+  #               label = PWlabel))+
   scale_x_continuous(expand = c(0,0),limits = c(0,100))+
     scale_fill_brewer(palette = "Paired")+
     coord_flip()+
@@ -201,12 +229,12 @@ AltFig1<-function(DataSet,AuPosition) {
   ####################################3
   
 #   
-#   DataSet$IncomeGroup <- ordered(DataSet$IncomeGroup, levels = c("High", "Upper middle","Lower middle","Low"))
-#   # levels(DataSet$IncomeGroup)
-#   # DataSet<-AllData
+#   bootstrap_results$IncomeGroup <- ordered(bootstrap_results$IncomeGroup, levels = c("High", "Upper middle","Lower middle","Low"))
+#   # levels(bootstrap_results$IncomeGroup)
+#   # bootstrap_results<-AllData
 #   # AuPosition<-"author_first"
 #   if ((AuPosition=="author_first")==TRUE) {
-#     first_author_income_cats<-as.data.frame(DataSet) %>% 
+#     first_author_income_cats<-as.data.frame(bootstrap_results) %>% 
 #       filter(AuthorNum==1) %>% 
 #       group_by(JrnlType,IncomeGroup) %>% 
 #       tally() %>% 
@@ -217,7 +245,7 @@ AltFig1<-function(DataSet,AuPosition) {
 #                      "authors in different national income categories.", sep= " ")
 #     
 #   } else if ((AuPosition=="author_last")==TRUE) {
-#     first_author_income_cats<-as.data.frame(DataSet) %>% 
+#     first_author_income_cats<-as.data.frame(bootstrap_results) %>% 
 #       group_by(DOI) %>% 
 #       filter(AuthorNum == max(AuthorNum)) %>% 
 #       group_by(JrnlType,IncomeGroup) %>% 

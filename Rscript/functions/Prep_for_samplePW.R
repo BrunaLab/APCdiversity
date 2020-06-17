@@ -1,6 +1,6 @@
-Prep_for_samplePW<-function(AllData) {
+Prep_for_samplePW<-function(Dataset) {
 # # df of all articles in PW journals
-# FirstAuthPW<-AllData %>% 
+# FirstAuthPW<-Dataset %>% 
 #   filter(Country != "NA" & Code != "NA") %>%
 #   filter(JrnlType=="PW") %>% 
 #   filter(AuthorNum==1)
@@ -8,7 +8,7 @@ Prep_for_samplePW<-function(AllData) {
 # FirstAuthPW$Journal<-droplevels(FirstAuthPW$Journal)
 # 
 # # df of all articles in OA journals
-# FirstAuthOA<-AllData %>% 
+# FirstAuthOA<-Dataset %>% 
 #   filter(Country != "NA" & Code != "NA") %>%
 #   filter(JrnlType=="OA") %>% 
 #   filter(AuthorNum==1)
@@ -23,7 +23,7 @@ Prep_for_samplePW<-function(AllData) {
 
 # create a df telling you how many articles published in each OA journal
 # will sample in this amount from the df of PW articles
-OA_sample <- AllData %>%
+OA_sample <- Dataset %>%
   filter(JrnlType == "OA") %>% 
   group_by(pair_key,Journal) %>% 
   summarize(n=n_distinct(DOI))%>% 
@@ -35,7 +35,7 @@ nlevels(OA_sample$pair_key)
 OA_sample$pair_key<-droplevels(OA_sample$pair_key)
 nlevels(OA_sample$pair_key)
 
-PW_papers<- AllData %>%
+PW_papers<- Dataset %>%
   filter(JrnlType == "PW") %>% 
   group_by(pair_key,Journal,DOI) %>% 
   slice(1) %>% 

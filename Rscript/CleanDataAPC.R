@@ -327,3 +327,44 @@ NO_USA_CHN_FL<-semi_join(NO_first_author_USA_CHN,last_author_no_USA_CHN) %>%
    arrange(Journal,DOI,AuthorNum)
 
 write.csv(NO_USA_CHN_FL,"./data_clean/NO_USA_CHN_FL.csv", row.names = FALSE)
+
+
+
+one_author_pubs <- AllData %>%
+   group_by(DOI) %>% 
+   summarize(n=n_distinct(AuthorNum)) %>% 
+   filter(n==1) %>% 
+   select(-n) %>% 
+   left_join(AllData,by="DOI")
+one_author_pubs$Dataset<-"All Countries"
+one_author_pubs$author<-"solo"
+
+write.csv(one_author_pubs,"./data_clean/one_author_pubs_ALL.csv", row.names = FALSE)
+coauthor_pubs<- AllData %>%
+   group_by(DOI) %>% 
+   summarize(n=n_distinct(AuthorNum)) %>% 
+   filter(n>=2) %>% 
+   left_join(AllData,by="DOI")
+coauthor_pubs$Dataset<-"All Countries"
+coauthor_pubs$author<-"CoAuthored"
+
+write.csv(coauthor_pubs,"./data_clean/coauthor_pubs_ALL.csv", row.names = FALSE)
+one_author_pubsNOCHNUSA <- NO_USA_CHN_FL %>%
+   group_by(DOI) %>% 
+   summarize(n=n_distinct(AuthorNum)) %>% 
+   filter(n==1) %>% 
+   select(-n) %>% 
+   left_join(NO_USA_CHN_FL,by="DOI")
+one_author_pubsNOCHNUSA$Dataset<-"CHN & USA Excluded"
+one_author_pubsNOCHNUSA$author<-"solo"
+
+write.csv(one_author_pubsNOCHNUSA,"./data_clean/one_author_pubsNOCHNUSA.csv", row.names = FALSE)
+coauthor_pubsNOCHNUSA<- NO_USA_CHN_FL %>%
+   group_by(DOI) %>% 
+   summarize(n=n_distinct(AuthorNum)) %>% 
+   filter(n>=2) %>% 
+   left_join(NO_USA_CHN_FL,by="DOI") 
+coauthor_pubsNOCHNUSA$Dataset<-"CHN & USA Excluded"
+coauthor_pubsNOCHNUSA$author<-"CoAuthored"
+write.csv(coauthor_pubsNOCHNUSA,"./data_clean/coauthor_pubsNOCHNUSA.csv", row.names = FALSE)
+

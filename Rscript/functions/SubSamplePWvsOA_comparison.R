@@ -8,6 +8,8 @@ SubSamplePWvsOA_comparison<-function(Dataset,AuPosition) {
 # [2] a vector n with number of papers in each OA journal.
 #     a matching number of PW papers will be sampled with 
 #     'samplePW'
+
+# Dataset<-one_author_pubs  
 source("./Rscript/functions/Prep_for_samplePW.R")
 Prep_for_samplePW<-Prep_for_samplePW(Dataset)
 PW_papers<-Prep_for_samplePW[1]
@@ -105,6 +107,14 @@ Subsampled_Countries$Code<-as.factor(Subsampled_Countries$Code)
 Subsampled_Countries$Country<-as.factor(Subsampled_Countries$Country) 
 Subsampled_Countries$author<-AuPosition
 
+
+
+SubsampledPW.results_First$Dataset<-deparse(substitute(Dataset)) #adds the name of the dataset (All Data or No China USA as chr)
+SubsampledPW.results_First$Dataset<-gsub("AllData_noUSAorCHN","Without CHN & USA",SubsampledPW.results_First$Dataset)
+SubsampledPW.results_First$Dataset<-gsub("AllData","All Countries",SubsampledPW.results_First$Dataset)
+Subsampled_Countries$Dataset<-deparse(substitute(Dataset)) #adds the name of the dataset (All Data or No China USA as chr)
+Subsampled_Countries$Dataset<-gsub("AllData_noUSAorCHN","Without CHN & USA",Subsampled_Countries$Dataset)
+Subsampled_Countries$Dataset<-gsub("AllData","All Countries",Subsampled_Countries$Dataset)
 SubsampledPW.results<-list(SubsampledPW.results_First,Subsampled_Countries)
 toc()
 

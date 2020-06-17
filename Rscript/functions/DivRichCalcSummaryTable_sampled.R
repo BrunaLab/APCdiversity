@@ -1,27 +1,27 @@
-DivRichCalcSummaryTable_sampled<-function(DataSet,
-                                          DataSet2,
-                                          SubPW_First,
-                                          SubPW_Last,
-                                          SubPW_All,
-                                          SubPW_First_NOUSACHN,
-                                          SubPW_Last_NOUSACHN,
-                                          SubPW_All_NOUSACHN){
+DivRichCalcSummaryTable_sampled<-function(Dataset,
+                                          Dataset2,
+                                          SubsampledPW.results_First,
+                                          SubsampledPW.results_Last,
+                                          SubsampledPW.results_All,
+                                          SubsampledPW.results_First_NOUSACHN,
+                                          SubsampledPW.results_Last_NOUSACHN,
+                                          SubsampledPW.results_All_NOUSACHN){
   
   # browser()
-  # DataSet<-AllData
-  # DataSet2<-AllData_noUSAorCHN
+  # DataSet<-coauthor_pubs
+  # DataSet2<-coauthor_pubsNOCHNUSA
   vars<-list(DataSet,
              DataSet2,
-             SubPW_First[1],
-             SubPW_Last[1],
-             SubPW_All[1],
-             SubPW_First_NOUSACHN[1],
-             SubPW_Last_NOUSACHN[1],
-             SubPW_All_NOUSACHN[1])
+             SubsampledPW.results_First[1],
+             SubsampledPW.results_Last[1],
+             SubsampledPW.results_All[1],
+             SubsampledPW.results_First_NOUSACHN[1],
+             SubsampledPW.results_Last_NOUSACHN[1],
+             SubsampledPW.results_All_NOUSACHN[1])
   # browser()
   # 
-  SampledData<-as.data.frame(vars[1])
-  OriginalData<-as.data.frame(vars[2])
+  DataSet<-as.data.frame(vars[1])
+  DataSet2<-as.data.frame(vars[2])
   SubPW_First<-as.data.frame(vars[3])
   SubPW_Last<-as.data.frame(vars[4])
   SubPW_All<-as.data.frame(vars[5])
@@ -35,26 +35,7 @@ DivRichCalcSummaryTable_sampled<-function(DataSet,
   library(tidyr)
   library(dplyr)
   
-  
-  
-  DataSet %>% 
-    filter(JrnlType=="OA") %>% 
-    filter(AuthorNum==1) %>% 
-  summarize(n_distinct(Country))
-  
-  DataSet %>% 
-    filter(JrnlType=="OA") %>% 
-    summarize(n_distinct(Country))
-  
-  
-  DataSet %>% 
-    filter(JrnlType=="OA") %>% 
-    group_by(DOI) %>% 
-    filter(AuthorNum == max(AuthorNum)) %>%
-    ungroup() %>% 
-    summarize(n_distinct(Country))
-  
-  
+
   ##################################################
   # OA STATS _ALL COUNTRIES
   
