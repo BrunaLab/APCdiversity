@@ -81,20 +81,20 @@ Fig3<-function(DataSet,AuPosition,JrnlType) {
     
     # Figure 
     if (((vars[3]=="OA")==TRUE) & ((vars[2]=="author_first")==TRUE)) {
-      title_text=paste("Fig. 3a: Country in which the first",
-      "author of open access articles is based.",sep=" ")
+      # # title_text=paste("Fig. 3a: Country in which the first",
+      # "author of open access articles is based.",sep=" ")
       label_x="First author country"
     } else if (((vars[3]=="PW")==TRUE) & ((vars[2]=="author_first"))==TRUE){
-      title_text=paste("Fig. 3b: Country in which the first",
-                       "author of paywalled articles is based.",sep=" ")
+      # title_text=paste("Fig. 3b: Country in which the first",
+      #                  "author of paywalled articles is based.",sep=" ")
       label_x="First author country"
     } else if (((vars[3]=="OA")==TRUE) & ((vars[2]=="author_last")==TRUE)) {
-      title_text=paste("Fig. 3c: Country in which the last",
-                       "author of open access articles is based.",sep=" ")
+      # title_text=paste("Fig. 3c: Country in which the last",
+      #                  "author of open access articles is based.",sep=" ")
       label_x="Last author country"
     } else if (((vars[3]=="PW")==TRUE) & ((vars[2]=="author_last")==TRUE)){
-      title_text=paste("Fig. 3d: Country in which the last",
-                       "author of paywalled articles is based.",sep=" ")
+      # title_text=paste("Fig. 3d: Country in which the last",
+      #                  "author of paywalled articles is based.",sep=" ")
       label_x="Last author country"
     } else {
       stop("Please enter 'author_first' or 'author_last' for b and
@@ -115,16 +115,17 @@ Fig3<-function(DataSet,AuPosition,JrnlType) {
     plot3<-plot3+
       theme_light()+
       # labs(title = “Main title”, subtitle = “My subtitle”, caption = title_text)+
-      labs(title = title_text,size=10)+
+      # labs(title = title_text,size=10)+
       theme(
         axis.text.x = element_text(size=8),
         axis.text.y = element_text(size=8),
         axis.title.x=element_text(colour="black", size = 12, vjust=-0.5),
         axis.title.y=element_text(colour="black", size = 12, hjust=0.5,vjust=0.5,angle = 90),
         plot.title = element_text(size=8),
-        legend.text = element_text(colour="black", size = 8, vjust=-0.5),
+        legend.text = element_text(colour="black", size = 8, vjust=0.5),
         legend.title = element_text(size=8),
         legend.position="right",
+        # legend.key.height = unit(1,"lines"),
         plot.margin =unit(c(1,1,1,1.5), "lines")  
       )
     plot3  

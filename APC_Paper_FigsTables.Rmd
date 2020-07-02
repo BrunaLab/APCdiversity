@@ -24,6 +24,9 @@ header-includes:
   - \usepackage{setspace}\doublespacing
   - \usepackage{lineno}
   - \linenumbers
+
+pdf_document:
+extra_dependencies: "subfig"
 ---
 
 
@@ -94,6 +97,9 @@ group_by(JrnlType) %>%
 
 ```{r ncountries,echo=FALSE, message=FALSE}
 # Total by Journal Type
+n_countriesAll<-AllData %>% 
+  summarize(n_distinct(Code))
+
 n_countries<-AllData %>% 
   group_by(JrnlType) %>% 
   summarize(n_distinct(Code))
@@ -117,6 +123,10 @@ ncountries_last<-ungroup(countries_last) %>%
   group_by(JrnlType) %>% 
   tally(n_distinct(Code))
 ```
+#### Number of Countries: All authors, All Journals
+* N = `r n_countriesAll`
+
+
 ### Number of Countries in PW journals
 * All authors N = `r n_countries[2,2]` 
 * First Authors N = `r ncountries_first[2,2]`
@@ -127,36 +137,6 @@ ncountries_last<-ungroup(countries_last) %>%
 * First Authors N = `r ncountries_first[1,2]`
 * Last Authors N = `r ncountries_last[1,2]`
 
-```{r geo_figs1, echo=FALSE, message=FALSE,warning=FALSE,fig.align='center',fig.cap="Single-author Publications, PW journals"}
-source("./Rscript/functions_figures/Fig3.R") 
-# single author pubs
-Fig3bSoloPW<-Fig3(one_author_pubs,"author_first","PW")
-Fig3bSoloPW
-```
-```{r geo_figs2, echo=FALSE, message=FALSE,warning=FALSE, fig.align='center',fig.cap="Single-author Publications, OA journals"}
-Fig3bSoloOA<-Fig3(one_author_pubs,"author_first","OA")
-Fig3bSoloOA
-```
-```{r geo_figs3, echo=FALSE, message=FALSE,warning=FALSE, fig.align='center',fig.cap="co-author Publications, PW journals, First Authors"}
-# coauthored, first author, PW
-Fig3bCoPW_First<-Fig3(coauthor_pubs,"author_first","PW")
-Fig3bCoPW_First
-```
-```{r geo_figs4, echo=FALSE, message=FALSE,warning=FALSE, fig.align='center',fig.cap="co-author Publications, OA journals, First Authors"}
-# coauthored, first author, OA
-Fig3aCoOA_First<-Fig3(coauthor_pubs,"author_first","OA")
-Fig3aCoOA_First
-```
-```{r geo_figs5, echo=FALSE, message=FALSE,warning=FALSE, fig.align='center',fig.cap="co-author Publications, PW journals, Last Authors"}
-# coauthored, last author, PW
-Fig3dCoPW_Last<-Fig3(coauthor_pubs,"author_last","PW")
-Fig3dCoPW_Last
-```
-```{r geo_figs6, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap="co-author Publications, OA journals, First Authors"}
-# coauthored, last author, OA
-Fig3cCoOA_Last<-Fig3(coauthor_pubs,"author_last","OA")
-Fig3cCoOA_Last
-```
 
 
 ```{r DivRichFigFiles, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Diversity (Bootstrap PW)"}
@@ -166,20 +146,68 @@ source("./Rscript/functions_figures/DivBootFig.R")
 source("./Rscript/functions_figures/RichBootFig.R")
 ```
 
-
-
-```{r RichFig, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Richness (Bootstrap PW)"}
+```{r RichFig, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Fig.1 Richness (Bootstrap PW)", fig.height = 7,fig.width=11}
 RichBootFig(bootstrap_results,Table2.2)
 ```
 
-```{r DivFig, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Diversity (Bootstrap PW)"}
+```{r DivFig, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Fig. 2 Diversity (Bootstrap PW)", fig.height = 7,fig.width=11}
 DivBootFig(bootstrap_results,Table2.2)
 ```
 
 
+```{r geo_figs1, echo=FALSE, message=FALSE,warning=FALSE, fig.align='center',fig.cap="Fig 3a. Single-author Publications, OA journals"}
+source("./Rscript/functions_figures/Fig3.R") 
+Fig3(one_author_pubs,"author_first","OA")
+```
+
+```{r geo_figs2, echo=FALSE, message=FALSE,warning=FALSE, fig.align='center',fig.cap="Fig 3b. Single-author Publications, PW journals"}
+# single author pubs
+Fig3(one_author_pubs,"author_first","PW")
+```
+
+```{r geo_figs3, echo=FALSE, message=FALSE,warning=FALSE,fig.align='center',fig.cap="Fig 3b. Single-author Publications, PW journals"}
+```
+
+```{r geo_figs4, echo=FALSE, message=FALSE,warning=FALSE, fig.align='center',fig.cap="Fig 4a. co-author Publications, OA journals, First Authors"}
+# coauthored, first author, OA
+Fig3(coauthor_pubs,"author_first","OA")
+```
+
+
+```{r geo_figs3, echo=FALSE, message=FALSE,warning=FALSE, fig.align='center',fig.cap="Fig 4b. co-author Publications, PW journals, First Authors."}
+# coauthored, first author, PW
+Fig3(coauthor_pubs,"author_first","PW")
+```
+
+
+
+```{r geo_figs6, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Fig 5a. co-author Publications, OA journals, Last Authors"}
+# coauthored, last author, OA
+Fig3(coauthor_pubs,"author_last","OA")
+```
+
+```{r geo_figs5, echo=FALSE, message=FALSE,warning=FALSE, fig.align='center',fig.cap="Fig 5b. co-author Publications, PW journals, Last Authors"}
+# coauthored, last author, PW
+Fig3(coauthor_pubs,"author_last","PW")
+```
+
+```{r IncomeGrpFig, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Fig 6. Prop. of Authors from each National Income category (Bootstrap PW)", fig.height = 6}
+bootstrap_results<-read_csv('./output/bootstrap_results.csv')
+bootstrap_results_countries<-read_csv("./output/bootstrap_results_countries.csv")
+source("./Rscript/functions_figures/AltFig1.R") 
+AltFig1(bootstrap_results,bootstrap_results_countries)
+```
+
+```{r RegionFig, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Fig 7. Prop. of Authors from each National Income category (Bootstrap PW)", fig.height = 6}
+source("./Rscript/functions_figures/AltFig1B.R") 
+AltFig1B(bootstrap_results,bootstrap_results_countries)
+```
+
+
+
 
 ### Table1
-```{r Table1,echo=FALSE, message=FALSE}
+```{r Table1,echo=FALSE, message=FALSE,warning=FALSE}
 library(tidyverse)
 library(kableExtra)
 AllData<-read_csv(file="./data_clean/AllData.csv")
@@ -187,8 +215,65 @@ AllData_noUSAorCHN<-read_csv(file="./data_clean/AllData_noUSAorCHN.csv")
 source("./Rscript/functions/SummaryTable.R") 
 Tables<-SummaryTable(AllData)
 Table1<-Tables[2]
-kable(head(Table1), digits = 2, format = "latex", row.names = FALSE) %>%
-  kable_styling(bootstrap_options = c("striped", "hover"),full_width = F,
-                font_size = 12,position = "left")
+Table1<-as.data.frame(Table1)
+names(Table1)<-c("Journal","Articles (n)","OA Mirror Articles (n)","APC ($)")
+Table1[4,1]<-"BiochimieSuper1"
+Table1[26,1]<-"Microelectronic EngineeringSuper2"
+Table1[37,4]<-""
+
+tmp<-knitr::kable(Table1, 
+      digits = 2,
+      align="c",
+      format="latex",
+      row.names = FALSE,
+      booktabs=T,
+      caption = "Elsevier subscription journals, the number of articles published in the subscription  journals and their open access mirrors, and the article processing charge (APC) for each open access journal.") %>%
+  kable_styling(bootstrap_options = c("hover"),
+                full_width = F,
+                font_size = 12,
+                position = "left") %>%
+  footnote(number = c("OA Mirror title: Biochimie Open", "OA Mirror title: Micro and Nano Engineering"))
+tmp<-str_replace(tmp, "Super1", "$^{1}$")
+tmp<-str_replace(tmp, "Super2", "$^{2}$")
+knitr::asis_output(tmp)
+```
+
+
+### Table2
+```{r Table2,echo=FALSE, message=FALSE,warning=FALSE}
+library(kableExtra)
+library(tidyverse)
+SubsampledPW.results_Solo<-read_csv('output/SubsampledPW.results_RichDiv_SOLO_ALL.csv')
+SubsampledPW.results_Solo_NoUSACHN<-read_csv('output/SubsampledPW.results_RichDiv_SOLO_ALL.csv')
+one_author_pubs_ALL<-read_csv(file="./data_clean/one_author_pubs_ALL.csv")
+coauthor_pubs_ALL<-read_csv(file="./data_clean/coauthor_pubs_ALL.csv")
+one_author_pubsNOCHNUSA<-read_csv(file="./data_clean/one_author_pubsNOCHNUSA.csv")
+coauthor_pubsNOCHNUSA<-read_csv(file="./data_clean/coauthor_pubsNOCHNUSA.csv")
+source("./Rscript/functions_figures/Table2.R")
+Table2<-Table2()
+Table2<-as.data.frame(Table2)
+names(Table2)<-c("Metric","Author","OA","Mean PW",
+                       "PW 95% CI", "OA",
+                       "Mean PW","PW 95% CI")
+kable(Table2, 
+      digits = 1, 
+      format = "latex", 
+      align="c",
+      row.names = FALSE, 
+      booktabs=T,
+      caption = "Geographic Richness and Diversity of different author types (Single, First, Last) for papers published in Open Access (OA) and Paywalled (PW) journals.") %>% 
+  kable_styling(bootstrap_options = c("hover"),
+                latex_options = c("scale_down"),
+                full_width = F,
+                font_size = 12,
+                position = "left") %>% 
+  add_header_above(c(" " = 2, "All Countries" = 3, "USA & China Excluded" = 3))
+```
+
+```{r geo_figsAppendix, echo=FALSE, message=FALSE,warning=FALSE,fig.align='center',fig.cap="Appendix 1: Number of first authors based in different countries (paywall and open access journals; 'first authors' includes the authors of sole-authored papers)."}
+one_author_pubs_ALL<-read_csv(file="./data_clean/one_author_pubs_ALL.csv")
+coauthor_pubs_ALL<-read_csv(file="./data_clean/coauthor_pubs_ALL.csv")
+source("./Rscript/functions_figures/AppFig1.R") 
+AppFig1(AllData)
 ```
 

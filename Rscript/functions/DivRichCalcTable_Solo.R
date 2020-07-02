@@ -1,17 +1,17 @@
-DivRichCalcTable_Solo<-function(one_author_pubs,
-                                          one_author_pubsNOCHNUSA,
-                                          SubsampledPW.results_Solo,
-                                          SubsampledPW.results_Solo_NoUSACHN){
+DivRichCalcTable_Solo<-function(one_author_pubs_ALL,
+                                one_author_pubsNOCHNUSA,
+                                SubsampledPW.results_Solo,
+                                SubsampledPW.results_Solo_NoUSACHN){
   
   
   # browser()
   
-  # DataSet1<-one_author_pubs
+  # DataSet1<-one_author_pubs_ALL
   # DataSet2<-one_author_pubsNOCHNUSA
-  vars<-list(one_author_pubs,
+  vars<-list(one_author_pubs_ALL,
              one_author_pubsNOCHNUSA,
-             SubsampledPW.results_Solo[1],
-             SubsampledPW.results_Solo_NoUSACHN[1])
+             SubsampledPW.results_Solo,
+             SubsampledPW.results_Solo_NoUSACHN)
              
   # browser()
   # 

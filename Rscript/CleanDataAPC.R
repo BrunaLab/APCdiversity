@@ -355,7 +355,7 @@ one_author_pubsNOCHNUSA <- NO_USA_CHN_FL %>%
    filter(n==1) %>% 
    select(-n) %>% 
    left_join(NO_USA_CHN_FL,by="DOI")
-one_author_pubsNOCHNUSA$Dataset<-"CHN & USA Excluded"
+one_author_pubsNOCHNUSA$Dataset<-"CHN & USA excluded"
 one_author_pubsNOCHNUSA$author<-"solo"
 
 write.csv(one_author_pubsNOCHNUSA,"./data_clean/one_author_pubsNOCHNUSA.csv", row.names = FALSE)
@@ -364,7 +364,7 @@ coauthor_pubsNOCHNUSA<- NO_USA_CHN_FL %>%
    summarize(n=n_distinct(AuthorNum)) %>% 
    filter(n>=2) %>% 
    left_join(NO_USA_CHN_FL,by="DOI") 
-coauthor_pubsNOCHNUSA$Dataset<-"CHN & USA Excluded"
+coauthor_pubsNOCHNUSA$Dataset<-"CHN & USA excluded"
 coauthor_pubsNOCHNUSA$author<-"CoAuthored"
 write.csv(coauthor_pubsNOCHNUSA,"./data_clean/coauthor_pubsNOCHNUSA.csv", row.names = FALSE)
 

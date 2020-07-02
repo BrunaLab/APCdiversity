@@ -8,20 +8,20 @@ DivRichCalcSummaryTable_sampled<-function(Dataset,
                                           SubsampledPW.results_All_NOUSACHN){
   
   # browser()
-  # DataSet<-coauthor_pubs
-  # DataSet2<-coauthor_pubsNOCHNUSA
-  vars<-list(DataSet,
-             DataSet2,
-             SubsampledPW.results_First[1],
-             SubsampledPW.results_Last[1],
-             SubsampledPW.results_All[1],
-             SubsampledPW.results_First_NOUSACHN[1],
-             SubsampledPW.results_Last_NOUSACHN[1],
-             SubsampledPW.results_All_NOUSACHN[1])
+  # Dataset<-coauthor_pubs
+  # Dataset2<-coauthor_pubsNOCHNUSA
+  vars<-list(Dataset,
+             Dataset2,
+             SubsampledPW.results_First,
+             SubsampledPW.results_Last,
+             SubsampledPW.results_All,
+             SubsampledPW.results_First_NOUSACHN,
+             SubsampledPW.results_Last_NOUSACHN,
+             SubsampledPW.results_All_NOUSACHN)
   # browser()
   # 
-  DataSet<-as.data.frame(vars[1])
-  DataSet2<-as.data.frame(vars[2])
+  Dataset<-as.data.frame(vars[1])
+  Dataset2<-as.data.frame(vars[2])
   SubPW_First<-as.data.frame(vars[3])
   SubPW_Last<-as.data.frame(vars[4])
   SubPW_All<-as.data.frame(vars[5])
@@ -43,15 +43,15 @@ DivRichCalcSummaryTable_sampled<-function(Dataset,
 
   AuPosition<-"author_first"
   JrnlType<-"OA"
-  Div_OA_pool_first<-DivRichCalc(DataSet,AuPosition,JrnlType)
+  Div_OA_pool_first<-DivRichCalc(Dataset,AuPosition,JrnlType)
   
   AuPosition<-"author_last"
   JrnlType<-"OA"
-  Div_OA_pool_last<-DivRichCalc(DataSet,AuPosition,JrnlType)
+  Div_OA_pool_last<-DivRichCalc(Dataset,AuPosition,JrnlType)
   
   AuPosition<-"author_all"
   JrnlType<-"OA"
-  Div_OA_pool_all<-DivRichCalc(DataSet,AuPosition,JrnlType)
+  Div_OA_pool_all<-DivRichCalc(Dataset,AuPosition,JrnlType)
   
   # Binding together
   DivMetricsPubsPooled_OA <- as.data.frame(cbind(Div_OA_pool_first[1],
@@ -83,15 +83,15 @@ DivRichCalcSummaryTable_sampled<-function(Dataset,
   source("./Rscript/functions/DivRichCalc.R") 
     AuPosition<-"author_first"
   JrnlType<-"OA"
-  Div_OA_pool_first_noCHNorUSA<-DivRichCalc(DataSet2,AuPosition,JrnlType)
+  Div_OA_pool_first_noCHNorUSA<-DivRichCalc(Dataset2,AuPosition,JrnlType)
   
   AuPosition<-"author_last"
   JrnlType<-"OA"
-  Div_OA_pool_last_noCHNorUSA<-DivRichCalc(DataSet2,AuPosition,JrnlType)
+  Div_OA_pool_last_noCHNorUSA<-DivRichCalc(Dataset2,AuPosition,JrnlType)
   
   AuPosition<-"author_all"
   JrnlType<-"OA"
-  Div_OA_pool_all_noCHNorUSA<-DivRichCalc(DataSet2,AuPosition,JrnlType)
+  Div_OA_pool_all_noCHNorUSA<-DivRichCalc(Dataset2,AuPosition,JrnlType)
   
   # Binding together
   DivMetricsPubsPooled_OA_noCHNorUSA <- as.data.frame(cbind(Div_OA_pool_first_noCHNorUSA[1],
