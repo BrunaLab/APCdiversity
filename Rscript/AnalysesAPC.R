@@ -229,9 +229,11 @@ source("./Rscript/functions_figures/AltFig1B.R")
 Fig1B<-AltFig1(bootstrap_results,bootstrap_results_countries)
 Fig1B
 
-
-
-
+# AuPosition: "author_first","author_last","solo"
+# countries: "All",  "no_CHN_USA"
+source("./Rscript/functions_figures/AltFig1_hist.R") 
+Fig1<-AltFig1_hist(bootstrap_results,bootstrap_results_countries,"author_first","All")
+Fig1
 
 ############################################################
 # Fig. 2: For 1st authors from each national income class,

@@ -44,7 +44,14 @@ WaiverCountries<- WaiverCountries %>% select(-notes)
 write.csv(WaiverCountries,"./data_clean/WaiverCountries.csv", row.names = FALSE)
 # remove from the environment
 
+################################################################
+# Load the data on stipends
 
+################################################################
+stipends<-read_csv(file="./data_raw/stipends.csv")
+stipends$stipend_national<-round(stipends$stipend_national,0)
+stipends$stipend_USD<-round(stipends$stipend_USD,0)
+write.csv(stipends,"./data_clean/stipends.csv", row.names = FALSE)
 ################################################################
 # Load and process publication records. These were downloaded
 # from Web of Science (WOS) and SCOPUS.
