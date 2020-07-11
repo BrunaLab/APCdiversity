@@ -160,6 +160,31 @@ LastAuthors <- AllData %>%
   ungroup()
 colnames(LastAuthors)
 
+##################################
+# This is to 1) id the wb income category of countries on wavier list  
+ADC<-AllData %>% 
+  select(Country, Code,IncomeGroup) %>% 
+  group_by(Country) %>% 
+  slice(1)
+
+ADC$Country<-as.factor(ADC$Country)
+ADC$IncomeGroup<-as.factor(ADC$IncomeGroup)
+ADC$Code<-as.factor(ADC$Code)
+
+WC<-as.data.frame(WaiverCountries)
+names(WC)<-c("Country","WaiverGroup","Code")
+WC$Country<-toupper(WC$Country)
+country_check<-full_join(ADC,WC,by="Code") %>% 
+  arrange(desc(WaiverGroup))
+# setdiff(WC,ADC)
+# setdiff(ADC,WC)
+
+
+
+
+
+
+
 
 
 

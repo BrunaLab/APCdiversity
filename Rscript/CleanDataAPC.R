@@ -99,37 +99,41 @@ articles_scopus <- c('./data_raw/raw_data_scopus/scopus1.bib',
                           './data_raw/raw_data_scopus/scopus24.bib',
                  './data_raw/raw_data_scopus/scopusOA.bib')
 
-
 ################################################################
 # Use package 'bibliometrix' to convert these to dataframes                         
 ################################################################
+
 # WOS dataframe
 articles_wos_df <- convert2df(articles_wos, dbsource = "wos", format = "plaintext")
 # Remove columns from the dataframe that only have NA values in them 
 articles_wos_df<-articles_wos_df[colSums(!is.na(articles_wos_df)) > 0]
-# Search for any duplicate records using the article DOI
-dupes<-duplicated(articles_wos_df$DI) # IDs the dupes
-summary(dupes) # TRUE tells you how many dupes there are
-# Keep only one of the duplicated records
-articles_wos_df<-articles_wos_df[!duplicated(articles_wos_df$DI), ]
-# Check again to ensure there are no duplicates remaining
-dupes<-duplicated(articles_wos_df$DI)
-summary(dupes) # all will be FALSE if no duplicates
-rm(dupes)
+
+# # DO NOT DO THIS - WOS HAS ERROS WHERE SAME DOI fo x2 articles
+# # Search for any duplicate records using the article DOI
+# dupes<-duplicated(articles_wos_df$DI) # IDs the dupes
+# summary(dupes) # TRUE tells you how many dupes there are
+# # Keep only one of the duplicated records
+# articles_wos_df<-articles_wos_df[!duplicated(articles_wos_df$DI), ]
+# # Check again to ensure there are no duplicates remaining
+# dupes<-duplicated(articles_wos_df$DI)
+# summary(dupes) # all will be FALSE if no duplicates
+# rm(dupes)
 
 # SCOPUS dataframe
 articles_scopus_df <- convert2df(articles_scopus, dbsource = "scopus", format = "bibtex")
 # Remove columns from the dataframe that only have NA values in them 
 articles_scopus_df<-articles_scopus_df[colSums(!is.na(articles_scopus_df)) > 0]
-# Search for any duplicate records using the article DOI
-dupes<-duplicated(articles_scopus_df$DI) # IDs the dupes
-summary(dupes) # TRUE tells you how many dupes there are
-# Keep only one of the duplicated records
-articles_scopus_df<-articles_scopus_df[!duplicated(articles_scopus_df$DI), ]
-# Check again to ensure there are no duplicates remaining
-dupes<-duplicated(articles_scopus_df$DI)
-summary(dupes) # all will be FALSE if no duplicates
-rm(dupes)
+
+# # DO NOT DO THIS - WOS HAS ERROS WHERE SAME DOI fo x2 articles
+# # Search for any duplicate records using the article DOI
+# dupes<-duplicated(articles_scopus_df$DI) # IDs the dupes
+# summary(dupes) # TRUE tells you how many dupes there are
+# # Keep only one of the duplicated records
+# articles_scopus_df<-articles_scopus_df[!duplicated(articles_scopus_df$DI), ]
+# # Check again to ensure there are no duplicates remaining
+# dupes<-duplicated(articles_scopus_df$DI)
+# summary(dupes) # all will be FALSE if no duplicates
+# rm(dupes)
 
 ################################################################
 # bind the SCOPUS and WOS dataframes together and
@@ -138,15 +142,17 @@ rm(dupes)
 all_articles_df<-bind_rows(articles_scopus_df,articles_wos_df)
 # Remove columns from the dataframe that only have NA values in them 
 all_articles_df<-all_articles_df[colSums(!is.na(all_articles_df)) > 0]
-# Search for any duplicate records using the article DOI
-dupes<-duplicated(all_articles_df$DI) # IDs the dupes
-summary(dupes) # TRUE tells you how many dupes there are
-# Keep only one of the duplicated records
-all_articles_df<-all_articles_df[!duplicated(all_articles_df$DI), ]
-# Check again to ensure there are no duplicates remaining
-dupes<-duplicated(all_articles_df$DI)
-summary(dupes) # all will be FALSE if no duplicates
-rm(dupes)
+
+# # DO NOT DO THIS - WOS HAS ERROS WHERE SAME DOI fo x2 articles
+# # Search for any duplicate records using the article DOI
+# dupes<-duplicated(all_articles_df$DI) # IDs the dupes
+# summary(dupes) # TRUE tells you how many dupes there are
+# # Keep only one of the duplicated records
+# all_articles_df<-all_articles_df[!duplicated(all_articles_df$DI), ]
+# # Check again to ensure there are no duplicates remaining
+# dupes<-duplicated(all_articles_df$DI)
+# summary(dupes) # all will be FALSE if no duplicates
+# rm(dupes)
 # save the df of records as .csv file in "data_clean" folder
 write.csv(all_articles_df,"./data_clean/all_articles.csv", row.names = FALSE)
 ################################################################
@@ -174,10 +180,26 @@ write.csv(all_articles_df,"./data_clean/all_articles.csv", row.names = FALSE)
 ################################################################
 # for some reason it is necessary to extract country data from 
 # SCOPUS and WOS files independently, then merge. That's why can't use: 
-# AuGeoAll <- metaTagExtraction(all_articles_df, Field = "AU_CO", sep = ";")
+AuGeoAll <- metaTagExtraction(all_articles_df, Field = "AU_CO", sep = ";")
 AuGeo_wos <- metaTagExtraction(articles_wos_df, Field = "AU_CO", sep = ";")
 AuGeo_scopus <- metaTagExtraction(articles_scopus_df, Field = "AU_CO", sep = ";")
 AllData<-bind_rows(AuGeo_scopus,AuGeo_wos)
+# 
+# write.csv(AuGeoAll,"./data_raw/AuGeoAll.csv")
+# write.csv(AllData,"./data_raw/AllData.csv")
+
+AuGeoAll_C1 <- metaTagExtraction(all_articles_df, Field = "AU1_CO", sep = ";")
+AuGeo_wos_C1 <- metaTagExtraction(articles_wos_df, Field = "AU1_CO", sep = ";")
+AuGeo_scopus_C1 <- metaTagExtraction(articles_scopus_df, Field = "AU1_CO", sep = ";")
+AllData_C1<-bind_rows(AuGeo_scopus_C1,AuGeo_wos_C1)
+
+summary(as.factor(AllData_C1$AU1_CO))
+AUCO<-as.data.frame(AllData$AU_CO)
+names(AUCO)<-c("AU_CO")
+AllData<-bind_cols(AllData_C1,AUCO)
+colnames(AllData)
+AllData<-AllData %>% select(TI,DI,SO,PY,AU_CO,AU1_CO)
+
 
 # remove from the environment
 rm(all_articles_df,
@@ -191,7 +213,7 @@ rm(all_articles_df,
 ################################################################
 # select columns: article DOI, journal, year published, author country.
 ################################################################
-AllData<-AllData %>% select(DI,SO,PY,AU_CO)
+# AllData<-AllData %>% select(DI,SO,PY,AU_CO)
 
 # Add pair_key (id no. for a mirror pair) & journal type (OA or PW)
 AllData<-left_join(AllData,MirrorPairs,by="SO") 
@@ -213,16 +235,18 @@ AllData<-cbind(AllData,tempDF)
 rm(tempDF) #remove the tempdf from environment
 # gather into long form 
 AllData<-AllData %>%
-  gather(author,country,7:ncol(AllData))
+  gather(author,country,11:ncol(AllData))
 # remove the 'V' from cells in author column
 # This also adds the order of authors for each paper 
 AllData$author<-gsub("V","",AllData$author) 
 AllData$author<-as.numeric(AllData$author)
 # head(AllData,10)
 # organize the df by article, with authors in order from 1...N
-AllData<-AllData %>% arrange(DI,author)
+AllData<-AllData %>% arrange(TI,author)
 # remove any that are incomplete
-AllData<-AllData[complete.cases(AllData), ]
+# summary(as.factor(AllData$AU1_CO))
+# AllData$AU1_CO<-AllData$AU1_CO %>% replace_na(list(x ="not_extracted"))
+# AllData<-AllData[complete.cases(AllData), ]
 # convert DOI to a factor
 AllData$DI<-as.factor(AllData$DI)
 # delete the column with all countries in a single cell
@@ -245,7 +269,7 @@ AllData$SO<-as.factor(AllData$SO)
 # rename columns
 AllData <- AllData %>%
   select(DOI = DI, Journal = SO, Year = PY, AuthorNum = author,
-         Country = country, Code = country_code, JrnlType = journal_cat, pair_key)
+         Country = country, Code = country_code, JrnlType = journal_cat, pair_key,TI)
 
 
 
@@ -273,7 +297,7 @@ AllData$pair_key<-droplevels(AllData$pair_key)
 AllData$DOI<- as.character(AllData$DOI)
 AllData$DOI<- AllData$DOI %>% replace_na("missing_DOI")
 AllData$DOI<- as.factor(AllData$DOI)
-AllData<-AllData %>% arrange(DOI,AuthorNum)
+AllData<-AllData %>% arrange(TI,AuthorNum)
 AllData$IncomeGroup <- as.factor(AllData$IncomeGroup)
 AllData$IncomeGroup <- ordered(AllData$IncomeGroup, levels = c("High", "Upper middle","Lower middle","Low"))
 # head(AllData)
