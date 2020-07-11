@@ -335,66 +335,66 @@ rm(MirrorPairs)
 
 # ID papers with a first author in USA or CHN
 first_author_no_USA_CHN<-AllData %>%
-   group_by(DOI) %>% 
+   group_by(TI) %>% 
    filter(AuthorNum==1 & Country!="CHINA") %>% 
    filter (AuthorNum==1 & Country!="USA") %>% 
-   select(DOI)
+   select(TI)
 
 # REMOVE THESE FROM THE AllData df
 NO_first_author_USA_CHN<-semi_join(AllData,first_author_no_USA_CHN) %>% 
-   arrange(Journal,DOI,AuthorNum)
+   arrange(Journal,TI,AuthorNum)
 
 # Now find the ones in this new reduced df that have 
 # china or usa as last author
 last_author_no_USA_CHN<-NO_first_author_USA_CHN %>%
-   group_by(DOI) %>% 
+   group_by(TI) %>% 
    filter(AuthorNum == max(AuthorNum)) %>%
    filter(Country!="CHINA") %>% 
    filter(Country!="USA") %>% 
-   select(DOI)
+   select(TI)
 
 # Remove them from the reduced df
 NO_USA_CHN_FL<-semi_join(NO_first_author_USA_CHN,last_author_no_USA_CHN) %>% 
-   arrange(Journal,DOI,AuthorNum)
+   arrange(Journal,TI,AuthorNum)
 
 write.csv(NO_USA_CHN_FL,"./data_clean/NO_USA_CHN_FL.csv", row.names = FALSE)
 
 
 
 one_author_pubs <- AllData %>%
-   group_by(DOI) %>% 
+   group_by(TI) %>% 
    summarize(n=n_distinct(AuthorNum)) %>% 
    filter(n==1) %>% 
    select(-n) %>% 
-   left_join(AllData,by="DOI")
+   left_join(AllData,by="TI")
 one_author_pubs$Dataset<-"All Countries"
 one_author_pubs$author<-"solo"
 
 write.csv(one_author_pubs,"./data_clean/one_author_pubs_ALL.csv", row.names = FALSE)
 coauthor_pubs<- AllData %>%
-   group_by(DOI) %>% 
+   group_by(TI) %>% 
    summarize(n=n_distinct(AuthorNum)) %>% 
    filter(n>=2) %>% 
-   left_join(AllData,by="DOI")
+   left_join(AllData,by="TI")
 coauthor_pubs$Dataset<-"All Countries"
 coauthor_pubs$author<-"CoAuthored"
 
 write.csv(coauthor_pubs,"./data_clean/coauthor_pubs_ALL.csv", row.names = FALSE)
 one_author_pubsNOCHNUSA <- NO_USA_CHN_FL %>%
-   group_by(DOI) %>% 
+   group_by(TI) %>% 
    summarize(n=n_distinct(AuthorNum)) %>% 
    filter(n==1) %>% 
    select(-n) %>% 
-   left_join(NO_USA_CHN_FL,by="DOI")
+   left_join(NO_USA_CHN_FL,by="TI")
 one_author_pubsNOCHNUSA$Dataset<-"CHN & USA excluded"
 one_author_pubsNOCHNUSA$author<-"solo"
 
 write.csv(one_author_pubsNOCHNUSA,"./data_clean/one_author_pubsNOCHNUSA.csv", row.names = FALSE)
 coauthor_pubsNOCHNUSA<- NO_USA_CHN_FL %>%
-   group_by(DOI) %>% 
+   group_by(TI) %>% 
    summarize(n=n_distinct(AuthorNum)) %>% 
    filter(n>=2) %>% 
-   left_join(NO_USA_CHN_FL,by="DOI") 
+   left_join(NO_USA_CHN_FL,by="TI") 
 coauthor_pubsNOCHNUSA$Dataset<-"CHN & USA excluded"
 coauthor_pubsNOCHNUSA$author<-"CoAuthored"
 write.csv(coauthor_pubsNOCHNUSA,"./data_clean/coauthor_pubsNOCHNUSA.csv", row.names = FALSE)
