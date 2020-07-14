@@ -33,7 +33,9 @@ WaiverCountries<-read_csv(file="./data_raw/ElsevierWaivers.csv")
 WaiverCountries$Code<-countrycode(WaiverCountries$Country,
                                   "country.name",
                                   "iso3c", warn = TRUE)
-left_join(WaiverCountries, CountryData,by=Country)
+
+left_join(WaiverCountries, CountryData,by="Code")
+
 
 # Note: Kosovo is not listed as an ISO standard country. 'XKX' is the unofficial code 
 # used by the European Commission and others until Kosovo is assigned an ISO code.
@@ -124,6 +126,9 @@ articles_scopus_df <- convert2df(articles_scopus, dbsource = "scopus", format = 
 # Remove columns from the dataframe that only have NA values in them 
 articles_scopus_df<-articles_scopus_df[colSums(!is.na(articles_scopus_df)) > 0]
 
+
+AuFirstScopus <- metaTagExtraction(articles_scopus_df, Field = "CR_AU", sep = ";")
+AuFirstScopus <- metaTagExtraction(articles_scopus_df, Field = "AU1_CO", sep = ";")
 # # DO NOT DO THIS - WOS HAS ERROS WHERE SAME DOI fo x2 articles
 # # Search for any duplicate records using the article DOI
 # dupes<-duplicated(articles_scopus_df$DI) # IDs the dupes
@@ -181,10 +186,13 @@ write.csv(all_articles_df,"./data_clean/all_articles.csv", row.names = FALSE)
 # for some reason it is necessary to extract country data from 
 # SCOPUS and WOS files independently, then merge. That's why can't use: 
 AuGeoAll <- metaTagExtraction(all_articles_df, Field = "AU_CO", sep = ";")
+AuGeoAll$key<-seq(1:nrow(AuGeoAll))
 AuGeo_wos <- metaTagExtraction(articles_wos_df, Field = "AU_CO", sep = ";")
 AuGeo_scopus <- metaTagExtraction(articles_scopus_df, Field = "AU_CO", sep = ";")
 AllData<-bind_rows(AuGeo_scopus,AuGeo_wos)
-# 
+AllData$key<-seq(1:nrow(AllData))
+# write.csv(AuGeo_scopus,"./data_raw/AuGeo_scopus.csv")
+# write.csv(AuGeo_wos,"./data_raw/AuGeo_wos.csv")
 # write.csv(AuGeoAll,"./data_raw/AuGeoAll.csv")
 # write.csv(AllData,"./data_raw/AllData.csv")
 
@@ -193,6 +201,15 @@ AuGeo_wos_C1 <- metaTagExtraction(articles_wos_df, Field = "AU1_CO", sep = ";")
 AuGeo_scopus_C1 <- metaTagExtraction(articles_scopus_df, Field = "AU1_CO", sep = ";")
 AllData_C1<-bind_rows(AuGeo_scopus_C1,AuGeo_wos_C1)
 
+# add an id number to each paper
+
+
+# How many authors per paper?
+authors_count<-AllData %>% select(key,AU)
+temp_au<- as.data.frame(str_split(authors_count$AU, ";", simplify = TRUE))
+key<-as.data.frame(authors_count$key)
+names(key)<-c("key")
+temp_au<-bind_cols(key,temp_au)
 summary(as.factor(AllData_C1$AU1_CO))
 AUCO<-as.data.frame(AllData$AU_CO)
 names(AUCO)<-c("AU_CO")
@@ -242,7 +259,7 @@ AllData$author<-gsub("V","",AllData$author)
 AllData$author<-as.numeric(AllData$author)
 # head(AllData,10)
 # organize the df by article, with authors in order from 1...N
-AllData<-AllData %>% arrange(TI,author)
+AllData<-AllData %>% arrange(key,author)
 # remove any that are incomplete
 # summary(as.factor(AllData$AU1_CO))
 # AllData$AU1_CO<-AllData$AU1_CO %>% replace_na(list(x ="not_extracted"))
@@ -314,7 +331,7 @@ AllData<-AllData %>% filter(!pair_key%in% missing_jrnls)
 rm(missing_jrnls)
 
 # save the csv
-write.csv(AllData,"./data_clean/AllData.csv", row.names = FALSE)
+write.csv(AllData,"./data_clean/AllData_WOS.csv", row.names = FALSE)
 
 
 ################################################################
@@ -371,6 +388,7 @@ one_author_pubs$Dataset<-"All Countries"
 one_author_pubs$author<-"solo"
 
 write.csv(one_author_pubs,"./data_clean/one_author_pubs_ALL.csv", row.names = FALSE)
+
 coauthor_pubs<- AllData %>%
    group_by(TI) %>% 
    summarize(n=n_distinct(AuthorNum)) %>% 
@@ -380,6 +398,7 @@ coauthor_pubs$Dataset<-"All Countries"
 coauthor_pubs$author<-"CoAuthored"
 
 write.csv(coauthor_pubs,"./data_clean/coauthor_pubs_ALL.csv", row.names = FALSE)
+
 one_author_pubsNOCHNUSA <- NO_USA_CHN_FL %>%
    group_by(TI) %>% 
    summarize(n=n_distinct(AuthorNum)) %>% 
@@ -390,6 +409,7 @@ one_author_pubsNOCHNUSA$Dataset<-"CHN & USA excluded"
 one_author_pubsNOCHNUSA$author<-"solo"
 
 write.csv(one_author_pubsNOCHNUSA,"./data_clean/one_author_pubsNOCHNUSA.csv", row.names = FALSE)
+
 coauthor_pubsNOCHNUSA<- NO_USA_CHN_FL %>%
    group_by(TI) %>% 
    summarize(n=n_distinct(AuthorNum)) %>% 
@@ -397,5 +417,6 @@ coauthor_pubsNOCHNUSA<- NO_USA_CHN_FL %>%
    left_join(NO_USA_CHN_FL,by="TI") 
 coauthor_pubsNOCHNUSA$Dataset<-"CHN & USA excluded"
 coauthor_pubsNOCHNUSA$author<-"CoAuthored"
+
 write.csv(coauthor_pubsNOCHNUSA,"./data_clean/coauthor_pubsNOCHNUSA.csv", row.names = FALSE)
 
