@@ -22,22 +22,26 @@ MirrorPairs<-read.csv("./data_clean/MirrorPairs.csv")
     group_by(pair_key,JrnlType,Journal) %>% 
     summarize(n=n_distinct(DOI)) %>% 
     arrange(Journal) %>% 
-    ungroup(Table1) %>%
+    # ungroup(Table1) %>%
     select(JrnlType,Journal,pair_key) %>% 
     spread(JrnlType,Journal)  
-Table1<-left_join(Table1,MirrorPairs,by="pair_key") %>% 
+  APC<-MirrorPairs %>% select(APC,pair_key)
+Table1<-left_join(Table1,APC,by="pair_key") %>% 
     filter(APC!="NA")
   
   Table1.1 <- DataSet %>% #number of papers per journal
     select(JrnlType,pair_key,DOI) %>% 
     group_by(JrnlType,pair_key) %>% 
     summarize(n=n_distinct(DOI))
-  Table1.1<-ungroup(Table1.1) %>%
+  Table1.1<-ungroup(Table1.1) 
+  Table1.1<-Table1.1 %>%
     select(JrnlType,n,pair_key) %>% 
     spread(JrnlType,n)
   
-  Table1<-bind_cols(Table1,Table1.1) %>% 
-    select(PW,PW1,OA,OA1,APC)
+  Table1<-left_join(Table1,Table1.1,by="pair_key") %>% 
+    select(PW=PW.x,PW1=PW.y,OA=OA.x,OA2=OA.y,APC)  
+  Table1<-ungroup(Table1)  
+  Table1<-Table1 %>% select(-pair_key)
   
   Table1$PW<-as.character(Table1$PW)
   Table1$PW<-str_to_title(Table1$PW)

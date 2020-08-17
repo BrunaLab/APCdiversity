@@ -26,7 +26,7 @@ Prep_for_samplePW<-function(Dataset) {
 OA_sample <- Dataset %>%
   filter(JrnlType == "OA") %>% 
   group_by(pair_key,Journal) %>% 
-  summarize(n=n_distinct(DOI))%>% 
+  summarize(n=n_distinct(refID))%>% 
   arrange(Journal) %>% 
   ungroup() %>% 
   select(pair_key,n)
@@ -37,9 +37,9 @@ nlevels(OA_sample$pair_key)
 
 PW_papers<- Dataset %>%
   filter(JrnlType == "PW") %>% 
-  group_by(pair_key,Journal,DOI) %>% 
+  group_by(pair_key,Journal,refID) %>% 
   slice(1) %>% 
-  select(DOI,Journal,JrnlType,pair_key)
+  select(refID,Journal,JrnlType,pair_key)
   # summarize(n=n_distinct(DOI)) %>% 
   # arrange(Journal) %>% 
   # ungroup() %>% 

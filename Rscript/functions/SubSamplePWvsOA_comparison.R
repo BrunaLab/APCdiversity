@@ -9,7 +9,8 @@ SubSamplePWvsOA_comparison<-function(Dataset,AuPosition) {
 #     a matching number of PW papers will be sampled with 
 #     'samplePW'
 
-# Dataset<-one_author_pubs  
+# Dataset<-coauthor_pubs_ALL_first_author 
+  
 source("./Rscript/functions/Prep_for_samplePW.R")
 Prep_for_samplePW<-Prep_for_samplePW(Dataset)
 PW_papers<-Prep_for_samplePW[1]
@@ -43,21 +44,23 @@ nboot <-1000 #number of bootstra p samples
 InvSimp <-rep(NA, nboot)
 Richness<-rep(NA, nboot)
 Countries<-rep(NA, nboot)
+Simpson<-rep(NA, nboot)
+Even<-rep(NA, nboot)
 replicate<-data.frame(replicate=as.numeric())
 
-SubsampledPW.results_First <- data.frame(Richness,InvSimp)
+SubsampledPW.results_First <- data.frame(Richness,InvSimp,Shannon,Even)
 # replicate<-data.frame(replicate)
 
-rm(InvSimp,Richness)
-set.seed(1000)
+rm(InvSimp,Richness,Simpson,Even)
+set.seed(1)
 for(i in 1:nboot){
   PW_sample<-samplePW(PW_papers,n)
   # The first element of the list is the list of papers. 
   # Need to take that list and Dataset to get back all the 
   # papers with all their authors.
   PW_sample<-as.data.frame(PW_sample[1])
-  PW_sample_DOIs<-PW_sample$DOI
-  PW_sample<-Dataset %>% filter(DOI%in%PW_sample_DOIs)
+  PW_sample_refID<-PW_sample$refID
+  PW_sample<-Dataset %>% filter(refID%in%PW_sample_refID)
   # PW_sample %>% summarize(n_distinct(DOI)) #confirm the number of articles
   PW_sample<-as.data.frame(PW_sample)
   AuPosition<-AuPosition
@@ -65,7 +68,10 @@ for(i in 1:nboot){
   results<-DivRichCalc(PW_sample,AuPosition,JrnlType)
   SubsampledPW.results_First[i,1]<-(results)[1]
   SubsampledPW.results_First[i,2]<-(results)[2]
+  SubsampledPW.results_First[i,3]<-(results)[4]
+  SubsampledPW.results_First[i,4]<-(results)[5]
   Countries[i]<-(results)[3]
+  
   # nCountries[i,1]<-i
   # nCountries[i,2]<-(nrow(Countries[[i]]))
   # count<-data.frame(replicate=rep(nCountries[i,1], each=nCountries[i,2]))
@@ -88,8 +94,8 @@ SubsampledPW.results_First
 
 # Use the AllData df to get the basic info on each country (code, region, etc)
 CountryInfo<-AllData %>% 
-  select(Country,Region,IncomeGroup,Code) %>% 
-  group_by(Country) %>% 
+  select(First_Author_Country,Region,IncomeGroup,Code) %>% 
+  group_by(Code) %>% 
   slice(1)
 head(CountryInfo,10)
 
@@ -99,12 +105,12 @@ Countries<-bind_cols(Countries,replicate)
 Subsampled_Countries<-as.data.frame(Countries)
 # str(Subsampled_Countries)
 Subsampled_Countries<-Subsampled_Countries %>% 
-  inner_join(CountryInfo,Subsampled_Countries,by="Country") 
+  inner_join(CountryInfo,Subsampled_Countries,by="Code") 
 # head(Subsampled_Countries,10)
 Subsampled_Countries$IncomeGroup<-as.factor(Subsampled_Countries$IncomeGroup) 
 Subsampled_Countries$Region<-as.factor(Subsampled_Countries$Region) 
 Subsampled_Countries$Code<-as.factor(Subsampled_Countries$Code) 
-Subsampled_Countries$Country<-as.factor(Subsampled_Countries$Country) 
+Subsampled_Countries$Country<-as.factor(Subsampled_Countries$First_Author_Country) 
 Subsampled_Countries$author<-AuPosition
 
 

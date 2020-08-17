@@ -11,7 +11,8 @@ Fig1<-function(DataSet,AuPosition) {
     if ((AuPosition=="author_first")==TRUE) {
       first_author_income_cats<-as.data.frame(DataSet) %>% 
         filter(AuthorNum==1) %>% 
-        group_by(JrnlType,IncomeGroup) %>% 
+        group_by(JrnlType,IncomeGroup) %>%
+        drop_na("IncomeGroup") %>% 
         tally() %>% 
         mutate(percentage=n/sum(n)*100)
       
@@ -24,6 +25,7 @@ Fig1<-function(DataSet,AuPosition) {
         group_by(DOI) %>% 
         filter(AuthorNum == max(AuthorNum)) %>% 
         group_by(JrnlType,IncomeGroup) %>% 
+        drop_na("IncomeGroup") %>% 
         tally() %>% 
         mutate(percentage=n/sum(n)*100)
       

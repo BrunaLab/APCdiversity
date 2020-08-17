@@ -4,6 +4,7 @@ Fig1waffle<-function(AllData) {
   first_author_income_cats<-AllData %>% 
     filter(AuthorNum==1) %>% 
     group_by(JrnlType,IncomeGroup) %>% 
+    drop_na("IncomeGroup") %>% 
     tally() %>% 
     mutate(percentage=n/sum(n)*100)
   

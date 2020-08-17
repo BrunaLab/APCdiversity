@@ -7,12 +7,12 @@ DivCalcJrnl<-function(DataSet) {
   # DataSet<-OA_papers
   # Author=1
   SiteBySpec1<-DataSet %>%
-    filter(Country != "NA" & Code != "NA") %>%
+    filter(First_Author_Country != "NA" & Code != "NA") %>%
     filter(AuthorNum==1) %>%
-    group_by(Journal, Country)%>%
+    group_by(Journal, Code)%>%
     tally()
   
-  SiteBySpec1 <- cast(SiteBySpec1, Journal ~ Country, value = 'n')
+  SiteBySpec1 <- cast(SiteBySpec1, Journal ~ Code, value = 'n')
   SiteBySpec1[is.na(SiteBySpec1)] <- 0
   ncols_SiteBySpec1<-ncol(SiteBySpec1)
   Countries <- names(SiteBySpec1[,2:ncols_SiteBySpec1]) #check this to be sure this 

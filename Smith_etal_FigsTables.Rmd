@@ -1,0 +1,272 @@
+---
+title: "APC Paper: Figures & Tables"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: pdf_document
+
+# abstract: |
+#   Text of abstract.
+# 
+# <!-- bibliography: Path to your .bib file -->
+# <!-- csl: Path to your .csl file #sets the style of your bibliography -->
+
+fig_caption: yes #yes will automatically add "Figure X" to the start 
+# of the caption and reorders automatically if the figure position changes
+always_allow_html: yes
+
+# These are LaTex settings to take care of floating figures/tables, line spacing, etc
+header-includes:
+  - \usepackage[nomarkers,nolists]{endfloat} #[nomarkers] excludes the {insert figure x around here] from main text. The others exclude the list of tables and figures. https://cs.brown.edu/about/system/managed/latex/doc/endfloat.pdf
+  - \usepackage{setspace}\doublespacing
+  - \usepackage{lineno}
+  - \linenumbers
+# 
+pdf_document:
+extra_dependencies: "subfig"
+appendix: 
+- "Appendix.Rmd"  
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,message=FALSE,warning=FALSE)
+
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(gridExtra)
+library(kableExtra)
+library(readr)
+library(egg)
+```
+
+```{r cached=TRUE}
+knitr::opts_chunk$set(echo = FALSE)
+
+MirrorPairs<-read.csv("./data_clean/MirrorPairs.csv")
+WaiverCountries<-read.csv("./data_clean/WaiverCountries.csv")
+
+
+
+AllData<-read_csv(file="./data_clean/all_data_analysis.csv")
+AllData_missing<-AllData %>% 
+  filter(AuthorNum==1) %>% 
+  filter(is.na(First_Author_Country)) %>% 
+  select(refID) 
+AllData<-AllData %>% filter(!refID %in% AllData_missing$refID) 
+rm(AllData_missing)
+
+sole_author_pubs_ALL <-read_csv("./data_clean/one_author_pubs_ALL.csv")
+
+coauthor_pubs_ALL<-read_csv("./data_clean/coauthor_pubs_ALL.csv")
+
+sole_author_pubsNOCHNUSA_first_author<-read_csv("./data_clean/one_author_pubsNOCHNUSA.csv")
+
+coauthor_pubsNOCHNUSA_first_author<-read_csv("./data_clean/coauthor_pubsNOCHNUSA.csv")
+
+sole_author_pubs_ALL_first_author<-read_csv("./data_clean/sole_author_pubs_ALL_first_author.csv")
+
+coauthor_pubs_ALL_first_author<-read_csv("./data_clean/coauthor_pubs_ALL_first_author.csv")
+
+bootstrap_results<-read_csv('./output/bootstrap_results.csv')
+
+bootstrap_results_countries<-read_csv("./output/bootstrap_results_countries.csv")
+
+Table2.2<-read.csv('./output/Table2.2.csv')
+
+
+```
+
+```{r npapers, echo=FALSE,message = FALSE,warning=FALSE}
+NumbArticles_JrnlType <- AllData %>% #number of papers per journal
+  group_by(JrnlType) %>% 
+  summarize(n=n_distinct(refID))
+
+n_OA<-NumbArticles_JrnlType[1,2]
+n_PW<-NumbArticles_JrnlType[2,2]
+Total_pubs<-n_OA+n_PW
+```
+
+```{r rich_div_figs1, echo=FALSE,message = FALSE,warning=FALSE}
+knitr::opts_knit$set(eval.after = "fig.cap")
+insert_custom1<-n_OA
+insert_custom2<-n_PW
+# Figure - Diversity
+source("./Rscript/functions_figures/DivBootFig.R")
+DivBootFig<-DivBootFig(bootstrap_results)
+# Figure - Richness
+source("./Rscript/functions_figures/RichBootFig.R")
+RichBootFig<-RichBootFig(bootstrap_results)
+```
+
+```{r rich_div_figs, echo=FALSE,message = FALSE,warning=FALSE}
+source("./Rscript/functions_figures/CountryPlot.R") 
+p1<-CountryPlot(sole_author_pubs_ALL_first_author,"author_first","OA")
+p2<-CountryPlot(sole_author_pubs_ALL_first_author,"author_first","PW")
+p3<-CountryPlot(coauthor_pubs_ALL_first_author,"author_first","OA")
+p4<-CountryPlot(coauthor_pubs_ALL_first_author,"author_first","PW")
+```
+
+```{r Fig1, fig.align='center',fig.cap="Percentage of authors of single-author publications in (A) Open Access journals and (B) Paywall journals based in different countries.",fig.height = 9,fig.width=6}
+grid.arrange(p1, p2, ncol = 1)
+```
+
+```{r Fig2, fig.align='center',fig.cap="Percentage of first authors of co-authored publications in (A) Open Access journals and (B) Paywall journals that are based in different countries,",fig.height = 9,fig.width=6}
+# coauthored, first author, OA
+grid.arrange(p3, p4, ncol = 1)
+```
+
+```{r Fig3, fig.align='center', fig.cap=paste("Author Geographic Richness for N = ", insert_custom1, " Open Access articles (red bar) and 1000 identically sized collections of Paywalled articles selected by bootstrapping from a pool of ",insert_custom2, " articles. The black line indicates the mean value for the 1000 bootstrap collections."), fig.fullwidth=TRUE}
+RichBootFig
+```
+
+```{r Fig4, fig.align='center', fig.cap=paste("Author Geographic Diversity (Inverse Simpson's Index) for N = ", insert_custom1, " Open Access articles (red bar) and 1000 identically sized collections of Paywalled articles selected by bootstrapping from a pool of ",insert_custom2, " articles.  The black line indicates the mean value for the 1000 bootstrap collections."),fig.fullwidth=TRUE}
+DivBootFig
+```
+
+```{r Fig5, fig.align='center', fig.cap="Percentage of first authors of (A) co-authored and (B) sole-authored open access articles (red bars) and 1000 bootstrapped collections of paywalled articles that are based in different global regions.", fig.fullwidth=TRUE,fig.height = 24,fig.width=20}
+source("./Rscript/functions_figures/IncomePlot.R") 
+IncomePlot(bootstrap_results,bootstrap_results_countries,"All")
+```
+
+```{r Fig6, fig.align='center', fig.cap="Percentage of first authors of (A) co-authored and (B) sole-authored open access articles (red bars) and 1000 bootstrapped collections of paywalled articles that are based in different global regions.",fig.fullwidth=TRUE,fig.height = 24,fig.width=20}
+source("./Rscript/functions_figures/RegionPlot.R") 
+RegionPlot(bootstrap_results,bootstrap_results_countries,"All")
+```
+
+
+```{r Table1, echo=FALSE,message = FALSE,warning=FALSE}
+source("./Rscript/functions/SummaryTable.R") 
+Tables<-SummaryTable(AllData)
+Table1<-Tables[2]
+Table1<-as.data.frame(Table1)
+names(Table1)<-c("Journal","Articles","Articles - OA Mirror","APC (US$)")
+Table1[4,1]<-"BiochimieSuper1"
+Table1[27,1]<-"Microelectronic EngineeringSuper2"
+Table1[39,4]<-""
+
+Table1<-arrange(Table1,desc(Table1[4]))
+
+tmp<-knitr::kable(Table1, 
+      digits = 2,
+      align="c",
+      format="latex",
+      row.names = FALSE,
+      booktabs=T,
+      linesep = "", #removes the blank line after every 5 lines
+      caption = "The Elsevier subscription journals included in this study, the number of articles published in each journal dueing the focal period, the number of articles published in their respective open access mirror journals, and the article processing charge (APC) for each open access mirror journal.") %>%
+  kable_styling(bootstrap_options = c("hover"),
+                full_width = F,
+                latex_options="scale_down",
+                font_size = 12,
+                position = "left") %>%
+  footnote(number = c("OA Mirror title: Biochimie Open", "OA Mirror title: Micro and Nano Engineering"))
+tmp<-str_replace(tmp, "Super1", "$^{1}$")
+tmp<-str_replace(tmp, "Super2", "$^{2}$")
+knitr::asis_output(tmp)
+```
+
+```{r Table2, echo=FALSE,message = FALSE,warning=FALSE}
+SubsampledPW.results_Solo<-read_csv('output/SubsampledPW.results_RichDiv_SOLO_ALL.csv')
+SubsampledPW.results_Solo_NoUSACHN<-read_csv('output/SubsampledPW.results_RichDiv_SOLO_ALL.csv')
+
+probs<-read_csv("./output/probs.csv")
+
+source("./Rscript/functions_figures/Table2.R")
+Table2<-Table2(sole_author_pubs_ALL_first_author,
+               sole_author_pubsNOCHNUSA_first_author,
+               coauthor_pubs_ALL_first_author,
+               coauthor_pubsNOCHNUSA_first_author)
+Table2<-as.data.frame(Table2)
+Table2<-bind_cols(Table2,probs)
+Table2<-Table2 %>% select("Metric",
+                          "Author",
+                          "OA"="OA (All Countries)",
+                          "Mean PW (All Countries)",
+                          "all",
+                          # "PW 95% CI (All Countries)",
+                          "OA (USA & CHN excluded)",
+                          # "PW 95% CI (USA & CHN excluded)",
+                          "Mean PW (USA & CHN excluded)",
+                          "without"
+                          )
+
+
+names(Table2)<-c("Metric",
+                 "Author",
+                 "OA",
+                 paste("PW","(mean\u00B1SD)",sep=" "),
+                 "Pr(PW>OA)",
+                 # "PW 95% CI",
+                 "OA",
+                 # "PW 95% CI",
+                 paste("PW","(mean\u00B1SD)",sep=" "),
+                 "Pr(PW>OA)"
+                 )
+
+kable(Table2, 
+      digits = 1, 
+      format = "latex", 
+      align="c",
+      row.names = FALSE, 
+      booktabs=T,
+      linesep = "", 
+      caption = "Geographic Richness and Geographic Diversity of lead authors of papers published in Open Access (OA) and Paywalled (PW) journals. Single: authors of sole-authored papers; First: first authors of co-authored papers.") %>% 
+  kable_styling(bootstrap_options = c("hover"),
+                latex_options = c("scale_down"),
+                full_width = F,
+                font_size = 12,
+                position = "center") %>% 
+  add_header_above(c(" " = 2, "All Countries" = 3, "Without China & USA" = 3))
+```
+
+```{r Table3, echo=FALSE,message = FALSE,warning=FALSE}
+stipends<-read_csv(file="./data_clean/stipends.csv")
+stipends<-as.data.frame(stipends)
+stipends$agency<-c("CNPq","","CONACYT","","SERB","RISTEKDIKTI","NRF","")
+source<-stipends$source
+stipends<-stipends %>% select(country, degree, agency,stipend_USD)
+names(stipends)<-c("Country","Degree","Agency","Stipend (US$)")
+stipends[1,1]<-"BrazilSuper1"
+stipends[2,1]<-""
+stipends[3,1]<-"MexicoSuper2"
+stipends[4,1]<-""
+stipends[5,1]<-"IndiaSuper3"
+stipends[6,1]<-"IndonesiaSuper4"
+stipends[7,1]<-"South AfricaSuper5"
+stipends[8,1]<-""
+foot1<-source[1]
+foot2<-source[3]
+foot3<-source[5]
+foot4<-source[6]
+foot5<-source[7]
+foot5<-"https://www.nrf.ac.za"
+# foot4<-gsub("%20Scholarships%","%20Scholarships\n%",foot4)
+# stipends[4]<-NULL
+tmp<-knitr::kable(stipends,
+                  digits = 1, 
+                  format = "latex", 
+                  align="c",
+                  row.names = FALSE, 
+                  booktabs=T,
+                  linesep = "", 
+                  caption = "Monthly stipends for graduate students in select countries") %>% 
+  kable_styling(bootstrap_options = c("hover"),
+                latex_options = c("scale_down"),
+                full_width = T,
+                font_size = 12,
+                position = "center") %>% 
+  footnote(number = c(foot1,foot2,foot3,foot4,foot5))
+tmp<-str_replace(tmp, "Super1", "$^{1}$")
+tmp<-str_replace(tmp, "Super2", "$^{2}$")
+tmp<-str_replace(tmp, "Super3", "$^{3}$")
+tmp<-str_replace(tmp, "Super4", "$^{4}$")
+tmp<-str_replace(tmp, "Super5", "$^{5}$")
+knitr::asis_output(tmp)
+
+```
+
+<!-- \newpage -->
+<!-- # Appendix -->
+<!-- ```{r child = "Smith_etal_Appendix.Rmd"} -->
+<!-- ``` -->

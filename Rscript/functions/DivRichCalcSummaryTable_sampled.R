@@ -1,11 +1,7 @@
 DivRichCalcSummaryTable_sampled<-function(Dataset,
                                           Dataset2,
                                           SubsampledPW.results_First,
-                                          SubsampledPW.results_Last,
-                                          SubsampledPW.results_All,
-                                          SubsampledPW.results_First_NOUSACHN,
-                                          SubsampledPW.results_Last_NOUSACHN,
-                                          SubsampledPW.results_All_NOUSACHN){
+                                          SubsampledPW.results_First_NOUSACHN){
   
   # browser()
   # Dataset<-coauthor_pubs
@@ -13,21 +9,14 @@ DivRichCalcSummaryTable_sampled<-function(Dataset,
   vars<-list(Dataset,
              Dataset2,
              SubsampledPW.results_First,
-             SubsampledPW.results_Last,
-             SubsampledPW.results_All,
-             SubsampledPW.results_First_NOUSACHN,
-             SubsampledPW.results_Last_NOUSACHN,
-             SubsampledPW.results_All_NOUSACHN)
+             SubsampledPW.results_First_NOUSACHN)
   # browser()
   # 
   Dataset<-as.data.frame(vars[1])
   Dataset2<-as.data.frame(vars[2])
   SubPW_First<-as.data.frame(vars[3])
-  SubPW_Last<-as.data.frame(vars[4])
-  SubPW_All<-as.data.frame(vars[5])
-  SubPW_First_NOUSACHN<-as.data.frame(vars[6])
-  SubPW_Last_NOUSACHN<-as.data.frame(vars[7])
-  SubPW_All_NOUSACHN<-as.data.frame(vars[8])
+  SubPW_First_NOUSACHN<-as.data.frame(vars[4])
+  
   
   
   library(vegan)
@@ -45,29 +34,14 @@ DivRichCalcSummaryTable_sampled<-function(Dataset,
   JrnlType<-"OA"
   Div_OA_pool_first<-DivRichCalc(Dataset,AuPosition,JrnlType)
   
-  AuPosition<-"author_last"
-  JrnlType<-"OA"
-  Div_OA_pool_last<-DivRichCalc(Dataset,AuPosition,JrnlType)
-  
-  AuPosition<-"author_all"
-  JrnlType<-"OA"
-  Div_OA_pool_all<-DivRichCalc(Dataset,AuPosition,JrnlType)
   
   # Binding together
   DivMetricsPubsPooled_OA <- as.data.frame(cbind(Div_OA_pool_first[1],
-                                                 Div_OA_pool_last[1],
-                                                 Div_OA_pool_all[1],
-                                                 Div_OA_pool_first[2],
-                                                 Div_OA_pool_last[2],
-                                                 Div_OA_pool_all[2]))
+                                                 Div_OA_pool_first[2]))
   
   DivMetricsPubsPooled_OA<-DivMetricsPubsPooled_OA %>% 
     dplyr::rename(OA_richness_first=V1,
-                  OA_richness_last=V2,
-                  OA_richness_all=V3,
-                  OA_invSimp_first=V4,
-                  OA_invSimp_last=V5,
-                  OA_invSimp_all=V6)
+                  OA_invSimp_first=V2)
   DivMetricsPubsPooled_OA<-as.data.frame(DivMetricsPubsPooled_OA)
   DivMetricsPubsPooled_OA
   
@@ -85,29 +59,14 @@ DivRichCalcSummaryTable_sampled<-function(Dataset,
   JrnlType<-"OA"
   Div_OA_pool_first_noCHNorUSA<-DivRichCalc(Dataset2,AuPosition,JrnlType)
   
-  AuPosition<-"author_last"
-  JrnlType<-"OA"
-  Div_OA_pool_last_noCHNorUSA<-DivRichCalc(Dataset2,AuPosition,JrnlType)
-  
-  AuPosition<-"author_all"
-  JrnlType<-"OA"
-  Div_OA_pool_all_noCHNorUSA<-DivRichCalc(Dataset2,AuPosition,JrnlType)
   
   # Binding together
   DivMetricsPubsPooled_OA_noCHNorUSA <- as.data.frame(cbind(Div_OA_pool_first_noCHNorUSA[1],
-                                                 Div_OA_pool_last_noCHNorUSA[1],
-                                                 Div_OA_pool_all_noCHNorUSA[1],
-                                                 Div_OA_pool_first_noCHNorUSA[2],
-                                                 Div_OA_pool_last_noCHNorUSA[2],
-                                                 Div_OA_pool_all_noCHNorUSA[2]))
+                                                   Div_OA_pool_first_noCHNorUSA[2]))
   
   DivMetricsPubsPooled_OA_noCHNorUSA<-DivMetricsPubsPooled_OA_noCHNorUSA %>% 
     dplyr::rename(OA_richness_first=V1,
-                  OA_richness_last=V2,
-                  OA_richness_all=V3,
-                  OA_invSimp_first=V4,
-                  OA_invSimp_last=V5,
-                  OA_invSimp_all=V6)
+                  OA_invSimp_first=V2)
   DivMetricsPubsPooled_OA_noCHNorUSA<-as.data.frame(DivMetricsPubsPooled_OA_noCHNorUSA)
   DivMetricsPubsPooled_OA_noCHNorUSA
   #######################################################################
@@ -129,9 +88,7 @@ DivRichCalcSummaryTable_sampled<-function(Dataset,
   # https://rpubs.com/maulikpatel/212123
   #######################################################################
   
-  PW_sampled<-bind_rows(SubPW_First,
-            SubPW_Last,
-            SubPW_All)
+  PW_sampled<-SubPW_First
   colnames(PW_sampled)
   PW_Richness<-PW_sampled %>% group_by(author) %>% 
     summarize(PW_avg_richness=mean(Richness),
@@ -154,7 +111,7 @@ DivRichCalcSummaryTable_sampled<-function(Dataset,
                                      sep="-")
   PW_Richness$metric<-"Richness"
   PW_Richness$author <-as.factor(PW_Richness$author)
-  PW_Richness$author <- ordered(PW_Richness$author, levels = c("first", "last","all"))
+  # PW_Richness$author <- ordered(PW_Richness$author, levels = c("first", "last","all"))
   PW_Richness<-PW_Richness %>% 
     select(author,metric,PW_AllCountries=PW_avg_richness,CIs_AllCountries=CIs,CIlow,CIhigh) %>% 
     arrange((author))
@@ -181,16 +138,14 @@ DivRichCalcSummaryTable_sampled<-function(Dataset,
   
   PW_Diversity$metric<-"Diversity"
   PW_Diversity$author <-as.factor(PW_Diversity$author)
-  PW_Diversity$author <- ordered(PW_Diversity$author, levels = c("first", "last","all"))
+  # PW_Diversity$author <- ordered(PW_Diversity$author, levels = c("first", "last","all"))
   PW_Diversity<-PW_Diversity %>% 
     select(author,metric,PW_AllCountries=PW_avg_richness,CIs_AllCountries=CIs,CIlow,CIhigh) %>% 
     arrange((author))
   PW_Diversity
   
   #######################################################################
-  PW_sampled_noUSACHN<-bind_rows(SubPW_First_NOUSACHN,
-                        SubPW_Last_NOUSACHN,
-                        SubPW_All_NOUSACHN)
+  PW_sampled_noUSACHN<-SubPW_First_NOUSACHN
   colnames(PW_sampled_noUSACHN)
   PW_Richness_noUSACHN<-PW_sampled_noUSACHN %>% group_by(author) %>% 
     summarize(PW_avg_richness=mean(Richness),
@@ -215,7 +170,7 @@ DivRichCalcSummaryTable_sampled<-function(Dataset,
   
   PW_Richness_noUSACHN$metric<-"Richness"
   PW_Richness_noUSACHN$author <-as.factor(PW_Richness_noUSACHN$author)
-  PW_Richness_noUSACHN$author <- ordered(PW_Richness_noUSACHN$author, levels = c("first", "last","all"))
+  # PW_Richness_noUSACHN$author <- ordered(PW_Richness_noUSACHN$author, levels = c("first", "last","all"))
   PW_Richness_noUSACHN<-PW_Richness_noUSACHN %>% 
     select(author,metric,PW_noUSAorCHN=PW_avg_richness,CIs_noUSAorCHN=CIs,CIlow,CIhigh) %>% 
     arrange((author))
@@ -244,7 +199,7 @@ DivRichCalcSummaryTable_sampled<-function(Dataset,
   
   PW_Diversity_noUSACHN$metric<-"Diversity"
   PW_Diversity_noUSACHN$author <-as.factor(PW_Diversity_noUSACHN$author)
-  PW_Diversity_noUSACHN$author <- ordered(PW_Diversity_noUSACHN$author, levels = c("first", "last","all"))
+  # PW_Diversity_noUSACHN$author <- ordered(PW_Diversity_noUSACHN$author, levels = c("first", "last","all"))
   PW_Diversity_noUSACHN<-PW_Diversity_noUSACHN %>% 
     select(author,metric,PW_noUSAorCHN=PW_avg_richness,CIs_noUSAorCHN=CIs,CIlow,CIhigh) %>% 
     arrange((author))
@@ -261,7 +216,9 @@ DivRichCalcSummaryTable_sampled<-function(Dataset,
   DivMetricsPubsPooled_OA_noCHNorUSA<-round(DivMetricsPubsPooled_OA_noCHNorUSA,1)
     PW_Stats_ALL$OA_noCHNorUSA<-DivMetricsPubsPooled_OA_noCHNorUSA
   RichDiv_Stats_ALL <- PW_Stats_ALL %>% 
-    select(author,metric,OA_AllCountries,PW_AllCountries,CIs_AllCountries,CIlow,CIhigh,OA_noCHNorUSA,PW_noUSAorCHN,CIs_noUSAorCHN,CIlow1,CIhigh1)
+    select(author=author...1,metric=metric...2,OA_AllCountries,PW_AllCountries,CIs_AllCountries,
+           CIlow=CIlow...5,CIhigh=CIhigh...6,OA_noCHNorUSA,PW_noUSAorCHN,CIs_noUSAorCHN,
+           CIlow1=CIlow...11,CIhigh1=CIhigh...12)
   colnames(RichDiv_Stats_ALL)
   
   

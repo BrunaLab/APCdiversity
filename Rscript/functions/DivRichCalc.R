@@ -1,47 +1,29 @@
 DivRichCalc<-function(DataSet,AuPosition,JrnlType) {
   
+  sole_NOCHNUSA<-read_csv("./data_clean/one_author_pubsNOCHNUSA.csv")
+  coauthor_NOCHNUSA<-read_csv("./data_clean/coauthor_pubsNOCHNUSA.csv")
+  sole_ALL<-read_csv("./data_clean/sole_author_pubs_ALL_first_author.csv")
+  coauthor_ALL<-read_csv("./data_clean/coauthor_pubs_ALL_first_author.csv")
+  
+  # AuPosition<-"author_first"
+  # JrnlType<-"OA"
+  # DataSet<-coauthor_ALL
+  
   vars<-list(DataSet,AuPosition,JrnlType)
   
-  if ((vars[2]=="author_first")==TRUE) {
-    
-    DataSet<-DataSet %>%
-      group_by(DOI) %>% 
-      filter(AuthorNum == 1)
-    
-  } else if ((vars[2]=="author_last")==TRUE) {
-    
-    DataSet <-DataSet %>%
-      group_by(DOI) %>%
-      filter(AuthorNum == max(AuthorNum)) %>% 
-      filter(AuthorNum>1)  # This removes any single authior papers
-    
-    
-  } else if ((vars[2]=="author_all")==TRUE) {
-    
-    DataSet <-DataSet
-      
-  } else {
-    stop("Please enter 'author_first', 'author_last', or 'author_all' for AuPosition")
-    
-  }
   
-  # summary(as.factor(DataSet$JrnlType))
+  if (((vars[2]=="author_first")==TRUE) & ((vars[3]=="OA")==TRUE)) {
+    DataSet<-as.data.frame(vars[1]) %>% 
+      filter(JrnlType == "OA") %>% 
+      filter(AuthorNum==1)
   
-  if ((vars[3]=="OA")==TRUE) {
-    
-    DataSet<-DataSet %>% filter(JrnlType == "OA")
-    
-  } else if ((vars[3]=="PW")==TRUE) {
-    
-    DataSet<-DataSet %>% filter(JrnlType == "PW")
-  
-    } else if ((vars[3]=="All")==TRUE) {
-    
-    DataSet<-DataSet
+  } else if (((vars[2]=="author_first")==TRUE) & ((vars[3]=="PW")==TRUE))  {
+    DataSet<-as.data.frame(vars[1]) %>% 
+      filter(JrnlType == "PW") %>% 
+      filter(AuthorNum==1)
     
   } else {
-    stop("Please enter 'PW' , 'OA' , or 'All' for JrnlType")
-    
+    stop("Please enter 'author_first', for 'AuPosition' ")
   }
   
   
@@ -51,14 +33,16 @@ DivRichCalc<-function(DataSet,AuPosition,JrnlType) {
   library(dplyr)
   
   SiteBySpec<-DataSet %>%
-    filter(Country != "NA" & Code != "NA") %>%
-    group_by(Country)%>%
+    filter(First_Author_Country != "NA" & Code != "NA") %>%
+    group_by(Code)%>%
     tally()
   Countries<-SiteBySpec
   Richness<-nrow(SiteBySpec)
-  SiteBySpec <- SiteBySpec %>% spread(Country, n)
+  SiteBySpec <- SiteBySpec %>% spread(Code, n)
+  
   InvSimpsons <- diversity(SiteBySpec, index = "invsimpson")
-  # InvSimpsons <- diversity(SiteBySpec, index = "shannon")
-  return(list(Richness=Richness,InvSimpsons=InvSimpsons,Countries=Countries))
+  Shannon <- diversity(SiteBySpec, index = "shannon")
+  Even <- Shannon/log(Richness)
+  return(list(Richness=Richness,InvSimpsons=InvSimpsons,Countries=Countries,Shannon=Shannon,Even=Even))
   
 }

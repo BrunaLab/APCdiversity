@@ -14,6 +14,7 @@ Fig2<-function(DataSet,AuPosition) {
     plot2data<-as.data.frame(DataSet) %>% 
       filter(AuthorNum==1) %>% 
       group_by(IncomeGroup,JrnlType) %>% 
+      drop_na("IncomeGroup") %>% 
       tally() %>% 
       mutate(percentage=n/sum(n)*100)
     
@@ -28,6 +29,7 @@ Fig2<-function(DataSet,AuPosition) {
       group_by(DOI) %>% 
       filter(AuthorNum == max(AuthorNum)) %>% 
       group_by(IncomeGroup,JrnlType) %>% 
+      drop_na("IncomeGroup") %>% 
       tally() %>% 
       mutate(percentage=n/sum(n)*100)
     

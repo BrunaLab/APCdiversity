@@ -11,7 +11,8 @@
 # library(reshape)
 # library(vegan)
 library(tidyverse)
-
+# AllData<-AllData_AuthorFirst
+summary(as.factor(AllData$Journal))
 # load the data to be used in analyses
 AllData<-read_csv(file="./data_clean/AllData.csv")
 MirrorPairs<-read.csv("./data_clean/MirrorPairs.csv")

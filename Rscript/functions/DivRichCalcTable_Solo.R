@@ -103,7 +103,7 @@ DivRichCalcTable_Solo<-function(one_author_pubs_ALL,
                          sep="-")
   PW_Richness$metric<-"Richness"
   PW_Richness$author <-as.factor(PW_Richness$author)
-  PW_Richness$author <- ordered(PW_Richness$author, levels = c("first", "last","all"))
+  # PW_Richness$author <- ordered(PW_Richness$author, levels = c("first", "last","all"))
   PW_Richness<-PW_Richness %>% 
     select(author,metric,PW_AllCountries=PW_avg_richness,CIs_AllCountries=CIs,CIlow,CIhigh) %>% 
     arrange((author))
@@ -130,7 +130,7 @@ DivRichCalcTable_Solo<-function(one_author_pubs_ALL,
   
   PW_Diversity$metric<-"Diversity"
   PW_Diversity$author <-as.factor(PW_Diversity$author)
-  PW_Diversity$author <- ordered(PW_Diversity$author, levels = c("first", "last","all"))
+  # PW_Diversity$author <- ordered(PW_Diversity$author, levels = c("first", "last","all"))
   PW_Diversity<-PW_Diversity %>% 
     select(author,metric,PW_AllCountries=PW_avg_richness,CIs_AllCountries=CIs,CIlow,CIhigh) %>% 
     arrange((author))
@@ -162,7 +162,7 @@ DivRichCalcTable_Solo<-function(one_author_pubs_ALL,
   
   PW_Richness_noUSACHN$metric<-"Richness"
   PW_Richness_noUSACHN$author <-as.factor(PW_Richness_noUSACHN$author)
-  PW_Richness_noUSACHN$author <- ordered(PW_Richness_noUSACHN$author, levels = c("first", "last","all"))
+  # PW_Richness_noUSACHN$author <- ordered(PW_Richness_noUSACHN$author, levels = c("first", "last","all"))
   PW_Richness_noUSACHN<-PW_Richness_noUSACHN %>% 
     select(author,metric,PW_noUSAorCHN=PW_avg_richness,CIs_noUSAorCHN=CIs,CIlow,CIhigh) %>% 
     arrange((author))
@@ -174,6 +174,13 @@ DivRichCalcTable_Solo<-function(one_author_pubs_ALL,
               count = n(),
               CIlow=quantile(InvSimp, alpha/2),
               CIhigh=quantile(InvSimp, 1-alpha/2))
+  
+  # boot_out<-as.matrix(boot_out)
+  # d<-quantile(boot_out, c(0.025, 0.975))
+  # xbar<-mean(boot_out)
+  # ci = xbar - c(d[2], d[1])
+  # cat('Confidence interval: ',ci, '\n')
+  # 
   PW_Diversity_noUSACHN$SD_avg_richness<-round(PW_Diversity_noUSACHN$SD_avg_richness,1)
   PW_Diversity_noUSACHN$PW_avg_richness<-round(PW_Diversity_noUSACHN$PW_avg_richness,1)
   PW_Diversity_noUSACHN$CIlow<-round(PW_Diversity_noUSACHN$CIlow,1)
@@ -191,7 +198,7 @@ DivRichCalcTable_Solo<-function(one_author_pubs_ALL,
   
   PW_Diversity_noUSACHN$metric<-"Diversity"
   PW_Diversity_noUSACHN$author <-as.factor(PW_Diversity_noUSACHN$author)
-  PW_Diversity_noUSACHN$author <- ordered(PW_Diversity_noUSACHN$author, levels = c("first", "last","all"))
+  # PW_Diversity_noUSACHN$author <- ordered(PW_Diversity_noUSACHN$author, levels = c("first", "last","all"))
   PW_Diversity_noUSACHN<-PW_Diversity_noUSACHN %>% 
     select(author,metric,PW_noUSAorCHN=PW_avg_richness,CIs_noUSAorCHN=CIs,CIlow,CIhigh) %>% 
     arrange((author))
@@ -208,7 +215,9 @@ DivRichCalcTable_Solo<-function(one_author_pubs_ALL,
   DivMetricsPubsPooled_OA_noCHNorUSA<-round(DivMetricsPubsPooled_OA_noCHNorUSA,1)
   PW_Stats_ALL$OA_noCHNorUSA<-DivMetricsPubsPooled_OA_noCHNorUSA
   RichDiv_Stats_ALL <- PW_Stats_ALL %>% 
-    select(author,metric,OA_AllCountries,PW_AllCountries,CIs_AllCountries,CIlow,CIhigh,OA_noCHNorUSA,PW_noUSAorCHN,CIs_noUSAorCHN,CIlow1,CIhigh1)
+    select(author=author...1,metric=metric...2,OA_AllCountries,
+           PW_AllCountries,CIs_AllCountries,CIlow=CIlow...5,CIhigh=CIhigh...6,
+           OA_noCHNorUSA,PW_noUSAorCHN,CIs_noUSAorCHN,CIlow1=CIlow...11,CIhigh1=CIhigh...12)
   colnames(RichDiv_Stats_ALL)
   RichDiv_Stats_ALL$author<-"solo"
   
