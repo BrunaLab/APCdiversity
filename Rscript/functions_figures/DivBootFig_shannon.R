@@ -53,6 +53,13 @@ DivBootFig_shannon<-function(bootstrap_results) {
   figure_values$Dataset<-gsub("CHN & USA excluded", "Without China & USA",figure_values$Dataset)
   
   
+  bootstrap_results$author <- factor(bootstrap_results$author,
+                                     levels = c("solo","author_first"))
+  figure_values$author <- factor(figure_values$author,
+                                 levels = c("solo","author_first"))
+  
+  
+  
   pDiv<-
     ggplot(bootstrap_results, aes(x=Shannon,fill=JrnlType)) +
     geom_histogram(bins=50, color="black",fill="darkgray",

@@ -14,7 +14,11 @@ library(tidyverse)
 
 # NEED TO STANDARDIZE COUNTRYIES IN UK IN COUNTRY COLUMN
 MirrorPairs<-read.csv("./data_clean/MirrorPairs.csv")
+
 WaiverCountries<-read.csv("./data_clean/WaiverCountries.csv")
+NON_WavierCountries<-read.csv("./data_clean/NON_WavierCountries.csv")
+
+
 # World Bank data on national income categories
 CountryData <- read.csv("data_raw/CLASS.csv", header = TRUE)
 CountryData <- CountryData[-1,]
@@ -35,6 +39,11 @@ levels(CountryData$Region)
 # Need to generate subsets of sole-author pubs, coauthor pubs 
 AllData<-read_csv(file="./data_clean/all_data_analysis.csv")
 
+AllData$First_Author_Country[AllData$First_Author_Country=="uk"|
+                               AllData$First_Author_Country=="UK"|
+                               AllData$First_Author_Country=="GBR"]<-"gbr"
+
+levels(as.factor(AllData$First_Author_Country))
 # 56 NA articles
 # all_data_analysis<-all_data_analysis %>%  drop_na("Code")
 
@@ -152,6 +161,13 @@ write.csv(coauthor_pubsNOCHNUSA_first_author,file="./data_clean/coauthor_pubsNOC
 write.csv(sole_author_pubs_ALL_first_author,file="./data_clean/sole_author_pubs_ALL_first_author.csv")
 write.csv(coauthor_pubs_ALL_first_author,file="./data_clean/coauthor_pubs_ALL_first_author.csv")
 
+# sole_author_pubs_ALL<-read_csv("./data_clean/one_author_pubs_ALL.csv")
+# coauthor_pubs_ALL<-read_csv("./data_clean/coauthor_pubs_ALL.csv")
+# sole_author_pubsNOCHNUSA_first_author<-read_csv("./data_clean/one_author_pubsNOCHNUSA.csv")
+# coauthor_pubsNOCHNUSA_first_author<-read_csv("./data_clean/coauthor_pubsNOCHNUSA.csv")
+# sole_author_pubs_ALL_first_author<-read_csv("./data_clean/sole_author_pubs_ALL_first_author.csv")
+# coauthor_pubs_ALL_first_author<-read_csv("./data_clean/coauthor_pubs_ALL_first_author.csv")
+
 ############################################################
 ############################################################
 # SUMMARY STATS
@@ -249,9 +265,10 @@ ncountries_first
 ##################################
 # This is to 1) id the wb income category of countries on wavier list  
 ADC<-AllData %>% 
-  select(First_Author_Country, Code,IncomeGroup) %>% 
+  select(First_Author_Country, Code,IncomeGroup,Region) %>% 
   group_by(First_Author_Country) %>% 
   slice(1)
+  
 
 ADC$Country<-as.factor(ADC$First_Author_Country)
 ADC$IncomeGroup<-as.factor(ADC$IncomeGroup)
@@ -260,8 +277,11 @@ ADC$Code<-as.factor(ADC$Code)
 WC<-as.data.frame(WaiverCountries)
 names(WC)<-c("Country","WaiverGroup","Code","Region","IncomeGroup")
 WC$Country<-toupper(WC$Country)
+names(ADC)
 country_check<-full_join(ADC,WC,by="Code") %>% 
   arrange(desc(WaiverGroup))
+
+
 # setdiff(WC,ADC)
 # setdiff(ADC,WC)
 
@@ -294,6 +314,8 @@ write.csv(SubsampledPW.results_First_Co_All[2],
           'output/SubsampledPW.results_Countries_CO_ALL.csv', 
           row.names = FALSE)
 
+SubsampledPW.results_RichDiv_CO_ALL.csv
+
 ########################################
 # SAMPLED DIV/RICH: SOLE AUTHOR PUBS, ALL COUNTRIES
 source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
@@ -306,6 +328,7 @@ write.csv(SubsampledPW.results_Solo_All[1],
 write.csv(SubsampledPW.results_Solo_All[2],
           'output/SubsampledPW.results_Countries_SOLO_ALL.csv',
           row.names = FALSE)
+
 
 ########################################
 # SAMPLED DIV/RICH: SOLE AUTHOR PUBS, NO USA OR CHINA
@@ -322,6 +345,10 @@ write.csv(SubsampledPW.results_Solo_NoUSACHN[1],
 write.csv(SubsampledPW.results_Solo_NoUSACHN[2], 
           'output/SubsampledPW.results_Countries_SOLO_NoUSACHN.csv', 
           row.names = FALSE)
+
+
+
+
 ########################################
 ########################################
 
@@ -337,12 +364,38 @@ write.csv(SubsampledPW.results_First_Co_NOUSACHN[2],
           'output/SubsampledPW.results_Countries_CO_NOUSACHN.csv', 
           row.names = FALSE)
 
+
+
+
 ########################################
+
 
 bootstrap_results_countries<-bind_rows(SubsampledPW.results_Solo_All[2],
                                        SubsampledPW.results_Solo_NoUSACHN[2],
                                        SubsampledPW.results_First_Co_All[2],
                                        SubsampledPW.results_First_Co_NOUSACHN[2])
+
+
+
+# IF LOADING FROM FOLDERS
+# 
+# SubsampledPW.results_First_Co_All<-read_csv("./output/SubsampledPW.results_RichDiv_CO_ALL.csv")
+# SubsampledPW.results_First_Co_All<-read_csv("./output/SubsampledPW.results_Countries_CO_ALL.csv")
+# 
+# SubsampledPW.results_First_Co_NOUSACHN<-read_csv("./output/SubsampledPW.results_RichDiv_CO_NOUSACHN.csv")
+# SubsampledPW.results_First_Co_NOUSACHN<-read_csv("./output/SubsampledPW.results_Countries_CO_NOUSACHN.csv")
+# 
+# SubsampledPW.results_Solo_All<-read_csv("./output/SubsampledPW.results_RichDiv_SOLO.csv")
+# SubsampledPW.results_Solo_All<-read_csv("./output/SubsampledPW.results_Countries_SOLO_ALL.csv")
+# 
+# SubsampledPW.results_Solo_NoUSACHN<-read_csv("./output/SubsampledPW.results_RichDiv_SOLO_NoUSACHN.csv")
+# SubsampledPW.results_Solo_NoUSACHN<-read_csv("./output/SubsampledPW.results_Countries_SOLO_NoUSACHN.csv")
+# 
+# bootstrap_results_countries<-bind_rows(SubsampledPW.results_Solo_All,
+#                                        SubsampledPW.results_Solo_NoUSACHN,
+#                                        SubsampledPW.results_First_Co_All,
+#                                        SubsampledPW.results_First_Co_NOUSACHN)
+# 
 
 summary(as.factor(bootstrap_results_countries$Dataset))
 
@@ -360,10 +413,15 @@ write.csv(bootstrap_results_countries, "./output/bootstrap_results_countries.csv
 #############################################
 # AUTHOR DIVERSITY & RICHNESS: ALL PAPERS POOLED
 #################################################
-# SubsampledPW.results_Solo<-read_csv('output/SubsampledPW.results_RichDiv_SOLO_ALL.csv')
+# SubsampledPW.results_Solo_All<-read_csv('output/SubsampledPW.results_RichDiv_SOLO_ALL.csv')
 # SubsampledPW.results_Solo_NoUSACHN<-read_csv('output/SubsampledPW.results_RichDiv_SOLO_NoUSACHN.csv')
-source("./Rscript/functions/DivRichCalcTable_Solo.R")
+# source("./Rscript/functions/DivRichCalcTable_Solo.R")
+# Table2_Solo<-DivRichCalcTable_Solo(sole_author_pubs_ALL_first_author,
+#                                    sole_author_pubsNOCHNUSA_first_author,
+#                                    SubsampledPW.results_Solo_All,
+#                                    SubsampledPW.results_Solo_NoUSACHN)
 
+source("./Rscript/functions/DivRichCalcTable_Solo.R")
 Table2_Solo<-DivRichCalcTable_Solo(sole_author_pubs_ALL_first_author,
                                    sole_author_pubsNOCHNUSA_first_author,
                                    SubsampledPW.results_Solo_All[1],
@@ -373,7 +431,14 @@ Table2_Solo
 # 
 # SubsampledPW.results_First<-read_csv('output/SubsampledPW.results_RichDiv_FIRST_AUTHOR.csv')
 # SubsampledPW.results_First_NOUSACHN<-read_csv('output/SubsampledPW.results_RichDiv_FIRST_AUTHOR_NOUSACHN.csv')
-# 
+# source("./Rscript/functions/DivRichCalcSummaryTable_sampled.R")
+# Table2_CoAuthored<-DivRichCalcSummaryTable_sampled(coauthor_pubs_ALL_first_author,
+#                                                    coauthor_pubsNOCHNUSA_first_author,
+#                                                    SubsampledPW.results_First_Co_All,
+#                                                    SubsampledPW.results_First_Co_NOUSACHN)
+
+
+
 
 source("./Rscript/functions/DivRichCalcSummaryTable_sampled.R")
 Table2_CoAuthored<-DivRichCalcSummaryTable_sampled(coauthor_pubs_ALL_first_author,
@@ -383,6 +448,7 @@ Table2_CoAuthored<-DivRichCalcSummaryTable_sampled(coauthor_pubs_ALL_first_autho
 
 
 Table2_CoAuthored
+
 Table2_Joint<-bind_rows(Table2_CoAuthored,Table2_Solo)
 write.csv(Table2_Joint, "./tables_figs/Table2.csv", row.names = FALSE)
 # Table2_Joint<-read_csv("./tables_figs/Table2.csv")
@@ -403,7 +469,9 @@ Table2
 # # TODO: CONVERT THIS TO A FUNCTIONS!
 # ##################################################
 # # DATA PREP
-# OA_papers <- coauthor_pubs %>% filter(JrnlType == "OA")
+# OA_papers <- sole_author_pubs_ALL %>% filter(JrnlType == "OA")
+source("./Rscript/functions/DivRichCalc.R") 
+OA_data<-DivRichCalc(OA_papers,author_first,OA)
 # # OA_papers <- coauthor_pubsNOCHNUSA %>% filter(JrnlType == "OA")
 # OA_papers_boot<-sample_n(OA_papers, nrow(OA_papers), replace = TRUE)
 # source("./Rscript/functions/DivRichCalc.R") 
@@ -609,106 +677,216 @@ DivBootFig(bootstrap_results)
 # numbers for the paper = countries by category, waivers, etc. 
 # DIVERSITY
 # significance test (prop below)
+# 
+# # single, all
+# crit3<-as.numeric(Table2.2[2,4])
+# percPWlessthanOA3<-bootstrap_results %>% 
+#   filter(Dataset=="All Countries") %>% 
+#   filter(author=="solo") %>% 
+#   tally(InvSimp>crit3)/1000
+# percPWlessthanOA3
+# rm(crit3)
+# 
+# # first of coauthored, all
+# crit1<-as.numeric(Table2.2[1,4])
+# percPWlessthanOA1<-bootstrap_results %>% 
+#        filter(Dataset=="All Countries") %>% 
+#        filter(author=="author_first") %>%
+#         tally(InvSimp>crit1)/1000
+# rm(crit1)
+# percPWlessthanOA1
+# 
+# # single, no CHN USA
+# crit4<-as.numeric(Table2.2[4,4])
+# percPWlessthanOA4<-bootstrap_results %>% 
+#        filter(Dataset=="CHN & USA excluded") %>% 
+#        filter(author=="solo") %>% 
+#        tally(InvSimp>crit4)/1000
+# percPWlessthanOA4
+# rm(crit4)
+# 
+# 
+# # first of coauthored, no CHN USA
+# crit2<-as.numeric(Table2.2[3,4])
+# percPWlessthanOA2<-percPWlessthanOA<-bootstrap_results %>% 
+#   filter(Dataset=="CHN & USA excluded") %>% 
+#   filter(author=="author_first") %>% 
+#   tally(InvSimp>crit2)/1000
+# percPWlessthanOA2
+# rm(crit2)
+# 
+# col1<-rep(NA,4)
+# col2<-rep(NA,4)
+# probs<-bind_cols(col1,col2)
+# names(probs)<-c("all","without")
+# 
+# probs$all<-as.numeric(probs$all)
+# probs$without<-as.numeric(probs$without)
+# probs[4,1]<-percPWlessthanOA1
+# probs[4,2]<-percPWlessthanOA2
+# probs[3,1]<-percPWlessthanOA3
+# probs[3,2]<-percPWlessthanOA4
+# probs
+# # RICHNESS
+# # significance test (prop below)
+# 
+# 
+# # single, all
+# crit7<-as.numeric(Table2.2[2,5])
+# percPWlessthanOA7<-bootstrap_results %>% 
+#   filter(Dataset=="All Countries") %>% 
+#   filter(author=="solo") %>% 
+#   tally(Richness<38)/1000
+# percPWlessthanOA7
+# rm(crit7)
+# 
+# # first of coauthored, all
+# crit5<-as.numeric(Table2.2[1,5])
+# percPWlessthanOA5<-bootstrap_results %>% 
+#        filter(Dataset=="All Countries") %>% 
+#        filter(author=="author_first") %>% 
+#        tally(Richness<crit5)/1000
+# percPWlessthanOA5
+# rm(crit5)
+# 
+# 
+# 
+# # single, no CHN USA
+# crit8<-as.numeric(Table2.2[4,5])
+# percPWlessthanOA8<-bootstrap_results %>% 
+#   filter(Dataset=="CHN & USA excluded") %>% 
+#   filter(author=="solo") %>% 
+#   tally(Richness<36)/1000
+# percPWlessthanOA8
+# rm(crit8)
+# 
+# 
+# 
+# # first of coauthored, no CHN USA
+# crit6<-as.numeric(Table2.2[3,5])
+# percPWlessthanOA6<-
+# bootstrap_results %>% 
+#        filter(Dataset=="CHN & USA excluded") %>% 
+#        filter(author=="author_first") %>% 
+#        tally(Richness<crit6)/1000
+# percPWlessthanOA6
+# rm(crit6)
+# 
+# probs[2,1]<-percPWlessthanOA5
+# probs[2,2]<-percPWlessthanOA8
+# probs[1,1]<-percPWlessthanOA7
+# probs[1,2]<-percPWlessthanOA6
+# probs
 
-# single, all
-crit3<-as.numeric(Table2.2[2,4])
-percPWlessthanOA3<-bootstrap_results %>% 
-  filter(Dataset=="All Countries") %>% 
-  filter(author=="solo") %>% 
-  tally(InvSimp>crit3)/1000
-percPWlessthanOA3
-rm(crit3)
-
-# first of coauthored, all
-crit1<-as.numeric(Table2.2[1,4])
-percPWlessthanOA1<-bootstrap_results %>% 
-       filter(Dataset=="All Countries") %>% 
-       filter(author=="author_first") %>%
-        tally(InvSimp>crit1)/1000
-rm(crit1)
-percPWlessthanOA1
-
-# single, no CHN USA
-crit4<-as.numeric(Table2.2[4,4])
-percPWlessthanOA4<-bootstrap_results %>% 
-       filter(Dataset=="CHN & USA excluded") %>% 
-       filter(author=="solo") %>% 
-       tally(InvSimp>crit4)/1000
-percPWlessthanOA4
-rm(crit4)
-
-
-# first of coauthored, no CHN USA
-crit2<-as.numeric(Table2.2[3,4])
-percPWlessthanOA2<-percPWlessthanOA<-bootstrap_results %>% 
-  filter(Dataset=="CHN & USA excluded") %>% 
-  filter(author=="author_first") %>% 
-  tally(InvSimp>crit2)/1000
-percPWlessthanOA2
-rm(crit2)
-
-col1<-rep(NA,4)
-col2<-rep(NA,4)
-probs<-bind_cols(col1,col2)
-names(probs)<-c("all","without")
-
-probs$all<-as.numeric(probs$all)
-probs$without<-as.numeric(probs$without)
-probs[4,1]<-percPWlessthanOA1
-probs[4,2]<-percPWlessthanOA2
-probs[3,1]<-percPWlessthanOA3
-probs[3,2]<-percPWlessthanOA4
-probs
-# RICHNESS
-# significance test (prop below)
-
-
-# single, all
-crit7<-as.numeric(Table2.2[2,5])
-percPWlessthanOA7<-bootstrap_results %>% 
-  filter(Dataset=="All Countries") %>% 
-  filter(author=="solo") %>% 
-  tally(Richness<38)/1000
-percPWlessthanOA7
-rm(crit7)
-
-# first of coauthored, all
-crit5<-as.numeric(Table2.2[1,5])
-percPWlessthanOA5<-bootstrap_results %>% 
-       filter(Dataset=="All Countries") %>% 
-       filter(author=="author_first") %>% 
-       tally(Richness<crit5)/1000
-percPWlessthanOA5
-rm(crit5)
 
 
 
-# single, no CHN USA
-crit8<-as.numeric(Table2.2[4,5])
-percPWlessthanOA8<-bootstrap_results %>% 
-  filter(Dataset=="CHN & USA excluded") %>% 
-  filter(author=="solo") %>% 
-  tally(Richness<36)/1000
-percPWlessthanOA8
-rm(crit8)
+SubsampledPW.results_Solo<-read_csv('./output/SubsampledPW.results_RichDiv_SOLO_ALL.csv')
+SubsampledPW.results_First<-read_csv('./output/SubsampledPW.results_CO_ALL.csv')
+SubsampledPW.results_Solo_NoUSACHN<-read_csv('output/SubsampledPW.results_RichDiv_SOLO_NoUSACHN.csv')
+SubsampledPW.results_First_NoUSACHN<-read_csv('output/SubsampledPW.results_RichDiv_CO_NOUSACHN.csv')
+
+sole_ALL<-read_csv("./data_clean/sole_author_pubs_ALL_first_author.csv")
+sole_NOCHNUSA<-read_csv("./data_clean/one_author_pubsNOCHNUSA.csv")
+coauthor_ALL<-read_csv("./data_clean/coauthor_pubs_ALL_first_author.csv")
+coauthor_NOCHNUSA<-read_csv("./data_clean/coauthor_pubsNOCHNUSA.csv")
+
+source("./Rscript/functions/DivRichCalc.R")
+crit_solo_all<-DivRichCalc(sole_ALL,"author_first","OA")
+crit_solo_no_CHNUSA<-DivRichCalc(sole_NOCHNUSA,"author_first","OA")
+crit_first_all<-DivRichCalc(coauthor_ALL,"author_first","OA")
+crit_first_no_CHNUSA<-DivRichCalc(coauthor_NOCHNUSA,"author_first","OA")
+
+# SOLO, ALL, RICH
+R_crit_solo_all<-as.numeric(crit_solo_all[1])
+perc_R_SOLO_ALL<-SubsampledPW.results_Solo %>% 
+  tally(Richness>R_crit_solo_all)/1000
+perc_R_SOLO_ALL
+perc_R_SOLO_ALL$Author<-"Single"
+perc_R_SOLO_ALL$Dataset<-"All Countries"
+perc_R_SOLO_ALL$Metric<-"Richness"
+
+# SOLO, NO CHN USA, RICH
+R_crit_solo_no_CHNUSA<-as.numeric(crit_solo_no_CHNUSA[1])
+perc_R_SOLO_NOCHNUSA<-SubsampledPW.results_Solo_NoUSACHN %>% 
+  tally(Richness>R_crit_solo_no_CHNUSA)/1000
+perc_R_SOLO_NOCHNUSA
+perc_R_SOLO_NOCHNUSA$Author<-"Single"
+perc_R_SOLO_NOCHNUSA$Dataset<-"Without China and USA"
+perc_R_SOLO_NOCHNUSA$Metric<-"Richness"
 
 
 
-# first of coauthored, no CHN USA
-crit6<-as.numeric(Table2.2[3,5])
-percPWlessthanOA6<-
-bootstrap_results %>% 
-       filter(Dataset=="CHN & USA excluded") %>% 
-       filter(author=="author_first") %>% 
-       tally(Richness<crit6)/1000
-percPWlessthanOA6
-rm(crit6)
+# FIRST, ALL, RICH
+R_crit_first_all<-as.numeric(crit_first_all[1])
+perc_R_first_all<-SubsampledPW.results_First %>% 
+  tally(Richness>R_crit_first_all)/1000
+perc_R_first_all
+perc_R_first_all$Author<-"First"
+perc_R_first_all$Dataset<-"All Countries"
+perc_R_first_all$Metric<-"Richness"
 
-probs[2,1]<-percPWlessthanOA5
-probs[2,2]<-percPWlessthanOA8
-probs[1,1]<-percPWlessthanOA7
-probs[1,2]<-percPWlessthanOA6
-probs
+
+# FIRST, NO CHN USA, RICH
+R_crit_first_no_CHNUSA<-as.numeric(crit_first_no_CHNUSA[1])
+perc_R_first_NOCHNUSA<-SubsampledPW.results_First_NoUSACHN %>% 
+  tally(Richness>R_crit_first_no_CHNUSA)/1000
+perc_R_first_NOCHNUSA
+perc_R_first_NOCHNUSA$Author<-"First"
+perc_R_first_NOCHNUSA$Dataset<-"Without China and USA"
+perc_R_first_NOCHNUSA$Metric<-"Richness"
+
+
+# SOLO, ALL, DIV
+Div_crit_solo_all<-as.numeric(crit_solo_all[2])
+perc_Div_SOLO_ALL<-SubsampledPW.results_Solo %>% 
+  tally(InvSimp>Div_crit_solo_all)/1000
+perc_Div_SOLO_ALL
+perc_Div_SOLO_ALL$Author<-"Single"
+perc_Div_SOLO_ALL$Dataset<-"All Countries"
+perc_Div_SOLO_ALL$Metric<-"Diversity"
+
+# SOLO, NO CHN USA, DIV
+Div_crit_solo_no_CHNUSA<-as.numeric(crit_solo_no_CHNUSA[2])
+perc_D_SOLO_NOCHNUSA<-SubsampledPW.results_Solo_NoUSACHN %>% 
+  tally(InvSimp>Div_crit_solo_no_CHNUSA)/1000
+perc_D_SOLO_NOCHNUSA
+perc_D_SOLO_NOCHNUSA$Author<-"Single"
+perc_D_SOLO_NOCHNUSA$Dataset<-"Without China and USA"
+perc_D_SOLO_NOCHNUSA$Metric<-"Diversity"
+
+
+
+# FIRST, ALL, DIV
+Div_crit_first_all<-as.numeric(crit_first_all[2])
+perc_Div_first_ALL<-SubsampledPW.results_First %>% 
+  tally(InvSimp>Div_crit_first_all)/1000
+perc_Div_first_ALL<-perc_Div_first_ALL
+perc_Div_first_ALL$Author<-"First"
+perc_Div_first_ALL$Dataset<-"Without China & USA"
+perc_Div_first_ALL$Metric<-"Diversity"
+
+
+# FIRST, NO CHN USA, DIV
+Div_crit_first_no_CHNUSA<-as.numeric(crit_first_no_CHNUSA[2])
+perc_D_first_NOCHNUSA<-SubsampledPW.results_First_NoUSACHN %>% 
+  tally(InvSimp>Div_crit_first_no_CHNUSA)/1000
+perc_D_first_NOCHNUSA<-perc_D_first_NOCHNUSA
+perc_D_first_NOCHNUSA$Author<-"First"
+perc_D_first_NOCHNUSA$Dataset<-"Without China & USA"
+perc_D_first_NOCHNUSA$Metric<-"Diversity"
+
+
+probs<-bind_rows(perc_R_SOLO_ALL,
+                 perc_R_SOLO_NOCHNUSA,
+                 perc_R_first_all,
+                 perc_R_first_NOCHNUSA,
+                 perc_Div_SOLO_ALL,
+                 perc_D_SOLO_NOCHNUSA,
+                 perc_Div_first_ALL,
+                 perc_D_first_NOCHNUSA)
+
+probs<-probs %>% dplyr::rename("phat"="n")
 write_csv(probs,"./output/probs.csv")
 
 
@@ -849,11 +1027,6 @@ waiver_table<-waiver_table %>%
 
 
 
-
-
-
-
-
 waiver_table<-waiver_table %>% 
   group_by(WaiverGroup,IncomeGroup,Region) %>% 
   mutate(Region = replace(Region, row_number() > 1, "")) %>% 
@@ -890,6 +1063,129 @@ prop_waived<-WB_prop_waived %>%
 prop_waived
 
 
+
+####################
+# WAIVER TABLE 2
+###################WaiverCountries<-read.csv("./data_clean/WaiverCountries.csv")
+WaiverCountries<-read.csv("./data_clean/WaiverCountries.csv")
+NON_WavierCountries<-read.csv("./data_clean/NON_WavierCountries.csv")
+
+
+NON_WavierCountries$WaiverGroup<-"no waiver"
+
+waiver_table2<-bind_rows(WaiverCountries,NON_WavierCountries) %>% 
+  arrange(IncomeGroup,desc(WaiverGroup),Region,Country) 
+
+waiver_table2$IncomeGroup<-as.character(waiver_table2$IncomeGroup)
+waiver_table2$IncomeGroup<-gsub("Upper middle income", "Middle income",waiver_table2$IncomeGroup)
+waiver_table2$IncomeGroup<-gsub("Lower middle income", "Middle income",waiver_table2$IncomeGroup)
+
+waiver_table2$IncomeGroup<-ordered(waiver_table2$IncomeGroup, 
+                                   levels = c("Low income",
+                                              "Middle income",
+                                              "High income"))
+
+waiver_table2$WaiverGroup<-gsub("GroupA","A - 100%",waiver_table2$WaiverGroup)
+waiver_table2$WaiverGroup<-gsub("GroupB","B - 50%",waiver_table2$WaiverGroup)
+
+waiver_table2$WaiverGroup<-ordered(waiver_table2$WaiverGroup, 
+                                   levels = c("A - 100%",
+                                              "B - 50%",
+                                              "no waiver"))
+# 
+# 
+waiver_table2$group<-NA
+
+waiver_table2<-waiver_table2 %>%
+  select(IncomeGroup,Region,Country,WaiverGroup,group) %>% 
+  arrange(Region,WaiverGroup,Country,IncomeGroup) %>% 
+  group_by(Region,WaiverGroup,IncomeGroup) %>% 
+  mutate(group = replace(group, row_number() < 9, "1")) %>%
+  mutate(group = replace(group, (row_number() > 9 &row_number() <19), "2")) %>%
+  mutate(group = replace(group, (row_number() > 18 &row_number() <28), "3")) %>%
+  mutate(group = replace(group, (row_number() > 27 &row_number() <37), "4")) %>%
+  mutate(group = replace(group, (row_number() > 36 &row_number() <46), "5")) %>%
+  mutate(group = replace(group, (row_number() > 45 &row_number() <55), "6")) %>%
+  mutate(group = replace(group, row_number() > 54, "7")) %>%
+  group_by(Region,group,WaiverGroup,IncomeGroup) %>%
+  summarize(CountryGroups = str_c(Country, collapse = ", ")) #this line takes the individual
+#cells and collapses them into a single one
+waiver_table2$group<-NULL
+
+
+waiver_table2<-waiver_table2 %>% spread(WaiverGroup,CountryGroups)
+waiver_table3<-waiver_table2 %>%
+  arrange(Region,IncomeGroup) %>% 
+  group_by(Region,IncomeGroup) %>% 
+  mutate(IncomeGroup = replace(IncomeGroup, row_number() > 1, "")) %>% 
+  group_by(Region) %>% 
+  mutate(Region = replace(Region, row_number() > 1, "")) 
+
+
+
+
+waiver_table3<-waiver_table2 %>%
+  arrange(Region,WaiverGroup,IncomeGroup) %>% 
+  group_by(Region,WaiverGroup,IncomeGroup) %>% 
+  mutate(IncomeGroup = replace(IncomeGroup, row_number() > 1, "")) %>% 
+  group_by(Region,WaiverGroup) %>% 
+  mutate(WaiverGroup = replace(WaiverGroup, row_number() > 1, "")) %>% 
+  group_by(Region) %>% 
+  mutate(Region = replace(Region, row_number() > 1, "")) 
+
+
+# 
+# waiver_table4<-waiver_table3 %>%
+#   group_by(Region,WaiverGroup,IncomeGroup) %>% 
+#   mutate(Region = replace(Region, row_number() > 1, "")) %>% 
+#   group_by(Region,WaiverGroup) %>% 
+#   mutate(WaiverGroup = replace(WaiverGroup, row_number() > 1, "")) %>% 
+#   group_by(Region) %>% 
+#   mutate(Region = replace(Region, row_number() > 1, "")) 
+
+
+waiver_table3<-as.data.frame(waiver_table3)
+waiver_table3<-waiver_table3 %>% select(Region, WaiverGroup,IncomeGroup,CountryGroups)
+
+names(waiver_table3)<-c("Region", "Waiver Group","Income Group","Countries")
+
+
+waiver_table3$Countries<-gsub("French part","FRA",waiver_table3$Countries)
+waiver_table3$Countries<-gsub("Federated","Fed.",waiver_table3$Countries)
+waiver_table3$Countries<-gsub("of","",waiver_table3$Countries)
+waiver_table3$Countries<-gsub("Lao People’s Democratic Republic","Laos",waiver_table3$Countries)
+waiver_table3$Countries<-gsub("United Republic of Tanzania","Tanzania",waiver_table3$Countries)
+waiver_table3$Countries<-gsub(" and "," & ",waiver_table3$Countries)
+waiver_table3$Countries<-gsub(" SAR China","",waiver_table3$Countries)
+waiver_table3$Countries<-gsub("Democratic Republic","Dem. Repub.",waiver_table3$Countries)
+
+
+# waiver_table3$Country<-gsub("U.","\nU.",waiver_table3$Country)
+# waiver_table3$Countries<-gsub("Turks","\nTurks",waiver_table3$Countries)
+# waiver_table3$Countries<-gsub("Sudan","\nSudan",waiver_table3$Countries)
+# waiver_table3$Country<-gsub("Somalia","\nSomalia",waiver_table3$Country)
+# waiver_table3$Countries<-gsub("Sierra","\nSierra",waiver_table3$Countries)
+
+waiver_table3$Region<-gsub("East Asia","E. Asia",waiver_table3$Region)
+waiver_table3$Region<-gsub("North","N.",waiver_table3$Region)
+waiver_table3$Region<-gsub("America","Am.",waiver_table3$Region)
+
+waiver_table3 <- sapply(waiver_table3, as.character)
+waiver_table3[is.na(waiver_table3)] <- ""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ####################################
 # Figure - Richness
 source("./Rscript/functions_figures/RichBootFig.R")
@@ -903,31 +1199,425 @@ bootstrap_results %>%
   summarize(mean(Richness),mean(InvSimp),mean(Shannon),mean(Even))
   
 
+############################################################################
+# FIGURE 1: For each journal category, the % of articles by 
+# 1st authors from different national income classes
+############################################################################
+source("./Rscript/functions_figures/AppFig3.R") 
+AppFig3<-AppFig3(AllData,"author_first")
+AppFig3
 
 
 
 
 
+###################################3
+# Bray Curtis
+#####################################
+
+
+# dune2<-slice(dune,1:2)
+# simpson<-diversity(dune2,index = "simpson")
+# bray = vegdist(dune2, "bray") 
+# gower = vegdist(dune2, "gower")
+
+##################
+# BC SOLO ALL
+##################
+bootstrap_results_countries<-read_csv("./output/bootstrap_results_countries.csv")
+bootstrap_results_countries
+foo<-bootstrap_results_countries %>% 
+  filter(author=="solo"& Dataset=="All Countries") %>% 
+  select(n,Code,replicate) %>% 
+  arrange(n) %>% 
+  spread(Code,n) 
+foo[is.na(foo)] = 0
+foo$cat<-"PW"
+foo$cat<-NULL
+foo$replicate<-NULL
+bray = vegdist(foo, "bray")
+str(bray)
+bray<-as.matrix(bray)
+bray[lower.tri(bray)] <- 0
+bray[lower.tri(bray,diag=TRUE)] <- NA
+bray<-as.vector(bray)
+bray<-as.vector(na.omit(bray))
+hist(bray)
+
+
+
+# sole_NOCHNUSA
+# coauthor_NOCHNUSA
+# sole_ALL
+# coauthor_ALL
+
+source("./Rscript/functions/DivRichCalc.R") 
+OA_data<-DivRichCalc(sole_ALL,'author_first','OA')
+OA_countries<-as.data.frame(OA_data[3])
+colnames(OA_countries)
+names(OA_countries)<-c("Code","n")
+OA_countries<-OA_countries %>%spread(Code,n)
+OA_countries[is.na(OA_countries)] = 0
+OA_countries$cat<-"OA"
+
+data<-bind_rows(OA_countries,foo)
+data[is.na(data)] = 0
+# first row is oa
+data$cat<-NULL
+data$replicate<-NULL
+
+bray2 = vegdist(data, "bray") 
+#hist(bray2)
+str(bray2)
+
+bray2<-as.matrix(bray2)
+bray2[lower.tri(bray2)] <- 0
+bray2[lower.tri(bray2,diag=TRUE)] <- NA
+
+bray2<-as_tibble(bray2)
+OAvPW<-slice(bray2,1)
+OAvPW<-as.vector(OAvPW)
+OAvPW<-as.numeric(OAvPW)
+PWvPW<-slice(bray2,2:1001)
+
+PWvPW<-c(PWvPW)
+PWvPW<-unlist(PWvPW)
+PWvPW<-as.vector(PWvPW)
+PWvPW<-as_tibble(PWvPW)
+PWvPW<-na.omit(PWvPW)
+summary(PWvPW)
+
+OAvPW<-na.omit(OAvPW)
+OAvW<-unlist(OAvPW)
+OAvPW<-as_tibble(OAvPW)
+summary(OAvPW)
+summary(PWvPW)
+
+names(OAvPW)<-c("bray")
+names(PWvPW)<-c("bray")
+hist(PWvPW$bray)
+hist(OAvPW$bray)
+OAvPW$cat<-"OA vs. PW"
+PWvPW$cat<-"PW vs. PW"
+data2<-bind_rows(OAvPW,PWvPW)
+data2.1<-data2
+data2.1$authors<-"Single Authors"
+data2.1$dataset<-"All Countries"
+
+test1<-t.test(bray,bray2)
 
 
 
 
+##################
+# BC 1st of CO ALL
+##################
+
+bootstrap_results_countries<-read_csv("./output/bootstrap_results_countries.csv")
+foo<-bootstrap_results_countries %>% 
+  filter(author=="author_first"& Dataset=="All Countries") %>% 
+  select(n,Code,replicate) %>% 
+  arrange(n) %>% 
+  spread(Code,n) 
+foo[is.na(foo)] = 0
+foo$cat<-"PW"
+foo$cat<-NULL
+foo$replicate<-NULL
+bray = vegdist(foo, "bray")
+str(bray)
+bray<-as.matrix(bray)
+bray[lower.tri(bray)] <- 0
+bray[lower.tri(bray,diag=TRUE)] <- NA
+bray<-as.vector(bray)
+bray<-as.vector(na.omit(bray))
+hist(bray)
+
+
+
+# sole_NOCHNUSA
+# coauthor_NOCHNUSA
+# sole_ALL
+# coauthor_ALL
+
+source("./Rscript/functions/DivRichCalc.R") 
+OA_data<-DivRichCalc(coauthor_ALL,'author_first','OA')
+OA_countries<-as.data.frame(OA_data[3])
+colnames(OA_countries)
+names(OA_countries)<-c("Code","n")
+OA_countries<-OA_countries %>%spread(Code,n)
+OA_countries[is.na(OA_countries)] = 0
+OA_countries$cat<-"OA"
+
+data<-bind_rows(OA_countries,foo)
+data[is.na(data)] = 0
+# first row is oa
+data$cat<-NULL
+data$replicate<-NULL
+
+bray2 = vegdist(data, "bray") 
+#hist(bray2)
+str(bray2)
+
+bray2<-as.matrix(bray2)
+bray2[lower.tri(bray2)] <- 0
+bray2[lower.tri(bray2,diag=TRUE)] <- NA
+
+
+bray2<-as_tibble(bray2)
+OAvPW<-slice(bray2,1)
+OAvPW<-as.vector(OAvPW)
+OAvPW<-as.numeric(OAvPW)
+PWvPW<-slice(bray2,2:1001)
+
+PWvPW<-c(PWvPW)
+PWvPW<-unlist(PWvPW)
+PWvPW<-as.vector(PWvPW)
+PWvPW<-as_tibble(PWvPW)
+PWvPW<-na.omit(PWvPW)
+summary(PWvPW)
+
+OAvPW<-na.omit(OAvPW)
+OAvW<-unlist(OAvPW)
+OAvPW<-as_tibble(OAvPW)
+summary(OAvPW)
+summary(PWvPW)
+
+names(OAvPW)<-c("bray")
+names(PWvPW)<-c("bray")
+hist(PWvPW$bray)
+hist(OAvPW$bray)
+OAvPW$cat<-"OA vs. PW"
+PWvPW$cat<-"PW vs. PW"
+data2<-bind_rows(OAvPW,PWvPW)
+data2.2<-data2
+data2.2$authors<-"First Authors"
+data2.2$dataset<-"All Countries"
+
+
+test2<-t.test(bray,bray2)
 
 
 
 
+##################
+# BC Solo no CHN USA
+##################
+
+bootstrap_results_countries<-read_csv("./output/bootstrap_results_countries.csv")
+foo<-bootstrap_results_countries %>% 
+  filter(author=="solo"& Dataset=="CHN & USA excluded") %>% 
+  select(n,Code,replicate) %>% 
+  arrange(n) %>% 
+  spread(Code,n) 
+foo[is.na(foo)] = 0
+foo$cat<-"PW"
+foo$cat<-NULL
+foo$replicate<-NULL
+bray = vegdist(foo, "bray")
+str(bray)
+bray<-as.matrix(bray)
+bray[lower.tri(bray)] <- 0
+bray[lower.tri(bray,diag=TRUE)] <- NA
+bray<-as.vector(bray)
+bray<-as.vector(na.omit(bray))
+hist(bray)
+
+
+
+# sole_NOCHNUSA
+# coauthor_NOCHNUSA
+# sole_ALL
+# coauthor_ALL
+
+source("./Rscript/functions/DivRichCalc.R") 
+OA_data<-DivRichCalc(sole_NOCHNUSA,'author_first','OA')
+OA_countries<-as.data.frame(OA_data[3])
+colnames(OA_countries)
+names(OA_countries)<-c("Code","n")
+OA_countries<-OA_countries %>%spread(Code,n)
+OA_countries[is.na(OA_countries)] = 0
+OA_countries$cat<-"OA"
+
+data<-bind_rows(OA_countries,foo)
+data[is.na(data)] = 0
+# first row is oa
+data$cat<-NULL
+data$replicate<-NULL
+
+bray2 = vegdist(data, "bray") 
+#hist(bray2)
+str(bray2)
+
+bray2<-as.matrix(bray2)
+bray2[lower.tri(bray2)] <- 0
+bray2[lower.tri(bray2,diag=TRUE)] <- NA
+
+
+bray2<-as_tibble(bray2)
+OAvPW<-slice(bray2,1)
+OAvPW<-as.vector(OAvPW)
+OAvPW<-as.numeric(OAvPW)
+PWvPW<-slice(bray2,2:1001)
+
+PWvPW<-c(PWvPW)
+PWvPW<-unlist(PWvPW)
+PWvPW<-as.vector(PWvPW)
+PWvPW<-as_tibble(PWvPW)
+PWvPW<-na.omit(PWvPW)
+summary(PWvPW)
+
+OAvPW<-na.omit(OAvPW)
+OAvW<-unlist(OAvPW)
+OAvPW<-as_tibble(OAvPW)
+summary(OAvPW)
+summary(PWvPW)
+
+names(OAvPW)<-c("bray")
+names(PWvPW)<-c("bray")
+hist(PWvPW$bray)
+hist(OAvPW$bray)
+OAvPW$cat<-"OA vs. PW"
+PWvPW$cat<-"PW vs. PW"
+data2<-bind_rows(OAvPW,PWvPW)
+data2.3<-data2
+data2.3$authors<-"Single Authors"
+data2.3$dataset<-"China and USA Excluded"
+
+
+
+test3<-t.test(bray,bray2)
+
+
+
+##################
+# BC first of co no CHN USA
+##################
+
+bootstrap_results_countries<-read_csv("./output/bootstrap_results_countries.csv")
+foo<-bootstrap_results_countries %>% 
+  filter(author=="author_first"& Dataset=="CHN & USA excluded") %>% 
+  select(n,Code,replicate) %>% 
+  arrange(n) %>% 
+  spread(Code,n) 
+foo[is.na(foo)] = 0
+foo$cat<-"PW"
+foo$cat<-NULL
+foo$replicate<-NULL
+bray = vegdist(foo, "bray")
+str(bray)
+bray<-as.matrix(bray)
+bray[lower.tri(bray)] <- 0
+bray[lower.tri(bray,diag=TRUE)] <- NA
+bray<-as.vector(bray)
+bray<-as.vector(na.omit(bray))
+hist(bray)
+
+
+
+# sole_NOCHNUSA
+# coauthor_NOCHNUSA
+# sole_ALL
+# coauthor_ALL
+
+source("./Rscript/functions/DivRichCalc.R") 
+OA_data<-DivRichCalc(coauthor_NOCHNUSA,'author_first','OA')
+OA_countries<-as.data.frame(OA_data[3])
+colnames(OA_countries)
+names(OA_countries)<-c("Code","n")
+OA_countries<-OA_countries %>%spread(Code,n)
+OA_countries[is.na(OA_countries)] = 0
+OA_countries$cat<-"OA"
+
+data<-bind_rows(OA_countries,foo)
+data[is.na(data)] = 0
+# first row is oa
+data$cat<-NULL
+data$replicate<-NULL
+
+bray2 = vegdist(data, "bray") 
+#hist(bray2)
+str(bray2)
+
+bray2<-as.matrix(bray2)
+bray2[lower.tri(bray2)] <- 0
+bray2[lower.tri(bray2,diag=TRUE)] <- NA
+
+
+bray2<-as_tibble(bray2)
+OAvPW<-slice(bray2,1)
+OAvPW<-as.vector(OAvPW)
+OAvPW<-as.numeric(OAvPW)
+PWvPW<-slice(bray2,2:1001)
+
+PWvPW<-c(PWvPW)
+PWvPW<-unlist(PWvPW)
+PWvPW<-as.vector(PWvPW)
+PWvPW<-as_tibble(PWvPW)
+PWvPW<-na.omit(PWvPW)
+summary(PWvPW)
+
+OAvPW<-na.omit(OAvPW)
+OAvW<-unlist(OAvPW)
+OAvPW<-as_tibble(OAvPW)
+summary(OAvPW)
+summary(PWvPW)
+
+names(OAvPW)<-c("bray")
+names(PWvPW)<-c("bray")
+hist(PWvPW$bray)
+hist(OAvPW$bray)
+OAvPW$cat<-"OA vs. PW"
+PWvPW$cat<-"PW vs. PW"
+data2<-bind_rows(OAvPW,PWvPW)
+
+data2.4<-data2
+data2.4$authors<-"First Authors"
+data2.4$dataset<-"China and USA Excluded"
+
+
+test4<-t.test(bray,bray2)
+data<-bind_rows(data2.1,data2.2,data2.3,data2.4)
+
+write_csv(data,"./output/BC_data.csv")
+
+
+library(broom)
+library(purrr)
+
+
+data$authors <- ordered(data$authors,levels = c("Single Authors","First Authors"))
+
+tab <- map_df(list(test1, test2, test3,test4), tidy)
+# tab<-tab[c("estimate", "statistic", "p.value", "conf.low", "conf.high")]
+tab<-tab[c("statistic", "p.value", "conf.low", "conf.high")]
+tab<-tab %>% dplyr::rename("t"="statistic", "p value"="p.value", "95% CI (low)"="conf.low", "95% CI (high)"="conf.high")
+
+
+
+tab1<-data %>% group_by(dataset,authors,cat) %>% 
+  summarize(mean_BC=mean(bray)) %>% 
+  spread(cat,mean_BC) %>% 
+  select(authors,dataset,'OA vs. PW','PW vs. PW') 
+tab1<-dplyr::rename(tab1,'mean OA vs. PW'='OA vs. PW','mean PW vs. PW'='PW vs. PW')
+
+tab2<-data %>% group_by(dataset,authors,cat) %>% 
+  summarize(sd_BC=sd(bray)) %>% 
+  spread(cat,sd_BC) %>% 
+  select(authors,dataset,'OA vs. PW','PW vs. PW')
+tab2<-dplyr::rename(tab2,'SD OA vs. PW'='OA vs. PW','SD PW vs. PW'='PW vs. PW')
+
+
+tab1<-left_join(tab1,tab2)
+
+
+tab1<-bind_cols(tab1,tab)
 
 
 
 
-
-
-
-
-
-
-
-
+count<-data %>% group_by(dataset,authors,cat) %>% 
+  summarize(n=n()) 
+  
 
 
 
@@ -967,12 +1657,9 @@ write.csv(Table1v2, "./tables_figs/Table1v2_July.csv", row.names = FALSE)
 # FIGURE 1: For each journal category, the % of articles by 
 # 1st authors from different national income classes
 ############################################################################
-source("./Rscript/functions_figures/Fig1.R") 
-Fig1a<-Fig1(AllData,"author_first")
-Fig1a
-png(file="./tables_figs/plot1a_FirstAuthor_July.png",width=1000, height=700)
-Fig1a
-dev.off()
+source("./Rscript/functions_figures/AppFig3.R") 
+AppFig3<-AppFig3(AllData,"author_first")
+AppFig3
 
 ################
 # Fig 1 with sampled distributions of PW 
@@ -1035,7 +1722,7 @@ Appendix1Fig
 png(file="./tables_figs/Appendix1Fig.png",width=1000, height=700)
 Appendix1Fig
 dev.off()
-
+  
 # SOLO AUTHORED, PW
 source("./Rscript/functions_figures/Fig3.R") 
 Fig3bSoloPW<-Fig3(sole_author_pubs_ALL_first_author,"author_first","PW")

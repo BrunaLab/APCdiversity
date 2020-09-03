@@ -107,14 +107,14 @@ library(countrycode)
       # # title_text=paste("Fig. 3a: Country in which the first",
       # "author of open access articles is based.",sep=" ")
       label_x="First author country"
-      facet_label="A"
+      facet_label="(A) OA"
       legend_on=c(.9, .30)
       # legend_on="none"
     } else if (((vars[3]=="PW")==TRUE) & ((vars[2]=="author_first"))==TRUE){
       # title_text=paste("Fig. 3b: Country in which the first",
       #                  "author of paywalled articles is based.",sep=" ")
       label_x="First author country"
-      facet_label="B"
+      facet_label="(B) PW"
       legend_on="none"
       
     } else if (((vars[3]=="OA")==TRUE) & ((vars[2]=="author_last")==TRUE)) {
@@ -141,7 +141,7 @@ library(countrycode)
       # scale_fill_manual(drop=FALSE) + #This keeps all the factors
       # in the legend eveniof it doesn't have any of one of the levels in the plot
       geom_text(aes(label = n),hjust=-.2,size=2)+
-      annotate("text", x=28, y=49,label=facet_label) + 
+      annotate("text", x=28, y=45,label=facet_label) + 
       # ylim(0,50)+
       scale_y_continuous(limits = c(0, 50),breaks = seq(0,50, by=5),expand=c(0,0.1))+
       # geom_text(size = 3, position = position_stack(vjust = 0.5))+

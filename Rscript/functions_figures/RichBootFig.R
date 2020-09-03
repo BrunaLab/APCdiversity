@@ -52,6 +52,11 @@ RichBootFig<-function(bootstrap_results) {
   figure_values$Dataset<-gsub("CHN & USA excluded", "Without China & USA",figure_values$Dataset)
   
   
+  bootstrap_results$author <- factor(bootstrap_results$author,
+                                  levels = c("solo","author_first"))
+  figure_values$author <- factor(figure_values$author,
+                                     levels = c("solo","author_first"))
+  
   pRich<-
     ggplot(bootstrap_results, aes(x=Richness,fill=JrnlType)) +
     geom_histogram(bins=40, color="black",fill="darkgray",
@@ -152,5 +157,103 @@ RichBootFig<-function(bootstrap_results) {
   facet_labels<-c("A","B","C","D")
   pRich<-tag_facet(pRich, open="", close="", tag_pool=facet_labels,vjust=-1)
   pRich
-  return(pRich)
+  
+  
+  
+  figure_values<-ungroup(figure_values)
+  P_Hat<-figure_values
+  P_Hat$P_Hat<-NA
+  P_Hat$JrnlType<-NULL
+  ##########
+  # All countries, coauthored
+  crit<-figure_values %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="author_first") %>% 
+    select(OA_Rich)
+  
+  perc<-bootstrap_results %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="author_first") %>% 
+    ungroup() %>% 
+    tally(Richness<crit$OA_Rich) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  P_Hat$P_Hat[P_Hat$author=="author_first" & 
+                P_Hat$Dataset=="All Countries"]<-perc_belowOA
+  ###########
+  
+  
+  ##########
+  # without USA CHN, coauthored
+  crit<-figure_values %>% 
+    filter(Dataset=="Without China & USA") %>% 
+    filter(author=="author_first") %>% 
+    select(OA_Rich)
+  
+  perc<-bootstrap_results %>% 
+    filter(Dataset=="Without China & USA") %>% 
+    filter(author=="author_first") %>% 
+    ungroup() %>% 
+    tally(Richness<crit$OA_Rich) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  P_Hat$P_Hat[P_Hat$author=="author_first" & 
+                P_Hat$Dataset=="Without China & USA"]<-perc_belowOA
+  ###########
+  
+  ##########
+  # All countries, coauthored
+  crit<-figure_values %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="solo") %>% 
+    select(OA_Rich)
+  
+  perc<-bootstrap_results %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="solo") %>% 
+    ungroup() %>% 
+    tally(Richness<crit$OA_Rich) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  P_Hat$P_Hat[P_Hat$author=="solo" & 
+                P_Hat$Dataset=="All Countries"]<-perc_belowOA
+  ###########
+  
+  
+  ##########
+  # without USA CHN, coauthored
+  crit<-figure_values %>% 
+    filter(Dataset=="Without China & USA") %>% 
+    filter(author=="solo") %>% 
+    select(OA_Rich)
+  
+  perc<-bootstrap_results %>% 
+    filter(Dataset=="Without China & USA") %>% 
+    filter(author=="solo") %>% 
+    ungroup() %>% 
+    tally(Richness<crit$OA_Rich) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  P_Hat$P_Hat[P_Hat$author=="solo" & 
+                P_Hat$Dataset=="Without China & USA"]<-perc_belowOA
+  
+  
+  P_Hat<-P_Hat %>% arrange(Dataset,desc(author))
+  ###########
+  
+  
+  
+  
+  
+  
+  
+  return(list(pRich,P_Hat))
 }

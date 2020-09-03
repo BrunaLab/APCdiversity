@@ -124,11 +124,16 @@ countries<-vars[3]
   }
 
   
+  Subsampled_Income_summary_plot$author <- factor(Subsampled_Income_summary_plot$author,
+                                     levels = c("solo","author_first"))
+  
+  label_data$author <- factor(label_data$author,levels = c("solo","author_first"))
+  
   IncomePlot<-ggplot(Subsampled_Income_summary_plot,aes(x=perc,fill=IncomeGroup)) +
     geom_histogram(bins=100,color="black", size=0.5, position = 'identity') +
     # scale_fill_brewer(palette = "Blues")+
-    ylab("Frequency (No. of Bootstrap Runs)") + 
-    xlab("Percentage of authors in each group")+
+    ylab("Frequency") + 
+    xlab("Percentage of authors in each World Bank Lending Group")+
     # ylim(0,1000)+
     scale_y_continuous(limits = c(0, 800),breaks = seq(0,800, by=200),expand=c(0,0.1))+
     scale_x_continuous(limits = c(0, 90),breaks = seq(0,80, by=20),expand=c(0,0.1))+
@@ -180,6 +185,231 @@ countries<-vars[3]
   facet_labels<-c("A","B","C","D","E","F","G","H")
   IncomePlot<-tag_facet(IncomePlot,open="", close="", tag_pool=facet_labels,vjust=0.5,hjust=-1,size=10)
   IncomePlot   
-  return(IncomePlot)
+ 
+  # P_HAT
+  
+  # single, all
+  label_data<-ungroup(label_data)
+  P_Hat<-label_data
+  P_Hat$P_Hat<-NA
+  P_Hat$color<-NULL
+  ##########
+  # All countries, coauthored, High
+  crit<-label_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="author_first") %>% 
+    filter(IncomeGroup=="High\nIncome") %>% 
+    select(perc)
+  
+  perc<-Subsampled_Income_summary_plot %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="author_first") %>% 
+    filter(IncomeGroup=="High\nIncome") %>% 
+    ungroup() %>% 
+    tally(perc<crit$perc) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  P_Hat$P_Hat[P_Hat$IncomeGroup=="High\nIncome" &
+                P_Hat$author=="author_first" & 
+                P_Hat$Dataset=="All Countries"]<-perc_belowOA
+  ###########
+  
+  ##########
+  # All countries, coauthored, Lower-middle\nIncome
+  crit<-label_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="author_first") %>% 
+    filter(IncomeGroup=="Lower-middle\nIncome") %>% 
+    select(perc)
+  
+  perc<-Subsampled_Income_summary_plot %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="author_first") %>% 
+    filter(IncomeGroup=="Lower-middle\nIncome") %>% 
+    ungroup() %>% 
+    tally(perc<crit$perc) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  
+  P_Hat$P_Hat[P_Hat$IncomeGroup=="Lower-middle\nIncome" &
+                P_Hat$author=="author_first" & 
+                P_Hat$Dataset=="All Countries"]<-perc_belowOA
+  
+  ###########
+  
+  ##########
+  
+  # All countries, coauthored, Upper-middle\nIncome
+  crit<-label_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="author_first") %>% 
+    filter(IncomeGroup=="Upper-middle\nIncome") %>% 
+    select(perc)
+  
+  perc<-Subsampled_Income_summary_plot %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="author_first") %>% 
+    filter(IncomeGroup=="Upper-middle\nIncome") %>% 
+    ungroup() %>% 
+    tally(perc<crit$perc) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  
+  P_Hat$P_Hat[P_Hat$IncomeGroup=="Upper-middle\nIncome" &
+                P_Hat$author=="author_first" & 
+                P_Hat$Dataset=="All Countries"]<-perc_belowOA
+  ###########
+  
+  
+  ##########
+  # All countries, coauthored, Low\nIncome
+  crit<-label_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="author_first") %>% 
+    filter(IncomeGroup=="Low\nIncome") %>% 
+    select(perc)
+  
+  perc<-Subsampled_Income_summary_plot %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="author_first") %>% 
+    filter(IncomeGroup=="Low\nIncome") %>% 
+    ungroup() %>% 
+    tally(perc<crit$perc) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  
+  
+  P_Hat$P_Hat[P_Hat$IncomeGroup=="Low\nIncome" &
+                P_Hat$author=="author_first" & 
+                P_Hat$Dataset=="All Countries"]<-perc_belowOA
+  ###########
+  
+  ##########
+  # All countries, coauthored, High
+  crit<-label_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="solo") %>% 
+    filter(IncomeGroup=="High\nIncome") %>% 
+    select(perc)
+  
+  perc<-Subsampled_Income_summary_plot %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="solo") %>% 
+    filter(IncomeGroup=="High\nIncome") %>% 
+    ungroup() %>% 
+    tally(perc<crit$perc) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  P_Hat$P_Hat[P_Hat$IncomeGroup=="High\nIncome" &
+                P_Hat$author=="solo" & 
+                P_Hat$Dataset=="All Countries"]<-perc_belowOA
+  ###########
+  
+  ##########
+  # All countries, coauthored, Lower-middle\nIncome
+  crit<-label_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="solo") %>% 
+    filter(IncomeGroup=="Lower-middle\nIncome") %>% 
+    select(perc)
+  
+  perc<-Subsampled_Income_summary_plot %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="solo") %>% 
+    filter(IncomeGroup=="Lower-middle\nIncome") %>% 
+    ungroup() %>% 
+    tally(perc<crit$perc) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  
+  P_Hat$P_Hat[P_Hat$IncomeGroup=="Lower-middle\nIncome" &
+                P_Hat$author=="solo" & 
+                P_Hat$Dataset=="All Countries"]<-perc_belowOA
+  
+  ###########
+  
+  ##########
+  
+  # All countries, coauthored, Upper-middle\nIncome
+  crit<-label_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="solo") %>% 
+    filter(IncomeGroup=="Upper-middle\nIncome") %>% 
+    select(perc)
+  
+  perc<-Subsampled_Income_summary_plot %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="solo") %>% 
+    filter(IncomeGroup=="Upper-middle\nIncome") %>% 
+    ungroup() %>% 
+    tally(perc<crit$perc) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  
+  P_Hat$P_Hat[P_Hat$IncomeGroup=="Upper-middle\nIncome" &
+                P_Hat$author=="solo" & 
+                P_Hat$Dataset=="All Countries"]<-perc_belowOA
+  ###########
+  
+  
+  ##########
+  # All countries, coauthored, Low\nIncome
+  crit<-label_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="solo") %>% 
+    filter(IncomeGroup=="Low\nIncome") %>% 
+    select(perc)
+  
+  perc<-Subsampled_Income_summary_plot %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="solo") %>% 
+    filter(IncomeGroup=="Low\nIncome") %>% 
+    ungroup() %>% 
+    tally(perc<crit$perc) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  
+  
+  P_Hat$P_Hat[P_Hat$IncomeGroup=="Low\nIncome" &
+                P_Hat$author=="solo" & 
+                P_Hat$Dataset=="All Countries"]<-perc_belowOA
+  ###########
+  P_Hat
+  
+  levels(P_Hat$IncomeGroup)[levels(P_Hat$IncomeGroup)=="Low\nIncome"] <-"Low" 
+  levels(P_Hat$IncomeGroup)[levels(P_Hat$IncomeGroup)=="Lower-middle\nIncome"] <- "Lower middle"
+  levels(P_Hat$IncomeGroup)[levels(P_Hat$IncomeGroup)=="Upper-middle\nIncome"] <- "Upper middle"
+  levels(P_Hat$IncomeGroup)[levels(P_Hat$IncomeGroup)=="High\nIncome"] <-"High" 
+  
+  
+  P_Hat <- P_Hat %>% dplyr::rename("OA_perc"="perc", 
+                                   "Author"="author",
+                                   "Countries"="Dataset"
+  ) %>% 
+    select(-n) 
+  
+  
+  P_Hat$Author<-gsub("author_first","First",P_Hat$Author)
+  P_Hat$Author<-gsub("solo","Single",P_Hat$Author)
+  
+  
+  
+   return(list(IncomePlot,P_Hat))
   
 }

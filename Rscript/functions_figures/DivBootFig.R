@@ -53,6 +53,13 @@ DivBootFig<-function(bootstrap_results) {
   bootstrap_results$Dataset<-gsub("CHN & USA excluded", "Without China & USA",bootstrap_results$Dataset)
   figure_values$Dataset<-gsub("CHN & USA excluded", "Without China & USA",figure_values$Dataset)
   
+  
+  bootstrap_results$author <- factor(bootstrap_results$author,
+                                     levels = c("solo","author_first"))
+  figure_values$author <- factor(figure_values$author,
+                                 levels = c("solo","author_first"))
+  
+  
   pDiv<-
     ggplot(bootstrap_results, aes(x=InvSimp,fill=JrnlType)) +
     geom_histogram(bins=40, color="black",fill="darkgray",
@@ -66,8 +73,10 @@ DivBootFig<-function(bootstrap_results) {
     scale_x_continuous(breaks = seq(0,70, by=10),expand=c(0.1,0.02))+
     scale_y_continuous(limits = c(0, 375),breaks = seq(0,350, by=50),expand=c(0,0.1))+
     # scale_y_continuous(expand = c(0,0))+
-    xlab("Geographic Diversity (Simpson's Index)")+
-    ylab("Frequency")+
+    xlab("Geographic Diversity, D (Reciprocal of Simpson's Index)")+
+    
+    labs(x = "Geographic Diversity", y = "Frequency") +
+    
   
     coord_cartesian(clip="off")+
     # ylim(0,170)+
@@ -153,5 +162,103 @@ DivBootFig<-function(bootstrap_results) {
   pDiv<-tag_facet(pDiv,open="", close="", tag_pool=facet_labels,vjust=-1)
   pDiv
   
-  return(pDiv)
+  
+  
+  
+  
+  
+  ##################################################################################
+  # DIVERISTY
+  ############################################################################
+  figure_values<-ungroup(figure_values)
+  P_Hat<-figure_values
+  P_Hat$P_Hat<-NA
+  P_Hat$JrnlType<-NULL
+  ##########
+  # All countries, coauthored
+  crit<-figure_values %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="author_first") %>% 
+    select(OA_Div)
+  
+  perc<-bootstrap_results %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="author_first") %>% 
+    ungroup() %>% 
+    tally(InvSimp<crit$OA_Div) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  P_Hat$P_Hat[P_Hat$author=="author_first" & 
+                P_Hat$Dataset=="All Countries"]<-perc_belowOA
+  ###########
+  
+  
+  ##########
+  # without USA CHN, coauthored
+  crit<-figure_values %>% 
+    filter(Dataset=="Without China & USA") %>% 
+    filter(author=="author_first") %>% 
+    select(OA_Div)
+  
+  perc<-bootstrap_results %>% 
+    filter(Dataset=="Without China & USA") %>% 
+    filter(author=="author_first") %>% 
+    ungroup() %>% 
+    tally(InvSimp<crit$OA_Div) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  P_Hat$P_Hat[P_Hat$author=="author_first" & 
+                P_Hat$Dataset=="Without China & USA"]<-perc_belowOA
+  ###########
+  
+  ##########
+  # All countries, coauthored
+  crit<-figure_values %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="solo") %>% 
+    select(OA_Div)
+  
+  perc<-bootstrap_results %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="solo") %>% 
+    ungroup() %>% 
+    tally(InvSimp<crit$OA_Div) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  P_Hat$P_Hat[P_Hat$author=="solo" & 
+                P_Hat$Dataset=="All Countries"]<-perc_belowOA
+  ###########
+  
+  
+  ##########
+  # without USA CHN, coauthored
+  crit<-figure_values %>% 
+    filter(Dataset=="Without China & USA") %>% 
+    filter(author=="solo") %>% 
+    select(OA_Div)
+  
+  perc<-bootstrap_results %>% 
+    filter(Dataset=="Without China & USA") %>% 
+    filter(author=="solo") %>% 
+    ungroup() %>% 
+    tally(InvSimp<crit$OA_Div) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  P_Hat$P_Hat[P_Hat$author=="solo" & 
+                P_Hat$Dataset=="Without China & USA"]<-perc_belowOA
+  
+  P_Hat<-P_Hat %>% arrange(Dataset,desc(author))
+  
+  #########
+  
+  
+  return(list(pDiv,P_Hat))
 }

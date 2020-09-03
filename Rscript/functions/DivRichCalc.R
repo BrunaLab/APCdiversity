@@ -7,7 +7,7 @@ DivRichCalc<-function(DataSet,AuPosition,JrnlType) {
   
   # AuPosition<-"author_first"
   # JrnlType<-"OA"
-  # DataSet<-coauthor_ALL
+  # DataSet<-sole_ALL
   
   vars<-list(DataSet,AuPosition,JrnlType)
   

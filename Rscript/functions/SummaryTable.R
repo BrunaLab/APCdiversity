@@ -28,7 +28,7 @@ MirrorPairs<-read.csv("./data_clean/MirrorPairs.csv")
   APC<-MirrorPairs %>% select(APC,pair_key)
 Table1<-left_join(Table1,APC,by="pair_key") %>% 
     filter(APC!="NA")
-  
+OA_journals<-Table1$OA
   Table1.1 <- DataSet %>% #number of papers per journal
     select(JrnlType,pair_key,DOI) %>% 
     group_by(JrnlType,pair_key) %>% 

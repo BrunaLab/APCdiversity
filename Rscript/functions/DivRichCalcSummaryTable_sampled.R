@@ -4,8 +4,11 @@ DivRichCalcSummaryTable_sampled<-function(Dataset,
                                           SubsampledPW.results_First_NOUSACHN){
   
   # browser()
-  # Dataset<-coauthor_pubs
-  # Dataset2<-coauthor_pubsNOCHNUSA
+  # Dataset<-coauthor_pubs_ALL_first_author
+  # Dataset2<-coauthor_pubsNOCHNUSA_first_author
+  # SubsampledPW.results_First<-SubsampledPW.results_First_Co_All
+  # SubsampledPW.results_First_NOUSACHN<- SubsampledPW.results_First_Co_NOUSACHN
+  
   vars<-list(Dataset,
              Dataset2,
              SubsampledPW.results_First,

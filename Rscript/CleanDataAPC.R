@@ -35,6 +35,7 @@ MirrorPairs<-read_csv(file="./data_raw/MirrorPairs.csv")
 # Load the list of Waiver Countries
 ################################################################
 WaiverCountries<-read_csv(file="./data_raw/ElsevierWaivers.csv")
+
 # add to the waiver
 WaiverCountries$Code<-countrycode(WaiverCountries$Country,
                                   "country.name",
@@ -47,6 +48,9 @@ WaiverCountries<-left_join(WaiverCountries, CountryData,by="Code")
 # used by the European Commission and others until Kosovo is assigned an ISO code.
 
 WaiverCountries$Code[WaiverCountries$Country=="Kosovo"]<-"XKX"
+WaiverCountries$Region[WaiverCountries$Country=="Kosovo"]<-"Europe & Central Asia"
+WaiverCountries$IncomeGroup[WaiverCountries$Country=="Kosovo"]<-"Upper middle income"
+
 WaiverCountries<- WaiverCountries %>% select(-notes)
 WaiverCountries$Country<-gsub("Micronesia (Federated States of)","Federated States of Micronesia",WaiverCountries$Country)
 WaiverCountries$Country<-gsub("Myanmar (Burma)","Myanmar",WaiverCountries$Country)
@@ -58,6 +62,19 @@ WaiverCountries$WaiverGroup<-gsub("Group_B_LowCostAccess","GroupB",WaiverCountri
 write.csv(WaiverCountries,"./data_clean/WaiverCountries.csv", row.names = FALSE)
 # remove from the environment
 
+# Now which ones aren't covered by waivers'
+
+NON_wavierCountries<-anti_join(CountryData,WaiverCountries,by="Code") %>%
+   arrange(IncomeGroup,Region)
+
+NON_wavierCountries$Country<-countrycode(NON_wavierCountries$Code,
+                                  "iso3c", "country.name",warn = TRUE)
+
+NON_wavierCountries$Country[NON_wavierCountries$Country=="Channel Islands"]<-"CHI"
+NON_wavierCountries$Region[NON_wavierCountries$Code=="CHI"]<-"Europe & Central Asia"
+NON_wavierCountries$IncomeGroup[NON_wavierCountries$Code=="CHI"]<-"High income"
+
+write.csv(NON_wavierCountries,"./data_clean/NON_WavierCountries.csv", row.names = FALSE)
 ################################################################
 # Load the data on stipends
 ################################################################

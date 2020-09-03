@@ -155,10 +155,15 @@ Region<-recode_factor(Region,"South Asia"="South\nAsia",
 
 label_data$Region<-Region 
 
+fig_data$author <- factor(fig_data$author,levels = c("solo","author_first"))
+
+label_data$author <- factor(label_data$author,levels = c("solo","author_first"))
+
+
   RegionPlot<-ggplot(fig_data,aes(x=perc,fill=Region)) +
     geom_histogram(bins=100,color="black", size=0.5, position = 'identity') +
     scale_fill_brewer(palette = "PRGn")+
-    ylab("Global Region") + 
+    ylab("Frequency") + 
     xlab("Percentage of authors in each region")+
     scale_y_continuous(limits = c(0, 850),breaks = seq(0,800, by=200),expand=c(0,0.1))+
     scale_x_continuous(limits = c(0, 60),breaks = seq(0,60, by=15),expand=c(0,01))+
@@ -208,6 +213,404 @@ label_data$Region<-Region
   facet_labels<-c("A","B","C","D","E","F","G","H","I","J","K","L","M","N")
   RegionPlot<-tag_facet(RegionPlot,open="", close="", tag_pool=facet_labels,vjust=0.5,hjust=-1,size=10)
   RegionPlot   
-  return(RegionPlot)
   
+  
+  #######################################################
+  #######################################################
+  #######################################################
+  # REGION P_hat
+  #######################################################
+  #######################################################
+  label_data<-ungroup(label_data)
+  P_Hat<-label_data
+  P_Hat$P_Hat<-NA
+  
+  ##########
+  # All countries, coauthored, South Asia
+  crit<-label_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="author_first") %>% 
+    filter(Region=="South\nAsia") %>% 
+    select(perc)
+  
+  perc<-fig_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="author_first") %>% 
+    filter(Region=="South\nAsia") %>% 
+    ungroup() %>% 
+    tally(perc<crit$perc) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  
+  
+  P_Hat$P_Hat[P_Hat$Region=="South\nAsia" &
+                P_Hat$author=="author_first" & 
+                P_Hat$Dataset=="All Countries"]<-perc_belowOA
+  ###########
+  
+  ##########
+  # All countries, coauthored, N AM
+  crit<-label_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="author_first") %>% 
+    filter(Region=="North\nAmerica") %>% 
+    select(perc)
+  
+  perc<-fig_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="author_first") %>% 
+    filter(Region=="North\nAmerica") %>% 
+    ungroup() %>% 
+    tally(perc<crit$perc) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  
+  
+  P_Hat$P_Hat[P_Hat$Region=="North\nAmerica" &
+                P_Hat$author=="author_first" & 
+                P_Hat$Dataset=="All Countries"]<-perc_belowOA
+  ###########
+  
+  ##########
+  # All countries, coauthored, SS Africa
+  crit<-label_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="author_first") %>% 
+    filter(Region=="Sub-Saharan\nAfrica") %>% 
+    select(perc)
+  
+  perc<-fig_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="author_first") %>% 
+    filter(Region=="Sub-Saharan\nAfrica") %>% 
+    ungroup() %>% 
+    tally(perc<crit$perc) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  
+  
+  P_Hat$P_Hat[P_Hat$Region=="Sub-Saharan\nAfrica" &
+                P_Hat$author=="author_first" & 
+                P_Hat$Dataset=="All Countries"]<-perc_belowOA
+  ###########
+  
+  ##########
+  # All countries, coauthored, LatAM Carib
+  crit<-label_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="author_first") %>% 
+    filter(Region=="Latin America &\nCaribbean") %>% 
+    select(perc)
+  
+  perc<-fig_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="author_first") %>% 
+    filter(Region=="Latin America &\nCaribbean") %>% 
+    ungroup() %>% 
+    tally(perc<crit$perc) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  
+  
+  P_Hat$P_Hat[P_Hat$Region=="Latin America &\nCaribbean" &
+                P_Hat$author=="author_first" & 
+                P_Hat$Dataset=="All Countries"]<-perc_belowOA
+  ###########
+  
+  ##########
+  # All countries, coauthored, ME North Af
+  crit<-label_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="author_first") %>% 
+    filter(Region=="Middle East &\nNorth Africa") %>% 
+    select(perc)
+  
+  perc<-fig_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="author_first") %>% 
+    filter(Region=="Middle East &\nNorth Africa") %>% 
+    ungroup() %>% 
+    tally(perc<crit$perc) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  
+  
+  P_Hat$P_Hat[P_Hat$Region=="Middle East &\nNorth Africa" &
+                P_Hat$author=="author_first" & 
+                P_Hat$Dataset=="All Countries"]<-perc_belowOA
+  ###########
+  
+  ##########
+  # All countries, coauthored, East Asia Pac
+  crit<-label_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="author_first") %>% 
+    filter(Region=="East Asia &\nPacific") %>% 
+    select(perc)
+  
+  perc<-fig_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="author_first") %>% 
+    filter(Region=="East Asia &\nPacific") %>% 
+    ungroup() %>% 
+    tally(perc<crit$perc) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  
+  
+  P_Hat$P_Hat[P_Hat$Region=="East Asia &\nPacific" &
+                P_Hat$author=="author_first" & 
+                P_Hat$Dataset=="All Countries"]<-perc_belowOA
+  ###########
+  
+  ##########
+  # All countries, coauthored, Europe Cent Asia
+  crit<-label_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="author_first") %>% 
+    filter(Region=="Europe &\nCentral Asia") %>% 
+    select(perc)
+  
+  perc<-fig_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="author_first") %>% 
+    filter(Region=="Europe &\nCentral Asia") %>% 
+    ungroup() %>% 
+    tally(perc<crit$perc) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  
+  
+  P_Hat$P_Hat[P_Hat$Region=="Europe &\nCentral Asia" &
+                P_Hat$author=="author_first" & 
+                P_Hat$Dataset=="All Countries"]<-perc_belowOA
+  ###########
+  
+  
+  ###########
+  ###########
+  ###########
+  # Solo
+  ###########
+  ###########
+  ###########
+  
+  ###########
+  # All countries, solo, South Asia
+  crit<-label_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="solo") %>% 
+    filter(Region=="South\nAsia") %>% 
+    select(perc)
+  
+  perc<-fig_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="solo") %>% 
+    filter(Region=="South\nAsia") %>% 
+    ungroup() %>% 
+    tally(perc<crit$perc) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  
+  
+  P_Hat$P_Hat[P_Hat$Region=="South\nAsia" &
+                P_Hat$author=="solo" & 
+                P_Hat$Dataset=="All Countries"]<-perc_belowOA
+  ###########
+  
+  ##########
+  # All countries, solo, na am
+  crit<-label_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="solo") %>% 
+    filter(Region=="North\nAmerica") %>% 
+    select(perc)
+  
+  perc<-fig_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="solo") %>% 
+    filter(Region=="North\nAmerica") %>% 
+    ungroup() %>% 
+    tally(perc<crit$perc) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  
+  
+  P_Hat$P_Hat[P_Hat$Region=="North\nAmerica" &
+                P_Hat$author=="solo" & 
+                P_Hat$Dataset=="All Countries"]<-perc_belowOA
+  ###########
+  
+  ##########
+  # All countries, solo, SS Africa
+  crit<-label_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="solo") %>% 
+    filter(Region=="Sub-Saharan\nAfrica") %>% 
+    select(perc)
+  
+  perc<-fig_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="solo") %>% 
+    filter(Region=="Sub-Saharan\nAfrica") %>% 
+    ungroup() %>% 
+    tally(perc<crit$perc) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  
+  
+  P_Hat$P_Hat[P_Hat$Region=="Sub-Saharan\nAfrica" &
+                P_Hat$author=="solo" & 
+                P_Hat$Dataset=="All Countries"]<-perc_belowOA
+  ###########
+  
+  ##########
+  # All countries, Solo, LatAm Carrib
+  crit<-label_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="solo") %>% 
+    filter(Region=="Latin America &\nCaribbean") %>% 
+    select(perc)
+  
+  perc<-fig_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="solo") %>% 
+    filter(Region=="Latin America &\nCaribbean") %>% 
+    ungroup() %>% 
+    tally(perc<crit$perc) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  
+  
+  P_Hat$P_Hat[P_Hat$Region=="Latin America &\nCaribbean" &
+                P_Hat$author=="solo" & 
+                P_Hat$Dataset=="All Countries"]<-perc_belowOA
+  ###########
+  
+  ##########
+  # All countries, solo, mid east n afr
+  crit<-label_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="solo") %>% 
+    filter(Region=="Middle East &\nNorth Africa") %>% 
+    select(perc)
+  
+  perc<-fig_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="solo") %>% 
+    filter(Region=="Middle East &\nNorth Africa") %>% 
+    ungroup() %>% 
+    tally(perc<crit$perc) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  
+  
+  P_Hat$P_Hat[P_Hat$Region=="Middle East &\nNorth Africa" &
+                P_Hat$author=="solo" & 
+                P_Hat$Dataset=="All Countries"]<-perc_belowOA
+  ###########
+  
+  ##########
+  # All countries, solo, E asia pac
+  crit<-label_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="solo") %>% 
+    filter(Region=="East Asia &\nPacific") %>% 
+    select(perc)
+  
+  perc<-fig_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="solo") %>% 
+    filter(Region=="East Asia &\nPacific") %>% 
+    ungroup() %>% 
+    tally(perc<crit$perc) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  
+  
+  P_Hat$P_Hat[P_Hat$Region=="East Asia &\nPacific" &
+                P_Hat$author=="solo" & 
+                P_Hat$Dataset=="All Countries"]<-perc_belowOA
+  ###########
+  
+  ##########
+  # All countries, solo, europe C asia
+  crit<-label_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="solo") %>% 
+    filter(Region=="Europe &\nCentral Asia") %>% 
+    select(perc)
+  
+  perc<-fig_data %>% 
+    filter(Dataset=="All Countries") %>% 
+    filter(author=="solo") %>% 
+    filter(Region=="Europe &\nCentral Asia") %>% 
+    ungroup() %>% 
+    tally(perc<crit$perc) %>% 
+    mutate(perc_belowOA = n/1000)
+  perc_belowOA<-perc$perc_belowOA
+  perc_belowOA
+  
+  
+  
+  P_Hat$P_Hat[P_Hat$Region=="Europe &\nCentral Asia" &
+                P_Hat$author=="solo" & 
+                P_Hat$Dataset=="All Countries"]<-perc_belowOA
+  ###########
+  
+  
+  Region<-P_Hat$Region
+  Region<-recode_factor(Region,"South\nAsia"="South Asia",
+                        "North\nAmerica"="North America",
+                        "Sub-Saharan\nAfrica"="Sub-Saharan Africa",
+                        "Latin America &\nCaribbean"="Latin America & Caribbean",
+                        "Middle East &\nNorth Africa"="Middle East & North Africa",
+                        "East Asia &\nPacific"="East Asia & Pacific",
+                        "Europe &\nCentral Asia"="Europe & Central Asia",
+                        .default = levels(Region))
+  P_Hat$Region<-Region 
+  
+  P_Hat <- P_Hat %>% dplyr::rename("OA_perc"="perc", 
+                                   "Author"="author",
+                                   "Countries"="Dataset") %>% 
+    select(-n) 
+  
+  
+  P_Hat$Author<-gsub("author_first","First",P_Hat$Author)
+  P_Hat$Author<-gsub("solo","Single",P_Hat$Author)
+  
+  
+  
+  
+  return(list(RegionPlot,P_Hat))
+ 
+  
+  
+   
 }

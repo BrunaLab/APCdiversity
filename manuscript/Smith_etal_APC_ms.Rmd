@@ -1,0 +1,695 @@
+---
+title             : "Article processing charges, the geographic diversity of author communities, and barriers to publication for authors in the Global South"
+shorttitle        : "APCs & author diversity "
+
+author: 
+  
+  - name          : "Audrey C. Smith"
+    affiliation   : "1"
+    role:         # Contributorship roles (e.g., CRediT, https://casrai.org/credit/)
+      - Methodology
+      - Investigation
+      - Formal analysis
+      - Writing - Original Draft Preparation
+      - Writing - Review & Editing
+    equal_contrib: yes
+  - name          : "Leandra Merz"
+    affiliation   : "1"
+    role:
+      - Methodology
+      - Investigation
+      - Formal analysis
+      - Writing - Original Draft Preparation
+      - Writing - Review & Editing
+    equal_contrib: yes
+  - name          : "Jesse Borden"
+    affiliation   : "1"
+    role:
+      - Methodology
+      - Investigation
+      - Software
+      - Formal analysis
+      - Writing - Review & Editing
+  - name          : "Chris K. Gulick"
+    affiliation   : "1"
+    role:
+      - Methodology
+      - Investigation
+      - Formal analysis
+      - Writing - Review & Editing
+  - name          : "Akhil R. Kshirsagar"
+    affiliation   : "1"
+    role:
+      - Methodology
+      - Investigation
+      - Formal analysis 
+      - Writing - Review & Editing
+  - name          : "Emilio M. Bruna"
+    affiliation   : "1"
+    corresponding : yes    # Define only one corresponding author
+    address       : "Center for Latin American Studies, University of Florida, PO Box 110530, Gainesville, Florida, 32611-0530 USA"
+    email         : "embruna@ufl.edu"
+    role:
+      - Conceptualization
+      - Methodology
+      - Investigation
+      - Formal analysis
+      - Data curation
+      - Visualization
+      - Writing - Original Draft Preparation
+      - Writing - Review & Editing
+      - Project administration
+      - Supervision   
+
+affiliation:
+  - id            : "1"
+    institution   : "University of Florida"
+
+note:       | 
+
+  A preprint of this article has been posted at MetaArXiv Preprints (osf.io/preprints/metaarxiv/s7cx4).
+
+authornote: |
+  A. Smith, L. Merz, & A. Kshirsagar: and Department of Geography, University of Florida, PO Box 117315, Gainesville, Florida, 32611 USA
+  J. Borden: School for Natural Resources and the Environment, University of Florida, PO Box 116455, Gainesville, Florida, 32611 USA
+  C. Gulick: Department of Wildlife Ecology and Conservation, University of Florida, PO Box 110430, Gainesville, Florida, 32611 USA
+  E. M. Bruna: Department of Wildlife Ecology and Conservation, University of Florida, PO Box 110430, Gainesville, Florida, 32611 USA and Center for Latin American Studies, University of Florida, PO Box 115530, Gainesville, Florida, 32611 USA
+
+
+
+abstract: |
+  Many OA journals require authors pay an article processing charge (APC), which researchers in the Global South often cite as an insurmountable financial barrier. This has led to speculation that there will be lower representation of these authors in OA journals charging APCs. We used “mirror journals” – APC-charging OA versions of paywalled (PW) titles with whom they share editorial boards and standards for acceptance – to investigate the relationship between APCs and the geographic diversity of authors. Most of the >41,000 articles we reviewed were published in PW journals. Although lead authors were based in >140 countries, ~45% were based in either the United States of America (USA) or China. After correcting for differences in sample size, we found no difference between OA and PW journals in the number of countries in which lead authors were based. After correcting for the dominance of China and the USA, we found that author diversity in OA journals was significantly lower than in PW journals. Most OA articles were written by authors in high-income countries; no articles in OA journals had first authors from low-income countries. Our results suggest APCs are a barrier to OA publication for scientists from the Global South.
+  
+keywords          : "Open access, article processing charges, author diversity, geographic diversity, Global South, mirror journals, Open Access"
+wordcount         : "3866"
+
+bibliography      : ["APCpaper_QSS.bib"]
+
+floatsintext      : no
+figurelist        : no
+tablelist         : no
+footnotelist      : no
+numbersections    : yes
+linenumbers       : yes
+mask              : no
+draft             : no
+replace_ampersands: yes
+
+documentclass     : "apa6"
+classoption       : "man"
+
+output:
+  papaja::apa6_pdf:   # apa6_word to render as a word doc
+    includes:
+    after_body: "appendix.tex"
+  
+  
+fig_caption: yes #yes will automatically add "Figure X" to the start 
+# of the caption and reorders automatically if the figure position changes
+always_allow_html: yes
+
+appendix: "Smith_etal_Appendix_QSSv1.Rmd"
+
+header-includes:
+  - \raggedbottom
+  - \usepackage{endfloat} #[nomarkers] excludes the {insert figure x around here] from main text. The others exclude the list of tables and figures. https://cs.brown.edu/about/system/managed/latex/doc/endfloat.pdf
+  - \usepackage{setspace}\doublespacing
+  - \usepackage{lineno}
+  - \linenumbers
+  - \usepackage{tabu}
+  - \usepackage{pdflscape}
+  - \newcommand{\blandscape}{\begin{landscape}}
+  - \newcommand{\elandscape}{\end{landscape}}
+---
+getwd()
+```{r setup, include = FALSE}
+library("papaja")
+r_refs("APCpaper_QSS.bib")
+knitr::opts_chunk$set(echo = FALSE,message=FALSE,warning=FALSE)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(gridExtra)
+library(kableExtra)
+library(readr)
+library(egg)
+library(magick)
+library(citr)
+
+```
+
+```{r cached=TRUE}
+knitr::opts_chunk$set(echo = FALSE)
+
+MirrorPairs<-read.csv("./data_clean/MirrorPairs.csv")
+WaiverCountries<-read.csv("./data_clean/WaiverCountries.csv")
+
+AllData<-read_csv(file="./data_clean/all_data_analysis.csv")
+AllData_missing<-AllData %>% 
+  filter(AuthorNum==1) %>% 
+  filter(is.na(First_Author_Country)) %>% 
+  select(refID) 
+AllData<-AllData %>% filter(!refID %in% AllData_missing$refID) 
+rm(AllData_missing)
+
+sole_author_pubs_ALL <-read_csv("./data_clean/one_author_pubs_ALL.csv")
+coauthor_pubs_ALL<-read_csv("./data_clean/coauthor_pubs_ALL.csv")
+sole_author_pubsNOCHNUSA_first_author<-read_csv("./data_clean/one_author_pubsNOCHNUSA.csv")
+coauthor_pubsNOCHNUSA_first_author<-read_csv("./data_clean/coauthor_pubsNOCHNUSA.csv")
+sole_author_pubs_ALL_first_author<-read_csv("./data_clean/sole_author_pubs_ALL_first_author.csv")
+coauthor_pubs_ALL_first_author<-read_csv("./data_clean/coauthor_pubs_ALL_first_author.csv")
+
+bootstrap_results<-read_csv('./output/bootstrap_results.csv')
+bootstrap_results_countries<-read_csv("./output/bootstrap_results_countries.csv")
+Table2.2<-read.csv('./output/Table2.2.csv')
+```
+
+```{r apcstats, echo = FALSE, warning=FALSE,message = FALSE}
+APC<-MirrorPairs %>% 
+  filter(JrnlType=="OA") %>% 
+  summarize(medianAPC=median(APC),
+            avg_APC=mean(APC),
+            sd_APC=sd(APC),
+            maxAPC=max(APC),
+            minAPC=min(APC))
+APC_stats<-round(APC,2)
+max<-APC_stats[4]
+min<-APC_stats[5]
+mean<-APC_stats[2]
+sd<-APC_stats[3]
+median<-APC_stats[1]
+```
+
+```{r njournals, echo = FALSE, warning=FALSE,message = FALSE}
+n_journals <- AllData %>% 
+  group_by(JrnlType) %>% 
+  summarize(n=n_distinct(Journal))
+njournalsOA<-n_journals[1,2]
+njournalsPW<-n_journals[2,2]
+```
+
+```{r npapers, echo=FALSE,message = FALSE,warning=FALSE}
+NumbArticles_JrnlType <- AllData %>% #number of papers per journal
+  group_by(JrnlType) %>% 
+  summarize(n=n_distinct(refID))
+
+NumbSoloArticles_JrnlType<-sole_author_pubs_ALL %>% 
+group_by(JrnlType) %>% 
+  summarize(n=n_distinct(refID))
+PW_solo<-NumbSoloArticles_JrnlType[2,2]
+OA_solo<-NumbSoloArticles_JrnlType[1,2]
+
+NumbCoAuthoredArticles_JrnlType<-coauthor_pubs_ALL %>% 
+group_by(JrnlType) %>% 
+  summarize(n=n_distinct(refID))
+
+n_OA<-NumbArticles_JrnlType[1,2]
+n_PW<-NumbArticles_JrnlType[2,2]
+Total_pubs<-n_OA+n_PW
+```
+
+```{r ncountries, echo=FALSE,message = FALSE,warning=FALSE}
+# Total Countries: sole-authored papers
+
+n_OA_countries<-AllData %>% 
+  filter(JrnlType=="OA") %>%
+  filter(AuthorNum==1) %>%
+  summarize(n_distinct(Code))
+  
+n_PW_countries<-AllData %>% 
+  filter(JrnlType=="PW") %>%
+  filter(AuthorNum==1) %>%
+  summarize(n_distinct(Code))
+  
+
+n_countries_SOLE_authors<-sole_author_pubs_ALL_first_author %>% 
+  summarize(n_distinct(Code))
+
+# Total Countries: first authors of co-authored papers
+n_countries_FIRST_authors<-coauthor_pubs_ALL_first_author %>% 
+  summarize(n_distinct(Code))
+
+
+countries_first_and_sole<-(c(sole_author_pubs_ALL_first_author$Code,
+                                     coauthor_pubs_ALL_first_author$Code))
+
+# Total Countries: all first authors (sole+first of authored)
+n_countries_FIRST_AND_SOLE_authors<-n_distinct(countries_first_and_sole)
+n_countries_total<-n_countries_FIRST_AND_SOLE_authors
+# Countries by Journal Type: Sole-authored papers                   
+n_countries_SOLE_by_jrnl<-sole_author_pubs_ALL_first_author %>% 
+  group_by(JrnlType) %>% 
+  summarize(n_distinct(Code))
+nSoleOA<-n_countries_SOLE_by_jrnl[1,2]
+nSolePW<-n_countries_SOLE_by_jrnl[2,2]
+# Countries by Journal Type: co-authored papers
+n_countries_FIRST_by_jrnl<-coauthor_pubs_ALL_first_author %>% 
+  group_by(JrnlType) %>% 
+  summarize(n_distinct(Code))
+nCoOA<-n_countries_FIRST_by_jrnl[1,2]
+nCoPW<-n_countries_FIRST_by_jrnl[2,2]
+
+# percent of articles with author in USA or CHN
+
+n_articles_first_CHN_USA<-AllData %>% 
+  filter(AuthorNum==1) %>% 
+  filter(Code=="CHN"|Code=="USA") %>% 
+  summarize(n_distinct(refID))
+
+Perc_USA_orCHN<-round(n_articles_first_CHN_USA/Total_pubs*100,2)
+
+n_articles_first_USA_OA<-AllData %>%
+  filter(JrnlType=="OA") %>% 
+  filter(AuthorNum==1) %>% 
+  filter(Code=="USA") %>% 
+  summarize(n_distinct(refID))
+Perc_USA_OA<-round(n_articles_first_USA_OA/NumbArticles_JrnlType[1,2]*100,2)
+
+n_articles_first_CHN_OA<-AllData %>%
+  filter(JrnlType=="OA") %>% 
+  filter(AuthorNum==1) %>% 
+  filter(Code=="CHN") %>% 
+  summarize(n_distinct(refID))
+Perc_CHN_OA<-round(n_articles_first_CHN_OA/NumbArticles_JrnlType[1,2]*100,2)
+
+
+n_articles_first_USA_PW<-AllData %>%
+  filter(JrnlType=="PW") %>% 
+  filter(AuthorNum==1) %>% 
+  filter(Code=="USA") %>% 
+  summarize(n_distinct(refID))
+Perc_USA_PW<-round(n_articles_first_USA_PW/NumbArticles_JrnlType[2,2]*100,2)
+
+n_articles_first_CHN_PW<-AllData %>%
+  filter(JrnlType=="PW") %>% 
+  filter(AuthorNum==1) %>% 
+  filter(Code=="CHN") %>% 
+  summarize(n_distinct(refID))
+
+Perc_CHN_PW<-round(n_articles_first_CHN_PW/NumbArticles_JrnlType[2,2]*100,2)
+
+```
+
+# Introduction  
+  Content in Open Access (i.e., OA) journals can be read without payment or subscription, and the number of OA articles published annually has grown dramatically over the last two decades [@piwowar_state_2018]. In addition to benefiting readers without access to traditional subscription journals (i.e., Paywall journals, PW), publishing in OA journals can also benefit an article’s authors [reviewed in @mckiernan_how_2016; @tennant_academic_2016]. For instance, articles in OA journals can garner more online views, have higher download rates, and accrue more citations over time than articles in PW outlets [@davis_open_2011; @eysenbach_citation_2006; @wang_open_2015]. Metrics such as these are increasingly taken into consideration when conducting performance evaluations of scientists, including the tenure and promotion process in academic institutions [@schimanski_evaluation_2018]. Publishing in OA journals can, therefore, play an important role in a scientist’s professional advancement and status [@macleavy_unintended_2020; @mckiernan_how_2016]. This is especially true when the OA journals have other characteristics used as indicators of prestige by evaluators, such as name recognition, high impact factors, perceived prestige, and association with major academic societies [@gray_sorry_2020; @schimanski_evaluation_2018].  
+  Many OA journals operate on an “author-pays” business model, whereby payment of an article processing charge (APC) helps defray the cost of journal operations [@crow_income_2009]. While most OA journals do not charge APCs [@crow_income_2009; @kozak_publication_2013; @morrison_oa_2019], the majority of OA articles are published in journals that do  [@openapc_openapc_2020; @pavan_article_2018; @piwowar_state_2018]. A recent survey found that the average APC was \$908 ($\pm$ \$608 SD, N = 4418 journals) with more than 500 journals charging at least \$2000 and 12 journals charging APCs over \$4000 [@morrison_oa_2019; @singh_oa_2019]. For many researchers, especially those working in the Global South^[The world’s ‘developing’ or ‘emerging’ economies primarily located in Latin America, Asia, Africa, and the Middle East [@brandt_north-south_1980].], these APCs are an insurmountable financial barrier [@bahlai_open_2019; @matheka_open_2014; @peterson_open_2013]. While publishers will often waive APCs for authors working in countries where the lack of funding is particularly acute (e.g., those identified by the World Bank “Low Income”), many countries in the Global South are ineligible for even partial waivers [@ellers_gold_2017; @lawson_fee_2015, Table A1]. As a result, the APCs charged by high-profile OA journals may be allowing scientists to read previously inaccessible journals while simultaneously preventing them from publishing in the same outlets [@ellers_gold_2017; @matheka_open_2014; @poynder_plan_2019].  
+  Despite long-standing concerns that OA journals charging APCs could have reduced representation of authors from the Global South, efforts to date to test this hypothesis remain limited. In part this is because identifying journals that can serve as controls with which to isolate the effect of APCs on author diversity has been inherently challenging, if not impossible [@ellers_gold_2017]. In 2018, however, the publishing company Elsevier introduced the concept of “OA mirror journals” – open access versions of established subscription-only titles with identical editorial boards, peer review procedures, and standards for acceptance [@cochrane_are_2018; @harrison_what_2019]. The goal was for this identical editorial structure, coupled with a nearly identical name (e.g., *Journal of Dentistry / Journal of Dentistry: X*, *Ecological Engineering / Ecological Engineering: X*), to elevate the visibility and status of OA mirrors to a level comparable to their subscription counterparts [@harrison_what_2019], thereby attracting authors that preferred open access publishing or for whom OA publishing was mandated by funding agencies or institutions. While there is no cost to authors publishing in the subscription-only “parent journals”, authors of articles in the corresponding mirror journals pay a median APC of \$`r median` (range = \$`r min`&ndash;\$`r max`, Table 1). Because they control for some of the major confounding factors that can influence authors’ submission decisions – journal name recognition, journal status, author relationships with editorial board members, criteria for suitability and acceptance – parent and mirror journals provide an ideal system to test for associations between APCs and author diversity.  
+  We used data from over 41,000 articles published in subscription journals and their open access mirrors to investigate the relationship between APCs and the geographic structure of author communities. We test three hypotheses: first, that the number of countries in which lead authors were based would be lower in Open Access journals. Second, that the diversity of countries in which lead authors were based would also be lower in OA journals. Third, that any such reductions would be due to Open Access journals having fewer lead authors from low-income countries. We tested these hypotheses using indices for describing the structure of groups derived from information theory [@calver_quantifying_2018; @espin_persistent_2017; @magurran_measuring_2004].
+
+# Methods  
+  In July 2020, we downloaded the complete reference records for all “Articles” and “Reviews” published in `r njournalsOA` mirror journals (Table 1) from the Web of Science Core Collection and SCOPUS databases. We then identified the date of the first and most recent publications in each mirror journal and downloaded the publication records of all articles published in each corresponding subscription journal during the same interval (Table 1). Next, we  identified the country in which the primary institution of every article’s first author was located and assigned the country to its respective World Bank Region^[Europe/Central Asia, East Asia/Pacific, Latin America/Caribbean, Sub-Saharan Africa, South Asia, Middle East/North Africa, North America (i.e., Canada, United States).] and Lending Group^[High Income (per capita GNI > \$12476, including both Organization for Economic Cooperation and Development (OECD) member and non-OECD member, Upper-middle income (per capita GNI \$4036&ndash;\$12475), Lower-middle income (per capita GNI \$1026&ndash;\$4035), Low-income (per capita GNI < \$1025)] [@world_bank_world_2020]. We then used the data for each journal category (i.e., OA or PW) to calculate the indices with which we tested our hypotheses.  
+    The most commonly used indices of diversity are calculated using two types of information. The first is Richness (*R*), which is the number of distinct categories contained in a sample (e.g., the number of countries in which authors from a group of journals are based). The second is Evenness, which is the relative frequency of each category in the sample (i.e., the relative proportion of authors based in each country). A robust and widely used diversity index is the reciprocal transformation of Simpson’s Index: 
+
+$D_{2}=\frac{1}{\sum_{i-1}^{R} p_{i}^{2}}$
+
+where *R* is the maximum value of Richness, and $p_{i}$ is the proportional abundance of type *i* during time interval *t*. Values of $D_{2}$ calculated for different groups are directly comparable; larger values of $D_{2}$ indicate greater diversity, with the maximum potential diversity equal to the highest value of Richness in the group [@magurran_measuring_2004].  
+  The small number of articles in many of the OA mirrors precluded robust comparisons of Geographic Diversity at the level of journal pairs. We therefore pooled all articles from OA or PW journals and calculated Geographic Richness and Geographic Diversity ($D_{2}$) of lead authors at the level of ‘journal type’ (i.e., PW or OA). It is important to note, however, that the Richness and Diversity of these two collections of articles cannot be compared directly – Richness is positively correlated with sample size, and there were 40-fold more PW articles than OA ones. We therefore used bootstrapping [@efron_introduction_1994] to generate 1000 different collections of PW articles that were identical in size and structure to the OA collection and calculated the Richness and Diversity of each of these. To generate these collections we counted the number of articles published in each OA mirror, then randomly sampled with replacement an identical number of articles from the respective PW journal [@fox_bootstrapping_2015].  
+  To determine if the Richness and Diversity of OA and PW articles were significantly different, we calculated $\hat{P}$ – the proportion of PW collections whose value of *R* or $D_{2}$ were below that for the OA collection. A $\hat{P}$ > 0.975 indicates the Diversity or Richness of OA is significantly greater than that of PW; OA Richness or Diversity is significantly lower when $\hat{P}$ < 0.025. The same procedure was used to compare the proportion of paywalled and open access journals written by authors in different global regions and national income categories.  
+  The analyses above were conducted for two types of lead authors: (1) the authors of single-authored papers, and (2) the first authors of co-authored papers. We analyzed single- and co-authored papers separately because of the potential insights into financial constraints that could emerge from divergent results for these author types: while the APC for a single-authored paper is the responsibility of one person, the APC of a co-authored paper can potentially be divided among – or even paid entirely by – co-authors with access to funding.  
+  Our initial results showed a dominance of authors based in China and the United States (Fig. A1). Although Simpson’s Index is can be robust to moderate differences in sampling effort, it is sensitive to how equitably samples are distributed between categories [i.e., it is a ‘dominance’ or ‘evenness’ index, @magurran_measuring_2004]. We therefore repeated our analyses after excluding all papers written by lead-authors based in either of these two countries. We also repeated all analyses with Shannon’s Index, which is considered less sensitive to extreme differences in relative frequency than Simpson’s Index. Results for the two indices were qualitatively similar (Fig. A2), so we present here only the results for Simpson’s Index.  
+  All data analyses were carried out with code written in the R statistical programming language [@r_core_team_r_2020]. We used the **``refplitr``**  [@fournier_refsplitr_2020] and **``bibliometrix``** [@aria_bibliometrix_2017] libraries to process the Web of Science and SCOPUS records (respectively) and georeference lead authors. We used the online **``MapAffil``** tool [@torvik_mapaffil_2015] to manually georeference the 141 addresses that these packages were unable to georeferenced automatically. Richness and Diversity were calculated with the **``vegan``** library [@oksanen_vegan_2019], while **``ggplot2``** [@wickham_welcome_2019] was used for all data visualizations^[Available at https://github.com/embruna/APCdiversity for review and improvement; the version used for this manuscript will be permanently archived at Zenodo and included in the References upon acceptance.].
+
+
+# Results  
+  The `r njournalsOA` OA mirror journals published `r n_OA` articles from their inception through the date we downloaded the article records . During the same interval, their respective PW journals published `r n_PW` articles (Table 1). Single-author publications accounted for approximately 20% of the articles in OA journals (N = `r OA_solo`), but only 2% of articles in PW journals (N = `r PW_solo`). While lead authors were collectively based in `r n_countries_total` countries, `r Perc_USA_orCHN`% of articles had a lead author whose primary institutional address was in either the United States of America (USA) or China (Fig. A1). There was, however, an important difference among journal types in the representation of authors from these two countries. While USA authors published three-fold more articles in OA journals than authors based in China, this pattern was reversed in PW journals (Figs. 1, 2).   
+
+## Geographic Richness  
+  Authors of single-author articles in OA and PW journals were based in N = `r nSoleOA` and N = `r nSolePW` countries, respectively (Fig. 1); first authors of co-authored papers were based in N = `r nCoOA` and N = `r nCoPW` countries (OA and PW journals, respectively; Fig 2). After correcting for differences in sample size by bootstrapping, there was no significant difference between OA and PW journals in author Geographic Richness (Fig. 3, Table 2). This was true for both single-authored articles ($R_{OA}$ = 38 vs. $\bar{R}_{PW}$ = 41.8 $\pm$ 2.9 SD, $\hat{P}$ = 0.07) and the first authors of collaborative articles ($R_{OA}$ = 60 vs. $\bar{R}_{PW}$ = 60.7 $\pm$ 3.3 SD, $\hat{P}$ = 0.38; Fig 3A,C). Because excluding China and the USA reduces Richness of both journal type by the same amount, there was no effect of doing so for either single-authors ($\hat{P}$ = 0.08 ) or first-authors ($\hat{P}$ = 0.09; Fig. 3B,C; Table 2).
+ 
+## Geographic Diversity  
+  While the Geographic Diversity of single-authored papers in OA journals was lower than that of PW journals, the difference was not statistically significant (Fig. 4A,B). This was true both when including all articles in the analyses ($\hat{P}$  = 0.81) and when excluding articles with lead authors in China or the USA to mitigate the effects of dominance on $D_2$ ($\hat{P}$ = 0.92). The results for the first authors of co-authored articles were more complex. Author Geographic Diversity is significantly greater in OA than PW journals when all articles are included in the dataset ($D_2^{OA}$ = 12.1, $\bar{D}_2^{PW}$ = 9.3 $\pm$ 0.7 SD, $\hat{P}$ = 0.0001; Fig 4C). However, this result was due to the effect of highly uneven distributions on $D_{2}$. When considering diversity after correcting for the dominance of authors based in the USA and China, the pattern is reversed – the Geographic Diversity of authors in OA journals is significantly lower than that of PW journals ($\bar{D}_2^{PW}$ = 24.8 $\pm$ 1.5 SD, $D_2^{OA}$ = 17.7, $\hat{P}$ = 1.0; Fig. 4D, Table 2).  
+
+## Global Regions and National Income Categories  
+  Overall, a nearly identical proportion of articles in Paywalled journals had first authors based in upper-middle and high-income countries (47.3% and 47.5%, respectively). In contrast, an overwhelming majority of articles in Open Access journals were written by first authors based in high-income countries (81%; Fig. A3). There was also a remarkable absence of lead authors from low-income countries in both OA and PW journals. While none of the 984 articles in Open Access journals had first authors from low-income countries, there were only N=54 articles by first authors based in low-income countries in Paywalled journals (0.013%). Two of these were single-author articles (Fig. 1B); the remainder were co-authored studies with first authors based in 19 different countries (Fig. 2B). When correcting for differences in sample size by bootstrapping, we found that Open Access papers had significantly more authors from North America and the East Asia / Pacific region, while there were significantly fewer authors from Latin American/the Caribbean, the Middle East/North Africa, and Sub-Saharan Africa (Fig. 5, Table 4). Consequently, the authors of articles in OA journals were significantly more likely to be based in high-income countries (Fig. 6, Table 5), while middle-income countries were significantly underrepresented.
+
+# Discussion  
+  One of the central tenets of open access publishing is that it helps make the scientific community more globally inclusive. This is considered particularly beneficial to scientific communities with limited financial resources, such as those in many countries of the Global South. While this benefit is undisputed, it has been suggested that OA publishing can also have unintended negative consequences for these same communities. Chief among these is that the funding model used by the most widely recognized and prestigious OA journals – a reliance on article processing charges –  allows for readers with limited financial resources to access the scientific literature, but also prevents them from contributing to it. We found that the Geographic Diversity of lead authors was significantly lower in OA journals charging APCs than in a matched set of subscription journals in which authors could publish free of charge.  Our data also showed that an overwhelming majority of articles in OA journals had lead authors based in high-income countries. Taken together, these results provide compelling evidence that APCs are a barrier to Open Access publication for scientists from the Global South.  
+  We gained unique insights into the Geographic Diversity and structure of author communities by using a diversity index that accounted for the proportional representation of authors from different countries (i.e., “evenness”). It is important to remember, however, that all members of a category are treated as functionally equivalent when calculating these indices. This means, for instance, that Geographic Richness can be identical even if the specific countries publishing in each journal category are entirely different. Similarly, a more even distribution of authorship reveals nothing about the types of countries whose proportional representation has increased – only that the pattern of national dominance has become less skewed.  
+  Although Open Access and Paywall journals had similar Geographic Richness, the countries in which authors were based were markedly different. Open Access articles have a far higher proportion of authors from North America, Europe/Central Asia, and the East Asia/Pacific region than similarly sized collections of PW articles (Fig. 5). This is in sharp contrast to PW journals where proportionately more authors are based in Sub-Saharan Africa, South Asia, the Middle East/North Africa, and Latin America/The Caribbean. Consequently, authorship of Open Access articles is overwhelmingly concentrated in high-income countries, while Paywall journals have proportionately more authors from middle-income countries (Fig. 6). For instance, the 25 most ‘productive’ countries in PW journals included 8 in the World Bank’s middle-income categories: China, India, Brazil, Iran, Turkey, Russia, Mexico, and Egypt (Fig. 2B). Open Access journals had only four middle-income countries among the top-25: China, India, Brazil, and Mexico (Fig. 2A).  
+  Perhaps the most surprising result of our study was the extent to which authors from low-income countries were underrepresented [see also @nunez_assessing_2019; @stocks_geographical_2008]. Of the more than 41,000 articles we reviewed, only 0.013% (N = 54) had lead authors based in low-income countries. All of these articles were in PW journals, all but two were coauthored articles. Almost half of these articles (44%) had first authors based in Ethiopia, North Korea, Nepal, or Syria; the remainder were based in 19 other countries, mostly in Sub-Saharan Africa. While previous studies have documented geographic variation in rates of open access publication, including very low rates in some regions [@iyandemye_low_2019], these studies all included OA journals in which authors could publish at no cost. The 38 OA journals we reviewed span disciplines from veterinary medicine to nutrition to waste management (Table 1); that there were zero papers with lead-authors from low-income countries, including from regions previously shown to have high rates of OA publication, further underscores the conclusion that authors in low-income countries are detrimentally affected by the financial burden of APCs.  
+  Previous research on author attitudes toward OA publishing has identified APCs as a barrier to publication, especially for independent researchers, students, or those at institutions focusing on undergraduate education [@coonin_publishing_2009; @dallmeier-tiessen_highlights_2011; @warlick_factors_2007]. We provide some of the strongest evidence to date that this is the case for researchers in the Global South as well [@appel_adoption_2019; @ezema_open_2017; @ncayiyana_open_2005]. Although it is conceivable that the differences we observed are due to many of our focal journals having above-average APCs [@solomon_publication_2012], we believe this is unlikely to be the cause. Authors in low-income countries are far more likely to use personal funds to pay APCs  [@solomon_study_2012], and for many, even the average APC of $904 would consume a large fraction of their research budget [@ciocca_reality_2017; @matheka_open_2014; @wingfield_how_2019], salary [@peterson_open_2013], or student stipend (Table 3). Funds to defray publication costs are clearly available to some scientists in some of these countries [@pavan_article_2018, Figs. 1 & 2]; therefore, the most likely explanation for the observed results is that authors are actively choosing to publish at no cost in the PW journal instead of paying to publish in the OA mirror [@ciocca_reality_2017].  
+  The lack of papers in OA journals by authors in low-income countries is particularly surprising given that most of these countries are eligible for waivers of APCs under the Elsevier’s “Research4Life” program (Table A1). We suggest there are at least four potential explanations for this. The first is that publisher policies for waiving APCs can be quite restrictive. For instance, the publisher of the OA journals included in our review will only waive APCs in cases where every co-author of an article is based in a country that is waiver-eligible [@elsevier_eligibility_2020]. Many of the articles in our dataset with first authors based in low-income countries had international collaborators in locations that rendered the articles ineligible for discounted or free publication [see also @gray_sorry_2020]. Second, it may be that authors were unaware waivers existed or that journal or publisher staff failed to recognize their eligibility and offer to transfer their submission to the OA mirror [@lawson_fee_2015]. Third, authors may have been aware of the option to publish OA at no expense, but nevertheless opted for publishing in the subscription outlets – perhaps because they view these as more prestigious [@ellers_gold_2017]. Finally, even large discounts on APCs are unlikely to be sufficient for many authors [@iyandemye_low_2019]. This is almost certainly true for authors in countries that are bizarrely offered only partial discounts (e.g., Honduras, Guatemala) despite socioeconomic conditions that are similar to those in nearby countries where authors can publish OA at no expense (e.g., Nicaragua, Table A1). In absolute terms, however, the minimal benefit of partial waivers may be most pronounced for authors in middle income countries – especially when they engage in productive collaborate with scientists based in middle-income countries such as Brazil, Mexico, South Africa, and Malaysia [@smith_scientific_2014] that are ineligible for waivers despite challenging economic conditions [@ciocca_reality_2017]. Regardless of the mechanism, our results suggest that waiver programs designed to increase the representation of scientists from the Global South in OA journals by reducing APCs have at best failed to do so, and at worst had the opposite effect. 
+
+## Caveats and Future Directions  
+  Inference in bibliometric studies must be drawn with care, as patterns such as those we documented are the result of a complex combination of pre-submission decisions by authors and post-submission decisions by editors. Using articles published in mirror journals to conduct our analyses allows us to control for many of the factors that shape these decisions. Most notably, the journals in a mirror pair have identical editorial boards, editorial philosophy, and publication priorities. While any implicit biases held by editors against authors from particular countries would undoubtedly reduce the overall representation of these countries in the literature, the reduction would be independent of the journal access category. As such, we believe our results reflect the outcome of pre-submission decisions by authors and are consistent with APCs being a central mechanism underlying them [@ciocca_reality_2017; @solomon_study_2012]. Our results also suggest several promising directions for future research. The first is to investigate why it appears scientists in some middle- and low-income countries, especially China and Brazil, overwhelmingly prefer to publish in subscription journals despite the apparent availability of funds to defray APCs. These academic communities might consider open access journals to be of lower quality, regardless of their affiliation with a known academic society, publisher, or connection to an established subscription journal [@editage_geographic_2018]. Alternatively, authors may be hesitant to consider them as outlets for their work because they do not yet have impact factors or other metrics used by their institutions in program evaluation [@appel_adoption_2019; @pavan_article_2018; @xu_chinese_2020]. Second, our results suggest there is a need for research on how to make waiver programs more effective, with particular emphasis on reducing financial barriers to OA publication for authors in middle-income countries. Answers to these questions will help editors, publishers, and the broader scientific community develop strategies to ensure prestigious open access journals are truly accessible to scientists from the Global South  [@rodriguez_awareness_2014].
+
+# Acknowledgements
+We thank N. Emery, C. Scott, and D. Forero for assistance in gathering preliminary data for the project. M. Nu$\tilde{n}$ez, -----, and ---- provided feedback on the manuscript.
+
+\newpage
+# References
+
+\begingroup
+\setlength{\parindent}{-0.5in}
+\setlength{\leftskip}{0.5in}
+
+<div id="refs" custom-style="Bibliography"></div>
+\endgroup
+
+
+
+```{r richdivfigs1, echo=FALSE,message = FALSE,warning=FALSE}
+knitr::opts_knit$set(eval.after = "fig.cap")
+insert_custom1<-n_OA
+insert_custom2<-n_PW
+# Figure - Diversity
+source("./Rscript/functions_figures/DivBootFig.R")
+DivBootFig<-DivBootFig(bootstrap_results)
+# Figure - Richness
+source("./Rscript/functions_figures/RichBootFig.R")
+RichBootFig<-RichBootFig(bootstrap_results)
+```
+
+```{r richdivfigs2, echo=FALSE, message = FALSE, warning=FALSE}
+source("./Rscript/functions_figures/CountryPlot.R") 
+p1<-CountryPlot(sole_author_pubs_ALL_first_author,"author_first","OA")
+p2<-CountryPlot(sole_author_pubs_ALL_first_author,"author_first","PW")
+p3<-CountryPlot(coauthor_pubs_ALL_first_author,"author_first","OA")
+p4<-CountryPlot(coauthor_pubs_ALL_first_author,"author_first","PW")
+```
+
+```{r Fig1, fig.align='center',fig.cap="Percentage of authors of single-author publications in (A) Open Access journals and (B) Paywall journals based in different countries. Numbers adjacent to bars are the number of lead authors based in each country.",fig.height = 9,fig.width=6}
+grid.arrange(p1, p2, ncol = 1)
+```
+
+```{r Fig2, fig.align='center',fig.cap="Percentage of first authors of co-authored publications in (A) Open Access journals and (B) Paywall journals that are based in different countries. Numbers adjacent to bars are the number of lead authors based in each country.",fig.height = 9,fig.width=6}
+# coauthored, first author, OA
+grid.arrange(p3, p4, ncol = 1)
+```
+
+```{r Fig3, fig.align='center', fig.cap=paste("Author Geographic Richness for N = ", insert_custom1, " Open Access articles (red bar) and 1000 identically sized collections of Paywalled articles selected by bootstrapping from a pool of ",insert_custom2, " articles. The black line indicates the mean value for the 1000 bootstrap collections."), fig.fullwidth=TRUE}
+RichBootFig[[1]]
+```
+
+```{r Fig4, fig.align='center', fig.cap=paste("Author Geographic Diversity ($D_2$) for N = ", insert_custom1, " Open Access articles (red bar) and 1000 identically sized collections of Paywalled articles selected by bootstrapping from a pool of ",insert_custom2, " articles.  The black line indicates the mean value for the 1000 bootstrap collections."),fig.fullwidth=TRUE}
+DivBootFig[[1]]
+```
+
+
+```{r IncomeRegionFIgs, cached=TRUE,echo=FALSE, message = FALSE, warning=FALSE}
+source("./Rscript/functions_figures/IncomePlot.R") 
+IncomePlot<-IncomePlot(bootstrap_results,bootstrap_results_countries,"All")
+source("./Rscript/functions_figures/RegionPlot.R") 
+RegionPlot<-RegionPlot(bootstrap_results,bootstrap_results_countries,"All")
+Fig_Income<-IncomePlot[[1]]
+Fig_Region<-RegionPlot[[1]]
+```
+
+```{r Fig5, echo=FALSE,message = FALSE, warning=FALSE, fig.align='center', fig.cap="Percentage of first authors of (A) co-authored and (B) sole-authored open access articles (red bars) and 1000 bootstrapped collections of paywalled articles that are based in different global regions.",fig.fullwidth=TRUE,fig.height = 24,fig.width=20}
+
+Fig_Region
+```
+
+```{r Fig6, echo=FALSE, message = FALSE, warning=FALSE, fig.align='center', fig.cap="Percentage of first authors of (A) co-authored and (B) sole-authored open access articles (red bars) and 1000 bootstrapped collections of paywalled articles that are based in different global regions.", fig.fullwidth=TRUE,fig.height = 24,fig.width=20}
+Fig_Income
+```
+
+```{r Table1, echo=FALSE,message = FALSE,warning=FALSE}
+source("./Rscript/functions/SummaryTable.R") 
+Tables<-SummaryTable(AllData)
+Table1<-Tables[2]
+Table1<-as.data.frame(Table1)
+names(Table1)<-c("Journal","Articles (PW)","Articles (OA mirror)","APC (US$)")
+Table1[4,1]<-"BiochimieSuper1"
+Table1[27,1]<-"Microelectronic EngineeringSuper2"
+Table1[39,4]<-""
+
+Table1<-arrange(Table1,desc(Table1[4]))
+
+tmp<-knitr::kable(Table1, 
+      digits = 2,
+      align="lccc",
+      format="latex",
+      row.names = FALSE,
+      booktabs=T,
+      linesep = "", #removes the blank line after every 5 lines
+      caption = "Elsevier subscription journals included in this study, the number of articles published in each one that were included in our study, the number of articles published in each Open Access mirror during the same time period, and the article processing charge (APC) charged by each OA mirror journal. With two exceptions, the titles of paywall and mirror journals are identical except for the 'X' at the end of mirror versions (e.g., Research Policy X, Optical Materials X).") %>%
+  kable_styling(bootstrap_options = c("hover"),
+                full_width = F,
+                latex_options="scale_down",
+                font_size = 12,
+                position = "left") %>%
+  footnote(number = c("OA Mirror title: Biochimie Open", "OA Mirror title: Micro and Nano Engineering"))
+tmp<-str_replace(tmp, "Super1", "$^{1}$")
+tmp<-str_replace(tmp, "Super2", "$^{2}$")
+knitr::asis_output(tmp)
+```
+
+```{r Table2, echo=FALSE,message = FALSE,warning=FALSE}
+source("./Rscript/functions_figures/Table2.R")
+Table2<-Table2(sole_author_pubs_ALL_first_author,
+               sole_author_pubsNOCHNUSA_first_author,
+               coauthor_pubs_ALL_first_author,
+               coauthor_pubsNOCHNUSA_first_author)
+
+
+Table2$Metric <-c("Richness","","Diversity","")
+Table2<-Table2 %>% select("Metric",
+                          "Author",
+                          "OA"="OA (All Countries)",
+                          # "PW 95% CI (All Countries)",
+                          "Mean PW (All Countries)",
+                          "P_Hat_All",
+                          "OA (USA & CHN excluded)",
+                          # "PW 95% CI (USA & CHN excluded)",
+                          "Mean PW (USA & CHN excluded)",
+                          "P_Hat_no")
+
+
+colnames(Table2)<-c("Metric",
+                    "Author",
+                    "OA",
+                    paste("PW","(mean\u00B1SD)",sep=" "),
+                    "$\\hat{P}$",                 
+                    "OA",
+                    paste("PW","(mean\u00B1SD)",sep=" "),
+                    "$\\hat{P}$")
+
+# # #
+kable(Table2,
+      digits = 3,
+      format = "latex",
+      align="c",
+      escape=FALSE,
+      row.names = FALSE,
+      booktabs=T,
+      linesep = "",
+      caption = "Geographic Richness and Geographic Diversity of lead authors of papers published in Open Access (OA) and Paywalled (PW) journals. The value for PW is the mean of 1000 bootstrap-generated article collections identical in size to the OA collection. Single: authors of single-authored papers; First: first authors of co-authored papers.") %>%
+  kable_styling(bootstrap_options = c("hover"),
+                full_width = FALSE,
+                latex_options = c("scale_down"),
+                font_size = 12,
+                position = "center") %>%
+  add_header_above(c(" " = 2, "All Countries" = 3, "Without China & USA" = 3))
+```
+
+```{r Table3, echo=FALSE,message = FALSE,warning=FALSE}
+stipends<-read_csv(file="./data_clean/stipends.csv")
+stipends<-as.data.frame(stipends)
+stipends$agency<-c("CNPq","","CONACYT","","SERB","RISTEKDIKTI","NRF","")
+source<-stipends$source
+stipends<-stipends %>% select(country, degree, agency,stipend_USD)
+names(stipends)<-c("Country","Degree","Agency","Stipend (US$)")
+stipends[1,3]<-"CNPqSuper1"
+stipends[2,1]<-""
+stipends[3,3]<-"CONACYTSuper2"
+stipends[4,1]<-""
+stipends[5,3]<-"SERBSuper3"
+stipends[6,3]<-"RISTEKDIKTISuper4"
+stipends[7,3]<-"NRFSuper5"
+stipends[8,1]<-""
+foot1<-source[1]
+foot2<-source[3]
+foot3<-source[5]
+foot4<-source[6]
+foot5<-source[7]
+foot5<-"https://www.nrf.ac.za"
+# foot4<-gsub("%20Scholarships%","%20Scholarships\n%",foot4)
+# stipends[4]<-NULL
+tmp<-knitr::kable(stipends,
+                  digits = 1,
+                  format = "latex",
+                  align="c",
+                  row.names = FALSE,
+                  booktabs=T,
+                  linesep = "",
+                  caption = "Monthly stipends for graduate students in select countries. The value of the stipend in US currency is based on the exchange rate in July 2020.") %>%
+  kable_styling(bootstrap_options = c("hover"),
+                latex_options = c("scale_down"),
+                full_width = T,
+                font_size = 12,
+                position = "center") %>%
+  footnote(number = c(foot1,foot2,foot3,foot4,foot5))
+tmp<-str_replace(tmp, "Super1", "$^[1]$")
+tmp<-str_replace(tmp, "Super2", "$^[2]$")
+tmp<-str_replace(tmp, "Super3", "$^[3]$")
+tmp<-str_replace(tmp, "Super4", "$^[4]$")
+tmp<-str_replace(tmp, "Super5", "$^[5]$")
+knitr::asis_output(tmp)
+```
+
+```{r Table4, echo=FALSE,message = FALSE,warning=FALSE}
+RegionTable<-RegionPlot[2]
+RegionTable<-as.data.frame(RegionTable)
+
+  Subsampled_Region_summary<-bootstrap_results_countries %>% 
+    group_by(author,Dataset,replicate,Region) %>% 
+    filter(Dataset=="All Countries") %>% 
+    drop_na() %>% 
+    summarize(n=n()) %>% 
+    mutate(perc=n/sum(n)*100) 
+  # str(Subsampled_Region_summary)
+  # levels(as.factor(Subsampled_Region_summary$replicate))
+  PW_means<-Subsampled_Region_summary %>% 
+    group_by(author,Dataset,Region) %>% 
+    summarise(mean=mean(perc)) %>% 
+    dplyr::rename("Countries"="Dataset",
+                  "Author"="author",
+                  "mean PW percentage"="mean")
+
+
+  PW_means$Author<-gsub("solo", "Single",PW_means$Author) 
+  PW_means$Author<-gsub("author_first", "First",PW_means$Author)
+  
+  RegionTable<-left_join(RegionTable,PW_means) %>% 
+    select(Author,Countries,Region,'mean PW percentage',OA_perc,P_Hat)
+
+  
+RegionTable$asterisk<-c(" "," ","*","*","*"," ","*"," ","*","*","*","*","","*")
+RegionTable$P_Hat<-paste(RegionTable$P_Hat,RegionTable$asterisk,sep="")
+RegionTable$asterisk<-NULL
+
+RegionTable_single<-RegionTable %>% 
+  select(Author,Countries,Region,'mean PW percentage',OA_perc,P_Hat) %>% 
+  filter(Author=="Single")
+
+RegionTable_first<-RegionTable %>% 
+  select(Author,Countries,Region,'mean PW percentage',OA_perc,P_Hat) %>% 
+  filter(Author=="First")
+
+RegionTable<-bind_rows(RegionTable_single,RegionTable_first)
+
+
+RegionTable<-RegionTable %>% 
+  mutate(Author = replace(Author, Region != "East Asia & Pacific", ""))
+
+RegionTable<-RegionTable %>% 
+  mutate(Countries = replace(Countries, Region != "East Asia & Pacific", ""))
+
+RegionTable<-as.data.frame(RegionTable)
+
+colnames(RegionTable)<-c("Author",
+                 "Countries",
+                 "Region",
+                 "PW",
+                 "OA",
+                 "$\\hat{P}$")
+
+kable(RegionTable,
+      digits = 2,
+      align="c",
+      format="latex",
+      row.names = FALSE,
+      escape= TRUE,
+      booktabs=T,
+      linesep = "", #removes the blank line after every 5 lines
+      caption = "Percentage of Open Access articles with authors based in different World Bank Regions. The value for paywalled journals (PW) is the mean percentage of 1000 bootstrap-generated article collections identical in size to the Open Access (OA) collection. Single: authors of single-authored papers; First: first authors of co-authored papers; Significant differences between the open access collection and bootstrapped paywall collections are indicated with an asterisk.") %>%
+  kable_styling(bootstrap_options = c("hover"),
+                full_width = F,
+                latex_options="scale_down",
+                font_size = 12,
+                position = "center")
+
+```
+
+```{r Table5, echo=FALSE,message = FALSE,warning=FALSE}
+IncomeTable<-IncomePlot[2]
+IncomeTable<-as.data.frame(IncomeTable)
+
+
+  Subsampled_Income_summary<-bootstrap_results_countries %>% 
+    group_by(author,Dataset,replicate,IncomeGroup) %>% 
+    filter(Dataset=="All Countries") %>% 
+    drop_na() %>% 
+    summarize(n=n()) %>% 
+    mutate(perc=n/sum(n)*100) 
+  # str(Subsampled_Region_summary)
+  # levels(as.factor(Subsampled_Region_summary$replicate))
+  PW_means<-Subsampled_Income_summary %>% 
+    group_by(author,Dataset,IncomeGroup) %>% 
+    summarise(mean=mean(perc)) %>% 
+    dplyr::rename("Author"="author",
+                  "PW (mean %)"="mean")
+
+
+  PW_means$Author<-gsub("solo", "Single",PW_means$Author) 
+  PW_means$Author<-gsub("author_first", "First",PW_means$Author)
+  
+  IncomeTable<-left_join(IncomeTable,PW_means) %>% 
+    select(Author,Countries,IncomeGroup,'PW (mean %)',OA_perc,P_Hat)
+
+  
+
+
+IncomeTable$asterisk<-c("*","*","*","*","*","*")
+IncomeTable$P_Hat<-paste(IncomeTable$P_Hat,IncomeTable$asterisk,sep="")
+IncomeTable$asterisk<-NULL
+
+IncomeTable_single<-IncomeTable %>% 
+  select(Author,Countries,IncomeGroup,'PW (mean %)',OA_perc,P_Hat) %>% 
+  filter(Author=="Single")
+# Author<-("")
+# Countries<-("")
+# IncomeGroup<-("Low")
+# OA_perc<-("-")
+# P_Hat<-("-")
+# foo <- data.frame(Author,Countries,IncomeGroup,OA_perc,P_Hat)
+# foo[] <- lapply(foo, as.character)
+# IncomeTable_single[]<-lapply(IncomeTable_single, as.character)
+# IncomeTable_single<-bind_rows(IncomeTable_single,foo)
+
+
+IncomeTable_first<-IncomeTable %>% 
+  select(Author,Countries,IncomeGroup,'PW (mean %)',OA_perc,P_Hat) %>% 
+  filter(Author=="First")
+# IncomeTable_first[]<-lapply(IncomeTable_first, as.character)
+# IncomeTable_first<-bind_rows(IncomeTable_first,foo)
+
+
+IncomeTable<-bind_rows(IncomeTable_single,IncomeTable_first)
+
+IncomeTable<-IncomeTable %>% 
+  mutate(Author = replace(Author, IncomeGroup != "High", ""))
+
+
+IncomeTable<-IncomeTable %>% 
+  mutate(Countries = replace(Countries, IncomeGroup != "High", ""))
+
+# IncomeTable$OA_perc<-as.numeric(IncomeTable$OA_perc)
+colnames(IncomeTable)<-c("Author",
+                 "Countries",
+                 "Lending Group",
+                 'PW',
+                 "OA",
+                 "$\\hat{P}$")
+
+# IncomeTable$'Open Access (%)'<-round(IncomeTable$'Open Access (%)',2)
+# IncomeTable$'Open Access (%)'<-as.character(IncomeTable$'Open Access (%)')
+# IncomeTable<-IncomeTable %>% replace_na(list('Open Access (%)'="-"))
+kable(IncomeTable,
+      digits = 2,
+      align="c",
+      format="latex",
+      row.names = FALSE,
+      escape = FALSE,
+      booktabs=T,
+      linesep = "", #removes the blank line after every 5 lines
+      caption = "Percentage of Open Access articles with authors based in different World Bank Lending Groups. The value for paywalled journals (PW) is the mean percentage of the 1000 bootstrap-generated article collections identical in size to the Open Access (OA) collection. Single: authors of single-authored papers. First: first authors of co-authored papers. Significant differences between the open access collection and bootstrapped paywall collections are indicated with an asterisk.") %>%
+  kable_styling(bootstrap_options = c("hover"),
+                full_width = F,
+                latex_options="scale_down",
+                font_size = 10,
+                position = "center")
+```
+
+
