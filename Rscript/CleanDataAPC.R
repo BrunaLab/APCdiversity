@@ -9,6 +9,9 @@
 library(tidyverse)
 library(bibliometrix)
 library(countrycode) 
+library(tictoc)
+
+
 
 ################################################################
 # load and add World Bank data on national income categories
@@ -23,7 +26,7 @@ CountryData <- CountryData %>%
              Region== "North America"|
              Region=="South Asia"|
              Region== "Sub-Saharan Africa")
-CountryData$Region <-droplevels(CountryData$Region)
+# CountryData$Region <-droplevels(CountryData$Region)
 
 ################################################################
 # Load the list of Pawall Journals and their OA mirrors 
@@ -79,8 +82,8 @@ write.csv(NON_wavierCountries,"./data_clean/NON_WavierCountries.csv", row.names 
 # Load the data on stipends
 ################################################################
 stipends<-read_csv(file="./data_raw/stipends.csv")
-stipends$stipend_national<-round(stipends$stipend_national,0)
-stipends$stipend_USD<-round(stipends$stipend_USD,0)
+# stipends$stipend_national<-round(stipends$stipend_national,0)
+# stipends$stipend_USD<-round(stipends$stipend_USD,0)
 write.csv(stipends,"./data_clean/stipends.csv", row.names = FALSE)
 
 
@@ -93,6 +96,7 @@ write.csv(stipends,"./data_clean/stipends.csv", row.names = FALSE)
 library(refsplitr)
 WOS_references<-references_read(data = './data_raw/raw_data_wos_july2020', dir = TRUE, include_all=FALSE)
 WOS<-WOS_references
+
 ########################################
 # WOS CLEANING
 ########################################
@@ -131,8 +135,9 @@ WOS$DI<-ifelse(WOS$DI== "missing_doi_",paste("missing_doi_",WOS$refID,sep=""),WO
 # EDIT JOURNAL TITLES
 WOS$SO<-gsub("-X",": X",WOS$SO)
 WOS$SO<-gsub("WATER RESEARCH X","WATER RESEARCH: X",WOS$SO)
+# levels(as.factor(WOS$SO))
 
-write.csv(WOS,"./output/WOS_july2020.csv")
+write.csv(WOS,"./output/WOS_july2020_step1.csv")
 # WOS<-read_csv("./output/WOS_july2020.csv")
 # WOS<-select(WOS,-X1)
 
@@ -152,11 +157,12 @@ write_csv(WOS_cln$review,"./output/WOS_review.csv")
 # Accept the disambiguation or load / merge your corrections 
 WOS_refined <- authors_refine(WOS_cln$review,WOS_cln$prelim)
 # save the disambiguated data set
-write_csv(WOS_refined,"./output/WOS_refined.csv")
+write_csv(WOS_refined,"./data_clean/WOS_refined.csv")
 # WOS_refined<-read.csv("./output/WOS_refined.csv")
 
-
+toc() # 61042.004 sec elapsed (~17 hours)
 ###################################
+tic()
 # FINAL WOS CLEAN AND PREP
 # ADD PACKAGE NAME AND PAIR_KEY
 WOS$package<-"refsplitr"
@@ -177,16 +183,16 @@ WOS$journal_cat[WOS$SO == 'EUROPEAN JOURNAL OF OBSTETRICS & GYNECOLOGY AND REPRO
 WOS$pair_key[WOS$SO == 'RESOURCES CONSERVATION AND RECYCLING'] <- 41
 WOS$journal_cat[WOS$SO == 'RESOURCES CONSERVATION AND RECYCLING'] <- "PW"
 WOS$pair_key[WOS$SO == 'WATER RESEARCH: X'] <- 39
-WOS$journal_cat[WOS$SO == 'WATER RESEARCH: X'] <- "PW"
+WOS$journal_cat[WOS$SO == 'WATER RESEARCH: X'] <- "OA"
 
 levels(as.factor(WOS$SO))
 levels(as.factor(WOS$pair_key))
 
 
-write.csv(WOS,"./output/WOS_july2020.csv")
+write.csv(WOS,"./data_clean/WOS_july2020.csv")
 # WOS<-read_csv("./output/WOS_july2020.csv")
 # WOS<-select(WOS,-X1)
-
+toc() # 6.65 secs
 ################################################################
 # Use package 'bibliometrix' to convert these to dataframes                         
 ################################################################
@@ -209,6 +215,7 @@ write.csv(WOS,"./output/WOS_july2020.csv")
 #                   './data_raw/raw_data_wos/savedrecs13.txt',
 #                   './data_raw/raw_data_wos/savedrecs14.txt')
 
+tic()
 # load records from SCOPUS  
 articles_scopus <- c('./data_raw/raw_data_scopus/scopus1.bib',
                           './data_raw/raw_data_scopus/scopus2.bib',
@@ -246,7 +253,7 @@ articles_scopus <- c('./data_raw/raw_data_scopus/scopus1.bib',
 # SCOPUS dataframe
 articles_scopus_df <- convert2df(articles_scopus, dbsource = "scopus", format = "bibtex")
 
-
+toc() #134.8 secs
 
 
 ########################################
@@ -261,11 +268,15 @@ missing_pk<-scopus %>% filter(is.na(pair_key))
 titles_needing_pairkey<-as.data.frame(summary(as.factor(missing_pk$SO)))
 titles_needing_pairkey
 
+
+scopus$SO<-gsub("WATER RESEARCH X","WATER RESEARCH: X",scopus$SO)
+
+
 # Correct SO needing a Pair Key
 scopus$pair_key[scopus$SO == 'EUROPEAN JOURNAL OF OBSTETRICS AND GYNECOLOGY AND REPRODUCTIVE BIOLOGY: X'] <- 16
-scopus$journal_cat[scopus$SO == 'EUROPEAN JOURNAL OF OBSTETRICS AND GYNECOLOGY AND REPRODUCTIVE BIOLOGY: X'] <- 'PW'
+scopus$journal_cat[scopus$SO == 'EUROPEAN JOURNAL OF OBSTETRICS AND GYNECOLOGY AND REPRODUCTIVE BIOLOGY: X'] <- 'OA'
 scopus$pair_key[scopus$SO == 'RESOURCES, CONSERVATION AND RECYCLING: X'] <- 41
-scopus$journal_cat[scopus$SO == 'RESOURCES, CONSERVATION AND RECYCLING: X'] <- 'PW'
+scopus$journal_cat[scopus$SO == 'RESOURCES, CONSERVATION AND RECYCLING: X'] <- 'OA'
 
 # correct / remove the ones with pair_key==0 
 scopus %>% filter(pair_key==0) %>% group_by(SO) %>% tally()
@@ -354,7 +365,16 @@ dupes_scopus <- scopus %>%
 # scopus<-scopus %>% replace_na(list(DI = "missing_doi_"))
 # scopus$DI<-ifelse(scopus$DI== "missing_doi_",paste("missing_doi_",scopus$refID,sep=""),scopus$DI)
 
-write_csv(scopus,"./output/scopus.csv")
+write_csv(scopus,"./data_clean/scopus.csv")
+# END HERE NOV 30
+
+
+
+
+
+
+
+
 
 
 
@@ -374,8 +394,19 @@ scopus_new <- scopus %>%
 # to check use this: if zero, then there are 
 # none in common that need to be deleted
 in_common<-intersect(WOS$DI,scopus_new$DI)
-write_csv(scopus_new,"./output/scopus_unique.csv")
+# write_csv(scopus_new,"./output/scopus_unique.csv")
 # scopus_new<-read_csv("./output/scopus_unique.csv")
+
+
+
+
+
+
+
+
+
+
+
 
 ########
 # HOW MANY ARTICLES PER JOURNAL?
@@ -394,7 +425,7 @@ all_summary<-all %>%
    group_by(pair_key,SO,journal_cat) %>% 
    tally() %>% 
    arrange(pair_key)
-write_csv(all_summary,"./output/all_summary.csv")
+# write_csv(all_summary,"./output/all_summary.csv")
 
 all_summary %>% filter(is.na(journal_cat)) %>% select(SO,db)
 
@@ -403,14 +434,14 @@ all_summary2<-all %>%
    group_by(pair_key,SO,db) %>% 
    tally() %>% 
    arrange(pair_key)
-write_csv(all_summary2,"./output/all_summary2.csv")
+# write_csv(all_summary2,"./output/all_summary2.csv")
 
 
 
 all_summary3<-all %>% 
    group_by(journal_cat) %>% 
    tally()  
-write_csv(all_summary3,"./output/all_summary3.csv")
+# write_csv(all_summary3,"./output/all_summary3.csv")
 
 
 # 
@@ -576,7 +607,7 @@ colnames(AuGeo_scopus)
 AllData_AuGeo<-AuGeo_scopus %>% select(database,DI,refID,TI,
                                        PY,pair_key,SO,journal_cat,
                                        AU,AU_UN,AU1_UN,AU_CO)
-write.csv(AllData_AuGeo,"./data_clean/AllData_AuGeo.csv", row.names = FALSE)
+# write.csv(AllData_AuGeo,"./data_clean/AllData_AuGeo.csv", row.names = FALSE)
 # Add pair_key (id no. for a mirror pair) & journal type (OA or PW)
 # AllData_AuGeo<-left_join(AllData_AuGeo,MirrorPairs,by="SO")
 # AllData_AuGeo<-select(AllData_AuGeo,-notes) #remove notes column
@@ -621,7 +652,7 @@ all1_summary<-all1 %>% group_by(code,journal_cat) %>%
    tally() %>% arrange(journal_cat,desc(n),code)
 all1_summary
 
-write.csv(all1_summary,"./output/all1_summary.csv", row.names = FALSE)
+# write.csv(all1_summary,"./output/all1_summary.csv", row.names = FALSE)
 
 
 colnames(AllData_AuGeo)
@@ -655,7 +686,7 @@ AllData_AuGeo<-AllData_AuGeo %>% arrange(DI,TI,CountryNum)
 AllData_AuGeo$DI<-as.factor(AllData_AuGeo$DI)
 # delete the column with all countries in a single cell
 AllData_AuGeo$AU_CO<-NULL
-write.csv(AllData_AuGeo,"./data_clean/AllData_AuGeo.csv", row.names = FALSE)
+# write.csv(AllData_AuGeo,"./data_clean/AllData_AuGeo.csv", row.names = FALSE)
 
 
 # are all the countries for an article the same? 
@@ -718,11 +749,11 @@ WOS_join<-as_tibble(WOS_join)
 first_authors<-bind_rows(scopus_1st_comparison,WOS_join)
 colnames(first_authors)
 coverage1<-first_authors %>% group_by(pair_key,PY,SO,package) %>% tally()
-write.csv(coverage1,"./output/coverage1.csv", row.names = FALSE)
+# write.csv(coverage1,"./output/coverage1.csv", row.names = FALSE)
 coverage2<-first_authors %>% group_by(pair_key,PY,SO) %>% tally()
-write.csv(coverage2,"./output/coverage2.csv", row.names = FALSE)
+# write.csv(coverage2,"./output/coverage2.csv", row.names = FALSE)
 coverage3<-first_authors %>% group_by(pair_key,SO) %>% tally()
-write.csv(coverage3,"./output/coverage3.csv", row.names = FALSE)
+# write.csv(coverage3,"./output/coverage3.csv", row.names = FALSE)
 
 summary(as.factor(first_authors$package))
 
@@ -844,7 +875,7 @@ AllData_CorrAffil$AU1_UN
 
 AllData_CorrAffil<-AllData_CorrAffil %>% select(database,DI,TI,
                                                       PY,SO,AU,AU1_UN)
-write.csv(AllData_CorrAffil,"./data_clean/AllData_CorrAffil.csv", row.names = FALSE)
+# write.csv(AllData_CorrAffil,"./data_clean/AllData_CorrAffil.csv", row.names = FALSE)
 
 AllData_CorrAffil<-left_join(AllData_CorrAffil,MirrorPairs,by="SO") 
 AllData_CorrAffil<-select(AllData_CorrAffil,-notes) #remove notes column
@@ -886,7 +917,7 @@ AllData_CorrAffil<-AllData_CorrAffil %>%  drop_na("corr_affil")
 AllData_CorrAffil$DI<-as.factor(AllData_CorrAffil$DI)
 # delete the column with all countries in a single cell
 AllData_CorrAffil$AU1_UN<-NULL 
-write.csv(AllData_CorrAffil,"./data_clean/AllData_CorrAffil.csv", row.names = FALSE)
+# write.csv(AllData_CorrAffil,"./data_clean/AllData_CorrAffil.csv", row.names = FALSE)
 
 
 ####################
@@ -970,12 +1001,12 @@ country_check_summary<-AllData %>% filter(CountryNum==1) %>%
 #################
 # Bibliometrix datasets
 missing_jrnls<-c(9,13,16)
-AllData_Authors<-read_csv("./data_clean/AllData_Authors.csv")
+# AllData_Authors<-read_csv("./data_clean/AllData_Authors.csv")
 AllData_Authors<-left_join(AllData_Authors,MirrorPairs,by="SO") 
 AllData_Authors<-select(AllData_Authors,-notes) #remove notes column
 AllData_Authors<-AllData_Authors %>% filter(!pair_key%in% missing_jrnls)
 #####
-AllData_CorrAffil<-read_csv("./data_clean/AllData_CorrAffil.csv")
+# AllData_CorrAffil<-read_csv("./data_clean/AllData_CorrAffil.csv")
 AllData_CorrAffil<-AllData_CorrAffil %>% filter(!pair_key%in% missing_jrnls)
 
 colnames(AllData_CorrAffil)
@@ -984,7 +1015,7 @@ AllData_CorrAffil <- AllData_CorrAffil %>%
           JrnlType = journal_cat, Year = PY, Title=TI,Authors=AU,
           corr_affil)
 ####
-AllData_Affiliations<-read_csv("./data_clean/AllData_Affiliations.csv")
+# AllData_Affiliations<-read_csv("./data_clean/AllData_Affiliations.csv")
 AllData_Affiliations<-AllData_Affiliations %>% filter(!pair_key%in% missing_jrnls)
 
 colnames(AllData_Affiliations)
@@ -994,7 +1025,7 @@ AllData_Affiliations <- AllData_Affiliations %>%
           Authors=AU, AU1_UN,AffiliationNum, Inst)
 ####
 missing_jrnls<-c(9,13,16)
-AllData_AuthorFirst<-read_csv("./data_clean/AllData_AuthorFirst.csv")
+# AllData_AuthorFirst<-read_csv("./data_clean/AllData_AuthorFirst.csv")
 AllData_AuthorFirst<-left_join(AllData_AuthorFirst,MirrorPairs,by="SO") 
 AllData_AuthorFirst<-select(AllData_AuthorFirst,-notes) #remove notes column
 AllData_AuthorFirst<-AllData_AuthorFirst %>% filter(!pair_key%in% missing_jrnls)
@@ -1014,7 +1045,7 @@ AllData_AuthorFirst$Country<-gsub("wales","UK",AllData_AuthorFirst$Country)
 AllData_AuthorFirst$Code<-
    countrycode(AllData_AuthorFirst$Country,"country.name", "iso3c", warn = TRUE)
 ############
-AllData_AuGeo<-read_csv("./data_clean/AllData_AuGeo.csv")
+# AllData_AuGeo<-read_csv("./data_clean/AllData_AuGeo.csv")
 AllData_AuGeo<-AllData_AuGeo %>% filter(!pair_key%in% missing_jrnls)
 colnames(AllData_AuGeo)
 AllData_AuGeo <- AllData_AuGeo %>%
@@ -1148,7 +1179,7 @@ AllData$IncomeGroup <- ordered(AllData$IncomeGroup, levels = c("High", "Upper mi
 # head(AllData)
 
 ############################################################
-# Remove any journal pairs for whihc data re incomplete
+# Remove any journal pairs for whichc data re incomplete
 ############################################################
 # TODO: no articles for "Clinics and Research in Hepatology and
 # Gastroenterology: X (9)" so exclude it and mirror
@@ -1176,6 +1207,7 @@ write.csv(MirrorPairs,"./data_clean/MirrorPairs.csv", row.names = FALSE)
 rm(MirrorPairs)
 
 
+toc()
 
 
 
@@ -1184,85 +1216,79 @@ rm(MirrorPairs)
 
 
 
-
-
-
-
-
-
-
-
-
-################################################################
-# ALL DATA without papers that have a USA or CHN first or last author
-
-# ID papers with a first author in USA or CHN
-first_author_no_USA_CHN<-AllData %>%
-   group_by(TI) %>% 
-   filter(AuthorNum==1 & Country!="CHINA") %>% 
-   filter (AuthorNum==1 & Country!="USA") %>% 
-   select(TI)
-
-# REMOVE THESE FROM THE AllData df
-NO_first_author_USA_CHN<-semi_join(AllData,first_author_no_USA_CHN) %>% 
-   arrange(Journal,TI,AuthorNum)
-
-# Now find the ones in this new reduced df that have 
-# china or usa as last author
-last_author_no_USA_CHN<-NO_first_author_USA_CHN %>%
-   group_by(TI) %>% 
-   filter(AuthorNum == max(AuthorNum)) %>%
-   filter(Country!="CHINA") %>% 
-   filter(Country!="USA") %>% 
-   select(TI)
-
-# Remove them from the reduced df
-NO_USA_CHN_FL<-semi_join(NO_first_author_USA_CHN,last_author_no_USA_CHN) %>% 
-   arrange(Journal,TI,AuthorNum)
-
-write.csv(NO_USA_CHN_FL,"./data_clean/NO_USA_CHN_FL.csv", row.names = FALSE)
-
-
-
-one_author_pubs <- AllData %>%
-   group_by(TI) %>% 
-   summarize(n=n_distinct(AuthorNum)) %>% 
-   filter(n==1) %>% 
-   select(-n) %>% 
-   left_join(AllData,by="TI")
-one_author_pubs$Dataset<-"All Countries"
-one_author_pubs$author<-"solo"
-
-write.csv(one_author_pubs,"./data_clean/one_author_pubs_ALL.csv", row.names = FALSE)
-
-coauthor_pubs<- AllData %>%
-   group_by(TI) %>% 
-   summarize(n=n_distinct(AuthorNum)) %>% 
-   filter(n>=2) %>% 
-   left_join(AllData,by="TI")
-coauthor_pubs$Dataset<-"All Countries"
-coauthor_pubs$author<-"CoAuthored"
-
-write.csv(coauthor_pubs,"./data_clean/coauthor_pubs_ALL.csv", row.names = FALSE)
-
-one_author_pubsNOCHNUSA <- NO_USA_CHN_FL %>%
-   group_by(TI) %>% 
-   summarize(n=n_distinct(AuthorNum)) %>% 
-   filter(n==1) %>% 
-   select(-n) %>% 
-   left_join(NO_USA_CHN_FL,by="TI")
-one_author_pubsNOCHNUSA$Dataset<-"CHN & USA excluded"
-one_author_pubsNOCHNUSA$author<-"solo"
-
-write.csv(one_author_pubsNOCHNUSA,"./data_clean/one_author_pubsNOCHNUSA.csv", row.names = FALSE)
-
-coauthor_pubsNOCHNUSA<- NO_USA_CHN_FL %>%
-   group_by(TI) %>% 
-   summarize(n=n_distinct(AuthorNum)) %>% 
-   filter(n>=2) %>% 
-   left_join(NO_USA_CHN_FL,by="TI") 
-coauthor_pubsNOCHNUSA$Dataset<-"CHN & USA excluded"
-coauthor_pubsNOCHNUSA$author<-"CoAuthored"
-
-write.csv(coauthor_pubsNOCHNUSA,"./data_clean/coauthor_pubsNOCHNUSA.csv", row.names = FALSE)
-
+# 
+# 
+# 
+# ################################################################
+# # ALL DATA without papers that have a USA or CHN first or last author
+# 
+# # ID papers with a first author in USA or CHN
+# first_author_no_USA_CHN<-AllData %>%
+#    group_by(TI) %>% 
+#    filter(AuthorNum==1 & Country!="CHINA") %>% 
+#    filter (AuthorNum==1 & Country!="USA") %>% 
+#    select(TI)
+# 
+# # REMOVE THESE FROM THE AllData df
+# NO_first_author_USA_CHN<-semi_join(AllData,first_author_no_USA_CHN) %>% 
+#    arrange(Journal,TI,AuthorNum)
+# 
+# # Now find the ones in this new reduced df that have 
+# # china or usa as last author
+# last_author_no_USA_CHN<-NO_first_author_USA_CHN %>%
+#    group_by(TI) %>% 
+#    filter(AuthorNum == max(AuthorNum)) %>%
+#    filter(Country!="CHINA") %>% 
+#    filter(Country!="USA") %>% 
+#    select(TI)
+# 
+# # Remove them from the reduced df
+# NO_USA_CHN_FL<-semi_join(NO_first_author_USA_CHN,last_author_no_USA_CHN) %>% 
+#    arrange(Journal,TI,AuthorNum)
+# 
+# write.csv(NO_USA_CHN_FL,"./data_clean/NO_USA_CHN_FL.csv", row.names = FALSE)
+# 
+# 
+# 
+# one_author_pubs <- AllData %>%
+#    group_by(TI) %>% 
+#    summarize(n=n_distinct(AuthorNum)) %>% 
+#    filter(n==1) %>% 
+#    select(-n) %>% 
+#    left_join(AllData,by="TI")
+# one_author_pubs$Dataset<-"All Countries"
+# one_author_pubs$author<-"solo"
+# 
+# write.csv(one_author_pubs,"./data_clean/one_author_pubs_ALL.csv", row.names = FALSE)
+# 
+# coauthor_pubs<- AllData %>%
+#    group_by(TI) %>% 
+#    summarize(n=n_distinct(AuthorNum)) %>% 
+#    filter(n>=2) %>% 
+#    left_join(AllData,by="TI")
+# coauthor_pubs$Dataset<-"All Countries"
+# coauthor_pubs$author<-"CoAuthored"
+# 
+# write.csv(coauthor_pubs,"./data_clean/coauthor_pubs_ALL.csv", row.names = FALSE)
+# 
+# one_author_pubsNOCHNUSA <- NO_USA_CHN_FL %>%
+#    group_by(TI) %>% 
+#    summarize(n=n_distinct(AuthorNum)) %>% 
+#    filter(n==1) %>% 
+#    select(-n) %>% 
+#    left_join(NO_USA_CHN_FL,by="TI")
+# one_author_pubsNOCHNUSA$Dataset<-"CHN & USA excluded"
+# one_author_pubsNOCHNUSA$author<-"solo"
+# 
+# write.csv(one_author_pubsNOCHNUSA,"./data_clean/one_author_pubsNOCHNUSA.csv", row.names = FALSE)
+# 
+# coauthor_pubsNOCHNUSA<- NO_USA_CHN_FL %>%
+#    group_by(TI) %>% 
+#    summarize(n=n_distinct(AuthorNum)) %>% 
+#    filter(n>=2) %>% 
+#    left_join(NO_USA_CHN_FL,by="TI") 
+# coauthor_pubsNOCHNUSA$Dataset<-"CHN & USA excluded"
+# coauthor_pubsNOCHNUSA$author<-"CoAuthored"
+# 
+# write.csv(coauthor_pubsNOCHNUSA,"./data_clean/coauthor_pubsNOCHNUSA.csv", row.names = FALSE)
+# 

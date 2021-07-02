@@ -1,0 +1,89 @@
+---
+title: "v2_decision"
+author: "Emilio bruna"
+date: "6/11/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Reviewer 1 = Reviewer 3 of the original version.
+
+Reviewer 2 = Reviewer 1 of the original version. 
+
+Reviewer 2 of the original version = considers your work acceptable for publication.
+
+
+**Reviewer 1 Comments to Author**
+
+Overall, I am very satisfied with how my comments and suggestions were taken into account in the revision, and I especially thank the authors for the very substantial work of incorporating the distinction of OA in the parent journals (POA) into the paper. 
+
+1. Nevertheless, the results on geographic diversity between POA and Mirror OA (MOA) could be further clarified
+
+
+2. The distinction between single and first authors could be better reflected in the discussion.
+
+
+3. Some issues, like the relevance of single/first author distinction, could be mentioned already in the introduction. 
+
+
+Please find my detailed comments and suggestions below. 
+
+1. Page 4 (lines 63-66): OA citation advantage is found also in case of self-archived articles published in subscription journals. Green OA could be mentioned in this context. 
+
+
+2. Page 5 (line 95): Here Elsevier’s mirror concept is introduced. It would be great if authors could, in the introduction or discussion, say something about the adoption (if any) of the same or similar concept by other publishers. Are the Elsevier Mirror journals the only option for this type of analysis? As regards the potential future analyses, is it possible to say anything on the development of this concept at Elsevier or elsewhere? 
+
+    * it appears Am Mathematical Society has a mirror systems as well ([denoted here](https://www.ams.org/journals) as "Series B" journals). But aside from that, it appears most are Elsevier. These are new, so may not have been time to be adiotped by others.
+
+3. Page 7 (131-133): As regards the third prediction, please clarify if you mean by “lead authors” both single and first authors, or only the latter: “Third, that any such reductions would be due to OA articles having fewer lead authors from the low-income countries predominantly located in the Global South”. 
+
+    * both single and first
+
+4. Page 8 (164-165): Please explain here in more detail your interpretation of results: “We found no difference in the Geographic Diversity of authors of these two groups of OA articles (Table A2, Figure A3)“. In Table A2, Geographic diversity of MOA is lower than POA for all countries (11.97 vs 13.28) but larger (18.29 vs 17.33) when China & USA are excluded. However, according to Table 2, there appear to be relatively large differences between MOA and POA in case of single authors. 
+
+
+
+5. Page 9 (lines 190-195): the distinction between single and co-authored papers is introduced here because of “the potential insights into financial constraints”. Perhaps this topic could be discussed already in the introduction as one of the factors potentially influencing the submission decisions. 
+
+    * ok, easy add
+    
+6. It is also important to recognize that co-authorship patterns differ considerably between fields, and the possible implications of this. It might be helpful to provide here (on page 9) a clear presentation of the number of Psub, POA and MOA articles that are single- or co-authored, for all countries and excluding China & US (like table 1). 
+
+    * True, but this is really going to have the biggest impact on last authors, which we dont analyze
+
+7. Page 11 (line 253): please use “Single-authored” instead of “Sole-authored articles”, terminology should be consistent throughout the paper. 
+
+    * Single-author (not authored)?
+
+8. Please explain here in more detail what the difference in Table 2 between POA and PSub (10.3 vs 9.9) means, as this result would seem to suggest that there is no difference in geographic diversity of POA and Psub when China & US are excluded. 
+
+
+9. According to Table 2 it also seems that the geographic diversity is much larger for single-authored MOA (17.4) than POA (10.3). 
+
+
+
+10. Page 13 (lines 290-292): It is stated that “We found that the Geographic Diversity of authors publishing Open Access articles, for which APCs are required, was significantly lower than that of authors publishing subscription-only articles.” It should be clarified to what extent this holds true for first as well as single authors. The distinction between single and first authors is currently not appropriately reflected in the discussion. There are several unanswered questions: what may explain that single-authors are more frequent (21%) in Mirror journals Parent journals (2%), what are the differences in geographic diversity between MOA and POA, and most importantly what are the potential insights into financial constraints? 
+
+    * No problem, pitch this as "first pass, needs more study" (ie, beyond the scope)
+
+11.  Page 36 Figure 7: consider using share instead of number of articles 
+
+
+
+**Reviewer 2 Comments to the Author**
+
+I think the revised article is much more explicit in terms of methods and analysis, and the authors have done an excellent job or addressing the reviewers’ comments. I think the results now are more robust.  I cannot properly evaluate whether my initial comment about the discrepancy in proportion between the numbers of papers compared in Mirror and parent journal is adequately addressed by the statistical methods the authors applied. I will leave this to the editor to decide, as he is much better acquainted with these methods than I am. But otherwise the paper is ready to be published with minor revisions. 
+
+1. One last caveat. The authors write: “whether Mirror journals are acceptable Gold OA outlets is situation-specific cOAlition S 2021. However, the link in the references leads to the page on Transformative Journals, and only 45 Elsevier journals have TJ status. Nothing is said there about situation-specificity, and it is not clear to me what the authors mean by it. cOAlition S states very clearly that Mirror journals are not Plan S compliant: “Open Access journals must not have a mirror/sister subscription journal with substantial overlap in editorial board to avoid business models charging for both access and publication. Such journals will de facto be considered ‘hybrid’ journals.” see [this link](https://urldefense.proofpoint.com/v2/url?u=https-3A__www.coalition-2Ds.org_technical-2Dguidance-5Fand-5Frequirements&d=DwIFaQ&c=sJ6xIWYx-zLMB3EPkvcnVg&r=hPRQO-QHqXhD8p9F43Mezw&m=2G0oxouG2X4NKct6mN0Ukg199kFPlUsbAOZLYvFFEDM&s=-6D1ss9N4AytzBFNnGJUnrmYJvy7ObdlqYhmum9Ebew&e=). cOAlition S will only support hybrid journals that are transitioning to Open Access via Transformative agreements and the Transformative journal route. The authors would have to check the Journal Checker Tool, but I doubt very much that mirror journals will be listed as compliant with Plan S policy: cOAlition S funders will not pay for the APC in them. 
+
+    * Mirror Journals are *not* compliant: "Open Access journals must not have a mirror/sister subscription journal with substantial overlap in editorial board to avoid business models charging for both access and publication. Such journals will de facto be considered ‘hybrid’ journals." (reference is [here](https://www.coalition-s.org/addendum-to-the-coalition-s-guidance-on-the-implementation-of-plan-s/principles-and-implementation/)) 
+
+
+2. Now if by ’situation-specific the authors mean that non-cOAlition S funders (e.g. NIH, China) may allow for publication in mirror journals, while cOAlition S funders do not, that should be more clearly indicated. As it stands now the sentence is confusing. 
+
+    * Yes, we meant "funders"  generally, so clarify
+
+3. Typos: 409: Ludo Waltman, and provided feedback -> and Ludo Waltman provided feedback

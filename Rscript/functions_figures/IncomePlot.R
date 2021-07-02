@@ -1,6 +1,6 @@
-IncomePlot<-function(DataSet,Subsampled_Countries,countries) {
-  # DataSet<-bootstrap_results
-  # Subsampled_Countries<-bootstrap_results_countries
+IncomePlot<-function(DataSet,Subsampled_Countries,countries,sole_ALL,sole_NOCHNUSA,first_ALL,first_NOCHNUSA) {
+  # DataSet<-Boot_RichDiv
+  # Subsampled_Countries<-Boot_Countries
   # countries<-"All"
   # countries<-"No_CHN_USA"
   library(tidyverse)
@@ -8,7 +8,28 @@ IncomePlot<-function(DataSet,Subsampled_Countries,countries) {
   library(ggExtra)
   library(egg)
 
-vars<-list(DataSet,Subsampled_Countries,countries)
+  
+  
+  DataSet<-DataSet %>% 
+    # mutate(OA_group = ifelse(OA_group == "OA", "PW", author)) %>% 
+    mutate(author = ifelse(Dataset == "sole_NOCHNUSA", "solo", author)) %>% 
+    mutate(author = ifelse(Dataset == "sole_ALL", "solo", author)) %>% 
+    mutate(author = ifelse(Dataset == "first_NOCHNUSA", "author_first", author)) %>% 
+    mutate(author = ifelse(Dataset == "first_ALL", "author_first", author)) 
+    # mutate(Dataset = ifelse(Dataset == "CHN & USA excluded", "Without China & USA", Dataset)) %>%
+    # mutate(Dataset = ifelse(Dataset == "CHN & USA excluded", "Without China & USA", Dataset))
+  
+  
+  
+  
+  Subsampled_Countries<-Subsampled_Countries %>%
+    mutate(Dataset = ifelse(Dataset == "sole_ALL", "All Countries", Dataset)) %>%
+    mutate(Dataset = ifelse(Dataset == "first_ALL", "All Countries", Dataset)) %>%
+    mutate(Dataset = ifelse(Dataset == "sole_NOCHNUSA","CHN & USA excluded", Dataset)) %>%
+    mutate(Dataset = ifelse(Dataset == "first_NOCHNUSA","CHN & USA excluded", Dataset))
+  # 
+  
+vars<-list(DataSet,Subsampled_Countries,countries,sole_ALL,sole_NOCHNUSA,first_ALL,first_NOCHNUSA)
   
 DataSet<-as.data.frame(vars[1])
 Subsampled_Countries<-as.data.frame(vars[2])
@@ -27,45 +48,49 @@ countries<-vars[3]
                                               levels = c("Low\nIncome","Lower-middle\nIncome","Upper-middle\nIncome","High\nIncome"))
   
   
+  as.factor(Subsampled_Countries$Dataset)
+  as.factor(Subsampled_Countries$ArticleCat)
+  
   Subsampled_Income_summary<-Subsampled_Countries %>% 
-    group_by(author,Dataset,replicate,IncomeGroup) %>% 
+    group_by(author,Dataset,ArticleCat,replicate,IncomeGroup) %>% 
     summarize(n=n()) %>% 
     mutate(perc=n/sum(n)*100) 
   
   PW_medians<-Subsampled_Income_summary %>% 
+    filter(ArticleCat=="PW") %>% 
     group_by(author,Dataset,replicate,IncomeGroup) %>% 
     summarise(median=median(perc))
-  PW_medians$JrnlType<-"PW"
+  PW_medians$ArticleCat<-"PW"
+  
+  
+  OAinPW_medians<-Subsampled_Income_summary %>% 
+    filter(ArticleCat=="OAinPW") %>% 
+    group_by(author,Dataset,replicate,IncomeGroup) %>% 
+    summarise(median=median(perc))
+  OAinPW_medians$ArticleCat<-"OAinPW"
   
   ###################################
   # OA 
   ###################################
   
-  one_author_pubs_ALL<-read_csv(file="./data_clean/one_author_pubs_ALL.csv")
-  one_author_pubs_ALL<-one_author_pubs_ALL %>% drop_na(IncomeGroup)
+  sole_ALL<-sole_ALL %>% drop_na(IncomeGroup)
+  first_ALL<-first_ALL %>% drop_na(IncomeGroup)
+  sole_NOCHNUSA<-sole_NOCHNUSA %>% drop_na(IncomeGroup)
+  first_NOCHNUSA<-first_NOCHNUSA %>% drop_na(IncomeGroup)
   
-  coauthor_pubs_ALL<-read_csv(file="./data_clean/coauthor_pubs_ALL.csv")
-  coauthor_pubs_ALL<-coauthor_pubs_ALL %>% drop_na(IncomeGroup)
+  first_ALL$Dataset<-"All Countries"
+  sole_ALL$Dataset<-"All Countries"
+  first_ALL$author<-"author_first"
+  sole_ALL$author<-"solo"
+  sole_NOCHNUSA$Dataset<-"CHN & USA excluded"
+  first_NOCHNUSA$Dataset<-"CHN & USA excluded"
+  sole_NOCHNUSA$author<-"solo"
+  first_NOCHNUSA$author<-"author_first"
   
-  one_author_pubsNOCHNUSA<-read_csv(file="./data_clean/one_author_pubsNOCHNUSA.csv")
-  one_author_pubsNOCHNUSA<-one_author_pubsNOCHNUSA %>% drop_na(IncomeGroup)
-  
-  coauthor_pubsNOCHNUSA<-read_csv(file="./data_clean/coauthor_pubsNOCHNUSA.csv")
-  coauthor_pubsNOCHNUSA<-coauthor_pubsNOCHNUSA %>% drop_na(IncomeGroup)
-  
-  coauthor_pubs_ALL$Dataset<-"All Countries"
-  one_author_pubs_ALL$Dataset<-"All Countries"
-  coauthor_pubs_ALL$author<-"author_first"
-  one_author_pubs_ALL$author<-"solo"
-  one_author_pubsNOCHNUSA$Dataset<-"CHN & USA excluded"
-  coauthor_pubsNOCHNUSA$Dataset<-"CHN & USA excluded"
-  one_author_pubsNOCHNUSA$author<-"solo"
-  coauthor_pubsNOCHNUSA$author<-"author_first"
-  
-  AllPubs<-bind_rows(one_author_pubs_ALL,
-                     one_author_pubsNOCHNUSA,
-                     coauthor_pubs_ALL,
-                     coauthor_pubsNOCHNUSA)
+  AllPubs<-bind_rows(sole_ALL,
+                     sole_NOCHNUSA,
+                     first_ALL,
+                     first_NOCHNUSA)
   
   levels(as.factor(AllPubs$author))
   levels(as.factor(AllPubs$Dataset))
@@ -78,12 +103,12 @@ countries<-vars[3]
   levels(as.factor(AllPubs$IncomeGroup))
   levels(as.factor(AllPubs$author))
 
-  OAData<-AllPubs %>% filter(JrnlType=="OA") %>% drop_na(IncomeGroup)
+  OAData<-AllPubs %>% filter(JrnlType=="OA" |JrnlType=="OAinPW") %>% drop_na(IncomeGroup)
   
   
   levels(as.factor(OAData$IncomeGroup))
   OA_percs<-OAData %>% 
-    group_by(author,Dataset,IncomeGroup) %>% 
+    group_by(author,Dataset,JrnlType,IncomeGroup) %>% 
     summarize(n=n()) %>% 
     mutate(perc=n/sum(n)*100)
 
@@ -129,6 +154,11 @@ countries<-vars[3]
   
   label_data$author <- factor(label_data$author,levels = c("solo","author_first"))
   
+  
+  # as.factor(Subsampled_Income_summary_plot$ArticleCat)
+  # as.factor(Subsampled_Income_summary_plot$author)
+  
+  
   IncomePlot<-ggplot(Subsampled_Income_summary_plot,aes(x=perc,fill=IncomeGroup)) +
     geom_histogram(bins=100,color="black", size=0.5, position = 'identity') +
     # scale_fill_brewer(palette = "Blues")+
@@ -161,9 +191,20 @@ countries<-vars[3]
     
     geom_text(data = label_data,
               aes(x=perc,
-                  y=400,
-                  label = "OA"),color="red", size=8)
+                  y=360,
+                  label = "OA"),color="red", size=8)+
   
+    geom_segment(data = label_data,
+                 aes(x = perc,
+                     y = as.numeric(IncomeGroup)-2,
+                     xend = perc, 
+                     yend = 350), 
+                 linetype="solid", color="blue")+
+    
+    geom_text(data = label_data,
+              aes(x=perc,
+                  y=400,
+                  label = "OA"),color="blue", size=8)
 
   IncomePlot<-IncomePlot+
     theme_classic()+

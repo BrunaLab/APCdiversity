@@ -1,4 +1,8 @@
-DivBootFig_shannon<-function(bootstrap_results) {
+DivBootFig_shannon<-function(BootMirror_RichDiv,
+                             sole_ALL,
+                             first_ALL,
+                             sole_NOCHNUSA, 
+                             first_NOCHNUSA) {
   
   
   library(ggplot2)
@@ -7,22 +11,17 @@ DivBootFig_shannon<-function(bootstrap_results) {
   library(RColorBrewer)
   library(egg)
   
-  sole_NOCHNUSA<-read_csv("./data_clean/one_author_pubsNOCHNUSA.csv")
-  coauthor_NOCHNUSA<-read_csv("./data_clean/coauthor_pubsNOCHNUSA.csv")
-  sole_ALL<-read_csv("./data_clean/sole_author_pubs_ALL_first_author.csv")
-  coauthor_ALL<-read_csv("./data_clean/coauthor_pubs_ALL_first_author.csv")
-  
   source("./Rscript/functions/DivRichCalc.R")
-  OAdiv_coauthor_ALL<-DivRichCalc(coauthor_ALL,"author_first","OA")
+  OAdiv_coauthor_ALL<-DivRichCalc(first_ALL,"author_first","both","OA")
   OAdiv_coauthor_ALL<-as.numeric(OAdiv_coauthor_ALL[4])
   
-  OAdiv_coauthor_NOCHNUSA<-DivRichCalc(coauthor_NOCHNUSA,"author_first","OA")
+  OAdiv_coauthor_NOCHNUSA<-DivRichCalc(first_NOCHNUSA,"author_first","both","OA")
   OAdiv_coauthor_NOCHNUSA<-as.numeric(OAdiv_coauthor_NOCHNUSA[4])
   
-  OAdiv_sole_ALL<-DivRichCalc(sole_ALL,"author_first","OA")
+  OAdiv_sole_ALL<-DivRichCalc(sole_ALL,"author_first","both","OA")
   OAdiv_sole_ALL<-as.numeric(OAdiv_sole_ALL[4])
   
-  OAdiv_sole_NOCHNUSA<-DivRichCalc(sole_NOCHNUSA,"author_first","OA")
+  OAdiv_sole_NOCHNUSA<-DivRichCalc(sole_NOCHNUSA,"author_first","both","OA")
   OAdiv_sole_NOCHNUSA<-as.numeric(OAdiv_sole_NOCHNUSA[4])
   
   OA_Diversity<-c(OAdiv_coauthor_ALL,OAdiv_coauthor_NOCHNUSA,
@@ -30,30 +29,31 @@ DivBootFig_shannon<-function(bootstrap_results) {
   OA_Diversity<-as_tibble(OA_Diversity)
   OA_Diversity<-dplyr::rename(OA_Diversity,"OA_Diversity"="value")
   
-  means_bootstrap_results<-bootstrap_results %>% 
+  means_Boot_RichDiv<-BootMirror_RichDiv %>% 
     group_by(author,Dataset) %>% 
     summarize(mean(Shannon))
   
-  figure_values<-bind_cols(means_bootstrap_results,OA_Diversity)
+  figure_values<-bind_cols(means_Boot_RichDiv,OA_Diversity)
   figure_values
   names(figure_values)<-c("author","Dataset", "mean_Div", "OA_Div")
   figure_values$JrnlType<-"PW"
   figure_values$mean_Div<-round(figure_values$mean_Div,digits=1)
   figure_values$OA_Div<-round(figure_values$OA_Div,digits=1)
-  summary(as.factor(bootstrap_results$author))
-  summary(as.factor(bootstrap_results$Dataset))
-  summary(as.factor(bootstrap_results$JrnlType))
+  summary(as.factor(BootMirror_RichDiv$author))
+  summary(as.factor(BootMirror_RichDiv$Dataset))
+  summary(as.factor(BootMirror_RichDiv$JrnlType))
   
   yWO_Div<-275
   yALL_Div<-275
   ySolo_Div<-275
   author.labels <- c(author_first = "First Authors", solo= "Single Authors")
   
-  bootstrap_results$Dataset<-gsub("CHN & USA excluded", "Without China & USA",bootstrap_results$Dataset)
-  figure_values$Dataset<-gsub("CHN & USA excluded", "Without China & USA",figure_values$Dataset)
+  BootMirror_RichDiv$Dataset<-gsub("all", "All Countries",BootMirror_RichDiv$Dataset)
+  BootMirror_RichDiv$Dataset<-gsub("no_CHN_USA", "Without China & USA",BootMirror_RichDiv$Dataset)
+  figure_values$Dataset<-gsub("no_CHN_USA", "Without China & USA",figure_values$Dataset)
+  figure_values$Dataset<-gsub("all", "All Countries",figure_values$Dataset)
   
-  
-  bootstrap_results$author <- factor(bootstrap_results$author,
+  BootMirror_RichDiv$author <- factor(BootMirror_RichDiv$author,
                                      levels = c("solo","author_first"))
   figure_values$author <- factor(figure_values$author,
                                  levels = c("solo","author_first"))
@@ -61,7 +61,7 @@ DivBootFig_shannon<-function(bootstrap_results) {
   
   
   pDiv<-
-    ggplot(bootstrap_results, aes(x=Shannon,fill=JrnlType)) +
+    ggplot(BootMirror_RichDiv, aes(x=Shannon,fill=JrnlType)) +
     geom_histogram(bins=50, color="black",fill="darkgray",
                    size=0.1,alpha=0.4, position = 'identity') +
     facet_grid(cols = vars(Dataset), rows=vars(author),
@@ -70,69 +70,69 @@ DivBootFig_shannon<-function(bootstrap_results) {
     xlim(2.5,4)+
     # ylim(0,400)+
     # scale_x_continuous(breaks = seq(0,70, by=10),expand=c(0.1,0.02))+
-    scale_y_continuous(limits = c(0, 300),breaks = seq(0,300, by=50),expand=c(0,0.1))+
+    scale_y_continuous(limits = c(0, 500),breaks = seq(0,500, by=50),expand=c(0,0.1))+
     # 
     geom_hline((aes(yintercept=-Inf)), color="black") +
     geom_vline((aes(xintercept=-Inf)) , color="black")+
     coord_cartesian(clip="off")+
     # ylim(0,170)+
     # median OF BOOTSTRAP
-    geom_segment(data = subset(filter(figure_values, author == "author_first" & Dataset == "All Countries")),
-                 aes(x = mean_Div, y = 0, xend = mean_Div, yend = yALL_Div), linetype="solid")+
-    geom_text(data = subset(filter(figure_values, author == "author_first" & Dataset == "All Countries")),
-              aes(x=mean_Div-0.15, y=yALL_Div+15, label=(paste("PW['mean']",as.character(mean_Div),sep=" == "))), 
-              parse=TRUE,size=2)+
-    
+    # geom_segment(data = subset(filter(figure_values, author == "author_first" & Dataset == "All Countries")),
+    #              aes(x = mean_Div, y = 0, xend = mean_Div, yend = yALL_Div), linetype="solid")+
+    # geom_text(data = subset(filter(figure_values, author == "author_first" & Dataset == "All Countries")),
+    #           aes(x=mean_Div-0.15, y=yALL_Div+15, label=(paste("PW['mean']",as.character(mean_Div),sep=" == "))), 
+    #           parse=TRUE,size=2)+
+    # 
     # OA Value
     geom_segment(data = subset(filter(figure_values,author == "author_first" & Dataset == "All Countries")),
                  aes(x = OA_Div , y = 0, xend = OA_Div, yend = yALL_Div), 
                  colour = "red",linetype="solid")+
-    geom_text(data = subset(filter(figure_values,author == "author_first" & Dataset == "All Countries")),
-              aes(x=OA_Div+.05, y=yALL_Div+15, label=(paste("OA",as.character(OA_Div),sep=" == "))),
-              parse=TRUE,color="red", size=2)+
+    # geom_text(data = subset(filter(figure_values,author == "author_first" & Dataset == "All Countries")),
+    #           aes(x=OA_Div, y=yALL_Div+15, label=(paste("OA",as.character(OA_Div),sep=" == "))),
+    #           parse=TRUE,color="red", size=2)+
     # MEAN OF BOOTSTRAP
-    geom_segment(data = subset(filter(figure_values,author == "solo" & Dataset == "All Countries")),
-                 aes(x = mean_Div, y = 0, xend = mean_Div, yend = yALL_Div), linetype="solid")+
-    geom_text(data = subset(filter(figure_values,author == "solo" & Dataset == "All Countries")),
-              aes(x=mean_Div+0.15, y=yALL_Div+15, label=(paste("PW['mean']",as.character(mean_Div),sep=" == "))), 
-              parse=TRUE,size=2)+
+    # geom_segment(data = subset(filter(figure_values,author == "solo" & Dataset == "All Countries")),
+    #              aes(x = mean_Div, y = 0, xend = mean_Div, yend = yALL_Div), linetype="solid")+
+    # geom_text(data = subset(filter(figure_values,author == "solo" & Dataset == "All Countries")),
+    #           aes(x=mean_Div+0.15, y=yALL_Div+15, label=(paste("PW['mean']",as.character(mean_Div),sep=" == "))), 
+    #           parse=TRUE,size=2)+
     # OA Value
     
     geom_segment(data = subset(filter(figure_values,author == "solo" & Dataset == "All Countries")),
                  aes(x = OA_Div , y = 0, xend = OA_Div, yend = ySolo_Div), 
                  colour = "red",linetype="solid")+
-    geom_text(data = subset(filter(figure_values,author == "solo" & Dataset == "All Countries")),
-              aes(x=OA_Div-0.1, y=ySolo_Div+15, label=(paste("OA",as.character(OA_Div),sep=" == "))),
-              parse=TRUE,color="red", size=2)+
+    # geom_text(data = subset(filter(figure_values,author == "solo" & Dataset == "All Countries")),
+    #           aes(x=OA_Div, y=ySolo_Div+15, label=(paste("OA",as.character(OA_Div),sep=" == "))),
+    #           parse=TRUE,color="red", size=2)+
     
     # MEAN OF BOOTSTRAP
-    geom_segment(data = subset(filter(figure_values,author == "author_first" & Dataset == "Without China & USA")),
-                 aes(x = mean_Div, y = 0, xend = mean_Div, yend = yWO_Div), linetype="solid")+
-    geom_text(data = subset(filter(figure_values,author == "author_first" & Dataset == "Without China & USA")),
-              aes(x=mean_Div+0.15, y=yWO_Div+15, label=(paste("PW['mean']",as.character(mean_Div),sep=" == "))), 
-              parse=TRUE,size=2)+
+    # geom_segment(data = subset(filter(figure_values,author == "author_first" & Dataset == "Without China & USA")),
+    #              aes(x = mean_Div, y = 0, xend = mean_Div, yend = yWO_Div), linetype="solid")+
+    # geom_text(data = subset(filter(figure_values,author == "author_first" & Dataset == "Without China & USA")),
+    #           aes(x=mean_Div+0.15, y=yWO_Div+15, label=(paste("PW['mean']",as.character(mean_Div),sep=" == "))), 
+    #           parse=TRUE,size=2)+
     
     # OA Value
-    geom_segment(data = subset(filter(figure_values,author == "author_first" & Dataset == "Without China & USA")),
+    geom_segment(data = subset(filter(figure_values,author == "author_first" & Dataset == "CHN & USA excluded")),
                  aes(x = OA_Div, y = 0, xend = OA_Div, yend = yWO_Div), 
                  colour = "red",linetype="solid")+
-    geom_text(data = subset(filter(figure_values,author == "author_first" & Dataset == "Without China & USA")),
-              aes(x=OA_Div-0.1, y=yWO_Div+15, label=(paste("OA",as.character(OA_Div),sep=" == "))), 
-              parse=TRUE,color="red", size=2)+
+    # geom_text(data = subset(filter(figure_values,author == "author_first" & Dataset == "CHN & USA excluded")),
+    #           aes(x=OA_Div, y=yWO_Div+15, label=(paste("OA",as.character(OA_Div),sep=" == "))), 
+    #           parse=TRUE,color="red", size=2)+
     # MEAN OF BOOTSTRAP
-    geom_segment(data = subset(filter(figure_values,author == "solo" & Dataset == "Without China & USA")),
-                 aes(x = mean_Div, y = 0, xend = mean_Div, yend = yWO_Div), linetype="solid")+
-    geom_text(data = subset(filter(figure_values,author == "solo" & Dataset == "Without China & USA")),
-              aes(x=mean_Div+0.15, y=yWO_Div+15, label=(paste("PW['mean']",as.character(mean_Div),sep=" == "))), 
-              parse=TRUE,size=2)+
+    # geom_segment(data = subset(filter(figure_values,author == "solo" & Dataset == "Without China & USA")),
+    #              aes(x = mean_Div, y = 0, xend = mean_Div, yend = yWO_Div), linetype="solid")+
+    # geom_text(data = subset(filter(figure_values,author == "solo" & Dataset == "Without China & USA")),
+    #           aes(x=mean_Div+0.15, y=yWO_Div+15, label=(paste("PW['mean']",as.character(mean_Div),sep=" == "))), 
+    #           parse=TRUE,size=2)+
     
     # OA Value
-    geom_segment(data = subset(filter(figure_values,author == "solo" & Dataset == "Without China & USA")),
+    geom_segment(data = subset(filter(figure_values,author == "solo" & Dataset == "CHN & USA excluded")),
                  aes(x = OA_Div , y = 0, xend = OA_Div, yend = ySolo_Div), 
                  colour = "red",linetype="solid")+
-    geom_text(data = subset(filter(figure_values,author == "solo" & Dataset == "Without China & USA")),
-              aes(x=OA_Div-0.1, y=ySolo_Div+15, label=(paste("OA",as.character(OA_Div),sep=" == "))),
-              parse=TRUE,color="red", size=2)+
+    # geom_text(data = subset(filter(figure_values,author == "solo" & Dataset == "CHN & USA excluded")),
+    #           aes(x=OA_Div, y=ySolo_Div+15, label=(paste("OA",as.character(OA_Div),sep=" == "))),
+    #           parse=TRUE,color="red", size=2)+
     guides(fill=guide_legend("Journal\nCategory"))+
     xlab("Geographic Diversity (Shannon Index)")+
     ylab("Frequency")

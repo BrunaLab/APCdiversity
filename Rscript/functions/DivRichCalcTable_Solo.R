@@ -1,17 +1,29 @@
-DivRichCalcTable_Solo<-function(one_author_pubs_ALL,
-                                one_author_pubsNOCHNUSA,
-                                SubsampledPW.results_Solo,
-                                SubsampledPW.results_Solo_NoUSACHN){
-  
-  
+# DivRichCalcTable_Solo<-function(one_author_pubs_ALL,
+#                                 one_author_pubsNOCHNUSA,
+#                                 SubsampledPW.results_Solo,
+#                                 SubsampledPW.results_Solo_NoUSACHN){
+# 
+  DivRichCalcTable_Solo<-function(sole_ALL,
+                                  sole_NOCHNUSA,
+                                  SubsampledPW.results_Solo,
+                                  SubsampledPW.results_Solo_NoUSACHN,
+                                  ArticleType){
+    
+
   # browser()
-  
-  # DataSet1<-one_author_pubs_ALL
-  # DataSet2<-one_author_pubsNOCHNUSA
-  vars<-list(one_author_pubs_ALL,
-             one_author_pubsNOCHNUSA,
+    # 
+    
+  #   SubsampledPW.results_Solo<-BootPW_SoloAll[1]
+  #   SubsampledPW.results_Solo_NoUSACHN<-BootPW_SoloNoUSACHN[1]
+  #   # ArticleType<-"OA"
+    #   # ArticleType<-"OAinPW"
+  # # DataSet1<-sole_ALL
+  # DataSet2<-sole_NOCHNUSA
+  vars<-list(sole_ALL,
+             sole_NOCHNUSA,
              SubsampledPW.results_Solo,
-             SubsampledPW.results_Solo_NoUSACHN)
+             SubsampledPW.results_Solo_NoUSACHN,
+             ArticleType)
              
   # browser()
   # 
@@ -19,6 +31,7 @@ DivRichCalcTable_Solo<-function(one_author_pubs_ALL,
   Original_data_noCHNorUSA<-as.data.frame(vars[2])
   SampledData_All<-as.data.frame(vars[3])
   SampledData_NoUSACHN<-as.data.frame(vars[4])
+  ArticleType<-as.character(vars[5])
   
   
   
@@ -33,8 +46,7 @@ DivRichCalcTable_Solo<-function(one_author_pubs_ALL,
   source("./Rscript/functions/DivRichCalc.R") 
   
   AuPosition<-"author_first"
-  JrnlType<-"OA"
-  Div_OA_pool_first<-DivRichCalc(Original_data_All,AuPosition,JrnlType)
+  Div_OA_pool_first<-DivRichCalc(sole_ALL,AuPosition,ArticleType)
   
   # Binding together
   DivMetricsPubsPooled_OA <- as.data.frame(cbind(Div_OA_pool_first[1],
@@ -60,8 +72,8 @@ DivRichCalcTable_Solo<-function(one_author_pubs_ALL,
   
   source("./Rscript/functions/DivRichCalc.R") 
   AuPosition<-"author_first"
-  JrnlType<-"OA"
-  Div_OA_pool_first_noCHNorUSA<-DivRichCalc(one_author_pubsNOCHNUSA,AuPosition,JrnlType)
+  # ArticleType<-"OA"
+  Div_OA_pool_first_noCHNorUSA<-DivRichCalc(sole_NOCHNUSA,AuPosition,ArticleType)
   
   # Binding together
   DivMetricsPubsPooled_OA_noCHNorUSA <- as.data.frame(cbind(Div_OA_pool_first_noCHNorUSA[1],

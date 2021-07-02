@@ -14,7 +14,6 @@ library(tidyverse)
 
 # NEED TO STANDARDIZE COUNTRYIES IN UK IN COUNTRY COLUMN
 MirrorPairs<-read.csv("./data_clean/MirrorPairs.csv")
-
 WaiverCountries<-read.csv("./data_clean/WaiverCountries.csv")
 NON_WavierCountries<-read.csv("./data_clean/NON_WavierCountries.csv")
 
@@ -34,10 +33,21 @@ CountryData <- CountryData %>%
 CountryData$Region <-droplevels(CountryData$Region)
 levels(CountryData$Region)
 
+# These are the OA articles that were published in PW journals
+# they are NOT in the AllData file - that file includes ONLY
+# PW articles in PW journals
+OA_in_PW<-read_csv(file="./data_clean/OA_in_PW.csv")
+OA_in_PW<-ungroup(OA_in_PW)
 
 
 # Need to generate subsets of sole-author pubs, coauthor pubs 
 AllData<-read_csv(file="./data_clean/all_data_analysis.csv")
+AllData<-ungroup(AllData)
+
+
+
+AllData$pair_key<-as.factor(AllData$pair_key)
+AllData$pair_key<-droplevels(AllData$pair_key)
 
 AllData$First_Author_Country[AllData$First_Author_Country=="uk"|
                                AllData$First_Author_Country=="UK"|
@@ -177,8 +187,8 @@ write.csv(coauthor_pubs_ALL_first_author,file="./data_clean/coauthor_pubs_ALL_fi
 n_journals <- AllData %>% 
   group_by(JrnlType) %>% 
   summarize(n=n_distinct(Journal))
-n_journalsOA<-njournals[1,2]
-n_journalsPW<-njournals[2,2]
+n_journalsOA<-n_journals[1,2]
+n_journalsPW<-n_journals[2,2]
 
 ############################################################
 # APCs
@@ -190,7 +200,8 @@ APC_stats<-MirrorPairs %>%
             sd_APC=sd(APC),
             maxAPC=max(APC),
             minAPC=min(APC))
-APC_stats<-round(APC,2)
+APC_stats$avg_APC<-round(APC_stats$avg_APC,2)
+APC_stats$sd_APC<-round(APC_stats$sd_APC,2)
 APC_stats
 
 ############################################################
@@ -314,7 +325,7 @@ write.csv(SubsampledPW.results_First_Co_All[2],
           'output/SubsampledPW.results_Countries_CO_ALL.csv', 
           row.names = FALSE)
 
-SubsampledPW.results_RichDiv_CO_ALL.csv
+
 
 ########################################
 # SAMPLED DIV/RICH: SOLE AUTHOR PUBS, ALL COUNTRIES
@@ -470,8 +481,9 @@ Table2
 # ##################################################
 # # DATA PREP
 # OA_papers <- sole_author_pubs_ALL %>% filter(JrnlType == "OA")
-source("./Rscript/functions/DivRichCalc.R") 
-OA_data<-DivRichCalc(OA_papers,author_first,OA)
+# source("./Rscript/functions/DivRichCalc.R") 
+# OA_data<-DivRichCalc(OA_papers,author_first,OA)
+
 # # OA_papers <- coauthor_pubsNOCHNUSA %>% filter(JrnlType == "OA")
 # OA_papers_boot<-sample_n(OA_papers, nrow(OA_papers), replace = TRUE)
 # source("./Rscript/functions/DivRichCalc.R") 
@@ -568,25 +580,42 @@ bootstrap_results$author<-ordered(bootstrap_results$author,
                                              "author_first"))
 levels(as.factor(bootstrapped_PW_combined$author))
 levels(as.factor(bootstrapped_PW_combined$Dataset))
-# bootstrap_results<-bind_rows(bootstrapped_PW_combined,
-#                              bootstrapped_OA_combined)
+
 
 ################
-OADivRichSolo<-DivRichCalc(one_author_pubs,"author_first","OA")
+
+
+OADivRichSolo<-DivRichCalc(sole_ALL,"author_first","OA")
 OAdivFA<-as.numeric((OADivRichSolo)[2])
 OARichFA<-as.numeric((OADivRichSolo)[1])
 
-OADivRichSoloNo<-DivRichCalc(one_author_pubsNOCHNUSA,"author_first","OA")
+OADivRichSoloNo<-DivRichCalc(sole_NOCHNUSA,"author_first","OA")
 OAdivFANo<-as.numeric((OADivRichSoloNo)[2])
 OARichFANo<-as.numeric((OADivRichSoloNo)[1])
 
-OADivRichFA<-DivRichCalc(coauthor_pubs,"author_first","OA")
+OADivRichFA<-DivRichCalc(coauthor_ALL,"author_first","OA")
 OAdivFA<-as.numeric((OADivRichFA)[2])
 OARichFA<-as.numeric((OADivRichFA)[1])
 
-OADivRichFN<-DivRichCalc(coauthor_pubsNOCHNUSA,"author_first","OA")
+OADivRichFN<-DivRichCalc(coauthor_NOCHNUSA,"author_first","OA")
 OAdivFN<-as.numeric((OADivRichFN)[2])
 OARichFN<-as.numeric((OADivRichFN)[1])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# bootstrap_results<-bind_rows(bootstrapped_PW_combined,
+#                              bootstrapped_OA_combined)
 
 summary(bootstrap_results)
 write.csv(bootstrap_results,'./output/bootstrap_results.csv',row.names = FALSE)
@@ -667,6 +696,16 @@ Table2.2$author<-as.factor(Table2.2$author)
 
 write.csv(Table2.2,'./output/Table2.2.csv',row.names = FALSE)
 # Table2.2<-read_csv('./output/Table2.2.csv')
+
+##############################################################
+# END 30 NOV
+##############################################################
+
+
+
+
+
+
 
 ###################
 # Figure - Diversity

@@ -46,14 +46,14 @@ AppFig1<-function(AllData) {
     lst.common.authors<-slice(AllGeo, (cutoff+1):nrow(AllGeo)) 
     # lst.common.authors$Code<-"all others"
     # lst.common.authors$IncomeGroup<-"all others"
-    lst.common.authors<-lst.common.authors %>% 
+    lst.common.authors <- lst.common.authors %>% 
       group_by(IncomeGroup) %>% 
-      summarize(n=sum(n),perc=sum(perc),n_countries=n_distinct(Code)) 
+      summarize(n=sum(n), perc=sum(perc), n_countries = n_distinct(Code)) 
     
-    lst.common.authors$Code<-paste(lst.common.authors$n_countries,lst.common.authors$IncomeGroup,sep = " ", collapse = NULL)
-    # lst.common.authors$Code<-paste(lst.common.authors$n_countries,lst.common.authors$IncomeGroup,"income countries", sep = " ", collapse = NULL)
-    # lst.common.authors$Code<-gsub("income countries","",lst.common.authors$Code)
-    # 
+    lst.common.authors$Code <- paste(lst.common.authors$n_countries, 
+                                     lst.common.authors$IncomeGroup,sep = " ", 
+                                     collapse = NULL)
+    
     lst.common.authors$IncomeGroup<- ordered(lst.common.authors$IncomeGroup, 
                                              levels = c("Low", 
                                                         "Lower-middle",

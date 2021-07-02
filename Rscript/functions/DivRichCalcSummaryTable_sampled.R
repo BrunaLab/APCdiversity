@@ -1,25 +1,31 @@
 DivRichCalcSummaryTable_sampled<-function(Dataset,
                                           Dataset2,
                                           SubsampledPW.results_First,
-                                          SubsampledPW.results_First_NOUSACHN){
+                                          SubsampledPW.results_First_NOUSACHN,
+                                          ArticleType){
   
   # browser()
-  # Dataset<-coauthor_pubs_ALL_first_author
-  # Dataset2<-coauthor_pubsNOCHNUSA_first_author
-  # SubsampledPW.results_First<-SubsampledPW.results_First_Co_All
-  # SubsampledPW.results_First_NOUSACHN<- SubsampledPW.results_First_Co_NOUSACHN
-  
+  # SubsampledPW.results_First<-BootPW_CoAll[1],
+  # SubsampledPW.results_First_NOUSACHN<- BootPW_CoNoUSACHN[1]
+  # ArticleType<-"OAinPW"
+  # AuPosition<-"author_first"
+  # ArticleType<-"OA"
+  # DataSet2<-first_NOCHNUSA
+  # DataSet<-first_ALL
+  # AuPosition<-"author_first"
+  # ArticleType<-"OAinPW"
   vars<-list(Dataset,
              Dataset2,
              SubsampledPW.results_First,
-             SubsampledPW.results_First_NOUSACHN)
+             SubsampledPW.results_First_NOUSACHN,
+             ArticleType)
   # browser()
   # 
   Dataset<-as.data.frame(vars[1])
   Dataset2<-as.data.frame(vars[2])
   SubPW_First<-as.data.frame(vars[3])
   SubPW_First_NOUSACHN<-as.data.frame(vars[4])
-  
+  ArticleType<-as.character(vars[5])
   
   
   library(vegan)
@@ -31,11 +37,11 @@ DivRichCalcSummaryTable_sampled<-function(Dataset,
   ##################################################
   # OA STATS _ALL COUNTRIES
   
+  
+  
   source("./Rscript/functions/DivRichCalc.R") 
-
   AuPosition<-"author_first"
-  JrnlType<-"OA"
-  Div_OA_pool_first<-DivRichCalc(Dataset,AuPosition,JrnlType)
+  Div_OA_pool_first<-DivRichCalc(first_ALL,AuPosition,ArticleType)
   
   
   # Binding together
@@ -58,9 +64,9 @@ DivRichCalcSummaryTable_sampled<-function(Dataset,
   # OA STATS _noChina or usa
   
   source("./Rscript/functions/DivRichCalc.R") 
-    AuPosition<-"author_first"
-  JrnlType<-"OA"
-  Div_OA_pool_first_noCHNorUSA<-DivRichCalc(Dataset2,AuPosition,JrnlType)
+  # AuPosition<-"author_first"
+  # ArticleType<-"OA"
+  Div_OA_pool_first_noCHNorUSA<-DivRichCalc(first_NOCHNUSA,"author_first",ArticleType)
   
   
   # Binding together

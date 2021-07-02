@@ -1,185 +1,768 @@
-Table2<-function(sole_author_pubs_ALL_first_author,sole_author_pubsNOCHNUSA_first_author,
-                 coauthor_pubs_ALL_first_author,coauthor_pubsNOCHNUSA_first_author){
-  vars<-list(sole_author_pubs_ALL_first_author,
-             sole_author_pubsNOCHNUSA_first_author,
-             coauthor_pubs_ALL_first_author,
-             coauthor_pubsNOCHNUSA_first_author)
-source("./Rscript/functions/DivRichCalcTable_Solo.R")
-source("./Rscript/functions/DivRichCalcSummaryTable_sampled.R")
+Table2<-function(sole_ALL,sole_NOCHNUSA,first_ALL,first_NOCHNUSA){
+  
+BootOAinPW_RichDiv<-read_csv("./output/BootOAinPW_RichDiv.csv")
+# BootOAinPW_Countries<-read_csv("./output/BootOAinPW_Countries.csv")
+BootMirror_RichDiv<-read_csv("./output/BootMirror_RichDiv.csv")
+# BootMirror_Countries<-read_csv("./output/BootMirror_Countries.csv")
 
+library(tidyverse)
 
-SubsampledPW.results_Solo<-read_csv('output/SubsampledPW.results_RichDiv_SOLO_ALL.csv')
-SubsampledPW.results_Solo_NoUSACHN<-read_csv('output/SubsampledPW.results_RichDiv_SOLO_NoUSACHN.csv')
-SubsampledPW.results_First<-read_csv('output/SubsampledPW.results_RichDiv_CO_ALL.csv')
-SubsampledPW.results_First_NoUSACHN<-read_csv('output/SubsampledPW.results_RichDiv_CO_NOUSACHN.csv')
+# OA - Both Mirror and Parent pooled---------------------------------------
+# 
+#   source("./Rscript/functions/DivRichCalc.R")
+#   OAdiv_first_ALL_OApool<-DivRichCalc(first_ALL,"author_first","both","OA")
+#   OAdiv_first_ALL_OApool<-as.numeric(OAdiv_first_ALL_OApool[2])
+#   OArich_first_ALL_OApool<-DivRichCalc(first_ALL,"author_first","both","OA")
+#   OArich_first_ALL_OApool<-as.numeric(OArich_first_ALL_OApool[1])
+#   OAeven_first_ALL_OApool<-DivRichCalc(first_ALL,"author_first","both","OA")
+#   OAeven_first_ALL_OApool<-as.numeric(OAeven_first_ALL_OApool[5])
+#   
+#   OAdiv_first_NOCHNUSA_OApool<-DivRichCalc(first_NOCHNUSA,"author_first","both","OA")
+#   OAdiv_first_NOCHNUSA_OApool<-as.numeric(OAdiv_first_NOCHNUSA_OApool[2])
+#   OArich_first_NOCHNUSA_OApool<-DivRichCalc(first_NOCHNUSA,"author_first","both","OA")
+#   OArich_first_NOCHNUSA_OApool<-as.numeric(OArich_first_NOCHNUSA_OApool[1])
+#   OAeven_first_NOCHNUSA_OApool<-DivRichCalc(first_NOCHNUSA,"author_first","both","OA")
+#   OAeven_first_NOCHNUSA_OApool<-as.numeric(OAeven_first_NOCHNUSA_OApool[5])
+#   
+# 
+#   OAdiv_sole_ALL_OApool<-DivRichCalc(sole_ALL,"author_first","both","OA")
+#   OAdiv_sole_ALL_OApool<-as.numeric(OAdiv_sole_ALL_OApool[2])
+#   OArich_sole_ALL_OApool<-DivRichCalc(sole_ALL,"author_first","both","OA")
+#   OArich_sole_ALL_OApool<-as.numeric(OArich_sole_ALL_OApool[1])
+#   OAeven_sole_ALL_OApool<-DivRichCalc(sole_ALL,"author_first","both","OA")
+#   OAeven_sole_ALL_OApool<-as.numeric(OAeven_sole_ALL_OApool[5])
+#   
+#   
+#   OAdiv_sole_NOCHNUSA_OApool<-DivRichCalc(sole_NOCHNUSA,"author_first","both","OA")
+#   OAdiv_sole_NOCHNUSA_OApool<-as.numeric(OAdiv_sole_NOCHNUSA_OApool[2])
+#   OArich_sole_NOCHNUSA_OApool<-DivRichCalc(sole_NOCHNUSA,"author_first","both","OA")
+#   OArich_sole_NOCHNUSA_OApool<-as.numeric(OArich_sole_NOCHNUSA_OApool[1])
+#   OAeven_sole_NOCHNUSA_OApool<-DivRichCalc(sole_NOCHNUSA,"author_first","both","OA")
+#   OAeven_sole_NOCHNUSA_OApool<-as.numeric(OAeven_sole_NOCHNUSA_OApool[5])
+#   
+#   
+#   
+#   author<-c(rep("First",2),rep("Single",2))
+#   Dataset<-rep(c("All Countries","Without China & USA"),2)
+#   # OA_articleType<-c(rep("allOA",4),rep("mirror",4),rep("OAinPW",4))
+#   OA_articleType<-c(rep("allOA",4))
+#   
+#   OA_Diversity<-data.frame("OA"=c(OAdiv_first_ALL_OApool,
+#                   OAdiv_first_NOCHNUSA_OApool,
+#                   OAdiv_sole_ALL_OApool,
+#                   OAdiv_sole_NOCHNUSA_OApool), 
+#                   "Author"=author,
+#                   "Dataset"=Dataset)
+#   
+#   OA_Richness<-data.frame("OA"=c(OArich_first_ALL_OApool,
+#                  OArich_first_NOCHNUSA_OApool,
+#                  OArich_sole_ALL_OApool,
+#                  OArich_sole_NOCHNUSA_OApool),
+#                  "Author"=author,
+#                  "Dataset"=Dataset)
+#   
+#   
+#     
+#     OA_Evenness<-data.frame("OA"=c(OAeven_first_ALL_OApool,
+#                                    OAeven_first_NOCHNUSA_OApool,
+#                                    OAeven_sole_ALL_OApool,
+#                                    OAeven_sole_NOCHNUSA_OApool),
+#                             "Author"=author,
+#                             "Dataset"=Dataset)
+#     
+#     OA_Richness$OA <- round(OA_Richness$OA,0)
+#     OA_Evenness$OA <- round(OA_Evenness$OA,2)
+#     OA_Diversity$OA <- round(OA_Diversity$OA,1)
+#     
+#   Observed<-bind_rows(OA_Richness,OA_Diversity,OA_Evenness)
+#   Observed$Metric=c(rep("Richness",4),rep("Diversity",4),rep("Evenness",4)) 
+#   
+#   Observed<-Observed %>% 
+#     select(Metric,Author,Dataset,OA) %>% 
+#     arrange(desc(Metric),Dataset,desc(Author))
+#   Observed<-pivot_wider(Observed,names_from=Dataset,values_from = c(OA))
+# 
+#   
+#   Observed_both_OA<-Observed
+#   Observed_both_OA$OA_jrnl<-"both"
+# OA - Mirror -------------------------------------------------------------
+  
+  OAdiv_first_ALL_OApool<-DivRichCalc(first_ALL,"author_first","OA","OA")
+  OAdiv_first_ALL_OApool<-as.numeric(OAdiv_first_ALL_OApool[2])
+  OArich_first_ALL_OApool<-DivRichCalc(first_ALL,"author_first","OA","OA")
+  OArich_first_ALL_OApool<-as.numeric(OArich_first_ALL_OApool[1])
+  OAeven_first_ALL_OApool<-DivRichCalc(first_ALL,"author_first","OA","OA")
+  OAeven_first_ALL_OApool<-as.numeric(OAeven_first_ALL_OApool[5])
+  
+  OAdiv_first_NOCHNUSA_OApool<-DivRichCalc(first_NOCHNUSA,"author_first","OA","OA")
+  OAdiv_first_NOCHNUSA_OApool<-as.numeric(OAdiv_first_NOCHNUSA_OApool[2])
+  OArich_first_NOCHNUSA_OApool<-DivRichCalc(first_NOCHNUSA,"author_first","OA","OA")
+  OArich_first_NOCHNUSA_OApool<-as.numeric(OArich_first_NOCHNUSA_OApool[1])
+  OAeven_first_NOCHNUSA_OApool<-DivRichCalc(first_NOCHNUSA,"author_first","OA","OA")
+  OAeven_first_NOCHNUSA_OApool<-as.numeric(OAeven_first_NOCHNUSA_OApool[5])
+  
+  
+  OAdiv_sole_ALL_OApool<-DivRichCalc(sole_ALL,"author_first","OA","OA")
+  OAdiv_sole_ALL_OApool<-as.numeric(OAdiv_sole_ALL_OApool[2])
+  OArich_sole_ALL_OApool<-DivRichCalc(sole_ALL,"author_first","OA","OA")
+  OArich_sole_ALL_OApool<-as.numeric(OArich_sole_ALL_OApool[1])
+  OAeven_sole_ALL_OApool<-DivRichCalc(sole_ALL,"author_first","OA","OA")
+  OAeven_sole_ALL_OApool<-as.numeric(OAeven_sole_ALL_OApool[5])
+  
+  
+  OAdiv_sole_NOCHNUSA_OApool<-DivRichCalc(sole_NOCHNUSA,"author_first","OA","OA")
+  OAdiv_sole_NOCHNUSA_OApool<-as.numeric(OAdiv_sole_NOCHNUSA_OApool[2])
+  OArich_sole_NOCHNUSA_OApool<-DivRichCalc(sole_NOCHNUSA,"author_first","OA","OA")
+  OArich_sole_NOCHNUSA_OApool<-as.numeric(OArich_sole_NOCHNUSA_OApool[1])
+  OAeven_sole_NOCHNUSA_OApool<-DivRichCalc(sole_NOCHNUSA,"author_first","OA","OA")
+  OAeven_sole_NOCHNUSA_OApool<-as.numeric(OAeven_sole_NOCHNUSA_OApool[5])
+  
+  
+  
+  author<-c(rep("First",2),rep("Single",2))
+  Dataset<-rep(c("All Countries","Without China & USA"),2)
+  # OA_articleType<-c(rep("allOA",4),rep("mirror",4),rep("OAinPW",4))
+  OA_articleType<-c(rep("mirror_OA",4))
+  
+  OA_Diversity<-data.frame("OA"=c(OAdiv_first_ALL_OApool,
+                                  OAdiv_first_NOCHNUSA_OApool,
+                                  OAdiv_sole_ALL_OApool,
+                                  OAdiv_sole_NOCHNUSA_OApool), 
+                           "Author"=author,
+                           "Dataset"=Dataset)
+  
+  OA_Richness<-data.frame("OA"=c(OArich_first_ALL_OApool,
+                                 OArich_first_NOCHNUSA_OApool,
+                                 OArich_sole_ALL_OApool,
+                                 OArich_sole_NOCHNUSA_OApool),
+                          "Author"=author,
+                          "Dataset"=Dataset)
+  
+  
+  
+  OA_Evenness<-data.frame("OA"=c(OAeven_first_ALL_OApool,
+                                 OAeven_first_NOCHNUSA_OApool,
+                                 OAeven_sole_ALL_OApool,
+                                 OAeven_sole_NOCHNUSA_OApool),
+                          "Author"=author,
+                          "Dataset"=Dataset)
+  
+  OA_Richness$OA <- round(OA_Richness$OA,0)
+  OA_Evenness$OA <- round(OA_Evenness$OA,2)
+  OA_Diversity$OA <- round(OA_Diversity$OA,1)
+  
+  Observed<-bind_rows(OA_Richness,OA_Diversity,OA_Evenness)
+  Observed$Metric=c(rep("Richness",4),rep("Diversity",4),rep("Evenness",4)) 
+  
+  Observed<-Observed %>% 
+    select(Metric,Author,Dataset,OA) %>% 
+    arrange(desc(Metric),Dataset,desc(Author))
+  Observed<-pivot_wider(Observed,names_from=Dataset,values_from = c(OA))
+  
+  Observed_mirror_OA<-Observed
+  Observed_mirror_OA$OA_jrnl<-"mirror"
+  
+  
+# OA - Parent -------------------------------------------------------------
 
-Table2_Solo<-DivRichCalcTable_Solo(as.data.frame(vars[1]),
-                                   as.data.frame(vars[2]),
-                                   SubsampledPW.results_Solo,
-                                   SubsampledPW.results_Solo_NoUSACHN)
+  
+  OAdiv_first_ALL_OApool<-DivRichCalc(first_ALL,"author_first","PW","OA")
+  OAdiv_first_ALL_OApool<-as.numeric(OAdiv_first_ALL_OApool[2])
+  OArich_first_ALL_OApool<-DivRichCalc(first_ALL,"author_first","PW","OA")
+  OArich_first_ALL_OApool<-as.numeric(OArich_first_ALL_OApool[1])
+  OAeven_first_ALL_OApool<-DivRichCalc(first_ALL,"author_first","PW","OA")
+  OAeven_first_ALL_OApool<-as.numeric(OAeven_first_ALL_OApool[5])
+  
+  OAdiv_first_NOCHNUSA_OApool<-DivRichCalc(first_NOCHNUSA,"author_first","PW","OA")
+  OAdiv_first_NOCHNUSA_OApool<-as.numeric(OAdiv_first_NOCHNUSA_OApool[2])
+  OArich_first_NOCHNUSA_OApool<-DivRichCalc(first_NOCHNUSA,"author_first","PW","OA")
+  OArich_first_NOCHNUSA_OApool<-as.numeric(OArich_first_NOCHNUSA_OApool[1])
+  OAeven_first_NOCHNUSA_OApool<-DivRichCalc(first_NOCHNUSA,"author_first","PW","OA")
+  OAeven_first_NOCHNUSA_OApool<-as.numeric(OAeven_first_NOCHNUSA_OApool[5])
+  
+  
+  OAdiv_sole_ALL_OApool<-DivRichCalc(sole_ALL,"author_first","PW","OA")
+  OAdiv_sole_ALL_OApool<-as.numeric(OAdiv_sole_ALL_OApool[2])
+  OArich_sole_ALL_OApool<-DivRichCalc(sole_ALL,"author_first","PW","OA")
+  OArich_sole_ALL_OApool<-as.numeric(OArich_sole_ALL_OApool[1])
+  OAeven_sole_ALL_OApool<-DivRichCalc(sole_ALL,"author_first","PW","OA")
+  OAeven_sole_ALL_OApool<-as.numeric(OAeven_sole_ALL_OApool[5])
+  
+  
+  OAdiv_sole_NOCHNUSA_OApool<-DivRichCalc(sole_NOCHNUSA,"author_first","PW","OA")
+  OAdiv_sole_NOCHNUSA_OApool<-as.numeric(OAdiv_sole_NOCHNUSA_OApool[2])
+  OArich_sole_NOCHNUSA_OApool<-DivRichCalc(sole_NOCHNUSA,"author_first","PW","OA")
+  OArich_sole_NOCHNUSA_OApool<-as.numeric(OArich_sole_NOCHNUSA_OApool[1])
+  OAeven_sole_NOCHNUSA_OApool<-DivRichCalc(sole_NOCHNUSA,"author_first","PW","OA")
+  OAeven_sole_NOCHNUSA_OApool<-as.numeric(OAeven_sole_NOCHNUSA_OApool[5])
+  
+  
+  
+  author<-c(rep("First",2),rep("Single",2))
+  Dataset<-rep(c("All Countries","Without China & USA"),2)
+  # OA_articleType<-c(rep("allOA",4),rep("mirror",4),rep("OAinPW",4))
+  OA_articleType<-c(rep("parent_OA",4))
+  
+  OA_Diversity<-data.frame("OA"=c(OAdiv_first_ALL_OApool,
+                                  OAdiv_first_NOCHNUSA_OApool,
+                                  OAdiv_sole_ALL_OApool,
+                                  OAdiv_sole_NOCHNUSA_OApool), 
+                           "Author"=author,
+                           "Dataset"=Dataset)
+  
+  OA_Richness<-data.frame("OA"=c(OArich_first_ALL_OApool,
+                                 OArich_first_NOCHNUSA_OApool,
+                                 OArich_sole_ALL_OApool,
+                                 OArich_sole_NOCHNUSA_OApool),
+                          "Author"=author,
+                          "Dataset"=Dataset)
+  
+  
+  
+  OA_Evenness<-data.frame("OA"=c(OAeven_first_ALL_OApool,
+                                 OAeven_first_NOCHNUSA_OApool,
+                                 OAeven_sole_ALL_OApool,
+                                 OAeven_sole_NOCHNUSA_OApool),
+                          "Author"=author,
+                          "Dataset"=Dataset)
+  
+  OA_Richness$OA <- round(OA_Richness$OA,0)
+  OA_Evenness$OA <- round(OA_Evenness$OA,2)
+  OA_Diversity$OA <- round(OA_Diversity$OA,1)
+  
+  Observed<-bind_rows(OA_Richness,OA_Diversity,OA_Evenness)
+  Observed$Metric=c(rep("Richness",4),rep("Diversity",4),rep("Evenness",4)) 
+  
+  Observed<-Observed %>% 
+    select(Metric,Author,Dataset,OA) %>% 
+    arrange(desc(Metric),Dataset,desc(Author))
+  Observed<-pivot_wider(Observed,names_from=Dataset,values_from = c(OA))
+  
+  Observed_parent_OA<-Observed
+  Observed_parent_OA$OA_jrnl<-"parent"
+  
+  
 
+# Bootstrap Values both----------------------------------------------------
 
-Table2_CoAuthored<-DivRichCalcSummaryTable_sampled(as.data.frame(vars[3]),
-                                                   as.data.frame(vars[4]),
-                                                   SubsampledPW.results_First,
-                                                   SubsampledPW.results_First_NoUSACHN)
+  # Div_means<-Boot_RichDiv %>% 
+  #   select(InvSimp,author,Dataset) %>% 
+  #   group_by(author,Dataset) %>% 
+  #   summarise(mean=mean(InvSimp),
+  #             SD=sd(InvSimp))
+  # Div_means$metric<-"Diversity"
+  # 
+  # 
+  # Rich_means<-Boot_RichDiv %>% 
+  #   select(Richness,author,Dataset) %>% 
+  #   group_by(author,Dataset) %>% 
+  #   summarise(mean=mean(Richness),
+  #             SD=sd(Richness))
+  # Rich_means$metric<-"Richness"
+  # 
+  # Even_means<-Boot_RichDiv %>% 
+  #   select(Even,author,Dataset) %>% 
+  #   group_by(author,Dataset) %>% 
+  #   summarise(mean=mean(Even),
+  #             SD=sd(Even))
+  # Even_means$metric<-"Evenness"
+  # 
+  # 
+  # 
+  # means<-bind_rows(Rich_means,Div_means,Even_means)
+  # means$author<-gsub("author_first","First",means$author)
+  # means$author<-gsub("solo","Single",means$author)
+  # means$Dataset<-gsub("CHN & USA excluded","Without China & USA",means$Dataset)
+  # means<-means %>% 
+  #   select(metric,author,Dataset,mean,SD) %>% 
+  #   dplyr::rename("Author"="author","Metric"="metric")
+  # means<-pivot_wider(means,names_from=Dataset,values_from = c(mean,SD))
+  
 
+# bootstrap values mirror -------------------------------------------------
+  
+  Div_means_Mirror<-BootMirror_RichDiv %>% 
+    select(InvSimp,author,Dataset) %>% 
+    group_by(author,Dataset) %>% 
+    summarise(mean=mean(InvSimp),
+              SD=sd(InvSimp))
+  Div_means_Mirror$metric<-"Diversity"
+  
+  
+  Rich_means_Mirror<-BootMirror_RichDiv %>% 
+    select(Richness,author,Dataset) %>% 
+    group_by(author,Dataset) %>% 
+    summarise(mean=mean(Richness),
+              SD=sd(Richness))
+  Rich_means_Mirror$metric<-"Richness"
+  
+  Even_means_Mirror<-BootMirror_RichDiv %>% 
+    select(Even,author,Dataset) %>% 
+    group_by(author,Dataset) %>% 
+    summarise(mean=mean(Even),
+              SD=sd(Even))
+  Even_means_Mirror$metric<-"Evenness"
+  
+  
+  
+  means_mirror<-bind_rows(Rich_means_Mirror,Div_means_Mirror,Even_means_Mirror)
+  means_mirror$author<-gsub("author_first","First",means_mirror$author)
+  means_mirror$author<-gsub("solo","Single",means_mirror$author)
+  means_mirror$Dataset<-gsub("CHN & USA excluded","Without China & USA",means_mirror$Dataset)
+  means_mirror<-means_mirror %>% 
+    select(metric,author,Dataset,mean,SD) %>% 
+    dplyr::rename("Author"="author","Metric"="metric")
+  means_mirror<-pivot_wider(means_mirror,names_from=Dataset,values_from = c(mean,SD))
+  
+  means_mirror$OA_jrnl<-"mirror"
+  
 
- 
+# bootstrap values parent -------------------------------------------------
+  
+  Div_means_OAinPW<-BootOAinPW_RichDiv %>% 
+    select(InvSimp,author,Dataset) %>% 
+    group_by(author,Dataset) %>% 
+    summarise(mean=mean(InvSimp),
+              SD=sd(InvSimp))
+  Div_means_OAinPW$metric<-"Diversity"
+  
+  
+  Rich_means_OAinPW<-BootOAinPW_RichDiv %>% 
+    select(Richness,author,Dataset) %>% 
+    group_by(author,Dataset) %>% 
+    summarise(mean=mean(Richness),
+              SD=sd(Richness))
+  Rich_means_OAinPW$metric<-"Richness"
+  
+  Even_means_OAinPW<-BootOAinPW_RichDiv %>% 
+    select(Even,author,Dataset) %>% 
+    group_by(author,Dataset) %>% 
+    summarise(mean=mean(Even),
+              SD=sd(Even))
+  Even_means_OAinPW$metric<-"Evenness"
+  
+  
+  
+  means_OAinPW<-bind_rows(Rich_means_OAinPW,Div_means_OAinPW,Even_means_OAinPW)
+  means_OAinPW$author<-gsub("author_first","First",means_OAinPW$author)
+  means_OAinPW$author<-gsub("solo","Single",means_OAinPW$author)
+  means_OAinPW$Dataset<-gsub("CHN & USA excluded","Without China & USA",means_OAinPW$Dataset)
+  means_OAinPW<-means_OAinPW %>% 
+    select(metric,author,Dataset,mean,SD) %>% 
+    dplyr::rename("Author"="author","Metric"="metric")
+  means_OAinPW<-pivot_wider(means_OAinPW,names_from=Dataset,values_from = c(mean,SD))
+  
+  means_OAinPW$OA_jrnl<-"parent"
+  
+  #######################################
+  # bind the two sets
+  #######################################
+  
+  means <- bind_rows(means_OAinPW, means_mirror)
+  observed <- bind_rows(Observed_mirror_OA, Observed_parent_OA)
   #######################################
   # put together in a a Table 
   #######################################
+  
+  names(means)
+  means <- means %>% select(Metric, 
+                          Author, 
+                          `mean_All Countries`,
+                          `SD_All Countries`,
+                          `mean_Without China & USA`,
+                          `SD_Without China & USA`,
+                          OA_jrnl)
+  
+  
+ 
+  
+  
+  Table2<-left_join(observed,means)
+  names(Table2)
+  Table2<-Table2 %>% select(Metric,
+                        Author,
+                        `All Countries`,
+                        `mean_All Countries`,
+                        `SD_All Countries`,
+                        `Without China & USA`,
+                        `mean_Without China & USA`,
+                        `SD_Without China & USA`,
+                        `OA_jrnl`)
+  
+  
+  Table2 <- Table2 %>% arrange(OA_jrnl,
+                               Metric,
+                               Author)
 
-Table2<-bind_rows(Table2_CoAuthored,Table2_Solo)
-Table2$author <- ordered(Table2$author, levels = c("solo","first", "last","all"))
+  
+  
+  
+  
+  #######################################
+  # p-hats mirror
+  #######################################
+  
+  
+  
+  BootVals_Mirror<-BootMirror_RichDiv %>% select(Richness,Even,InvSimp,author,Dataset)
+  boot_runs_Mirror<-BootVals_Mirror %>% group_by(author,Dataset) %>% summarize(n=n())
+  n_max<-max(boot_runs_Mirror$n)
+  BootVals_Mirror$run<-(rep(seq(1:n_max),nrow(boot_runs_Mirror)))
+  BootVals_Mirror<-pivot_wider(BootVals_Mirror,
+                        names_from=c(Dataset, author),
+                        values_from = c(Richness,Even, InvSimp)) %>%
+    select(-run)
+  colnames(BootVals_Mirror)
+  names(BootVals_Mirror)<-c("Rich_all_solo",
+                     "Rich_all_first",
+                     "Rich_NO_solo",
+                     "Rich_NO_first",
+                     "Even_all_solo",
+                     "Even_all_first",
+                     "Even_NO_solo",
+                     "Even_NO_first",
+                     "Div_all_solo",
+                     "Div_all_first",
+                     "Div_NO_solo",
+                     "Div_NO_first")
+  
+  BootVals_Mirror$OA_jrnl <- "mirror"
+  
+  #######################################
+  # p-hats parent
+  #######################################
+  
+  
+  BootVals_OAinPW<-BootOAinPW_RichDiv %>% select(Richness,Even,InvSimp,author,Dataset)
+  boot_runs_OAinPW<-BootVals_OAinPW %>% group_by(author,Dataset) %>% summarize(n=n())
+  n_max<-max(boot_runs_OAinPW$n)
+  BootVals_OAinPW$run<-(rep(seq(1:n_max),nrow(boot_runs_OAinPW)))
+  BootVals_OAinPW<-pivot_wider(BootVals_OAinPW,
+                               names_from=c(Dataset, author),
+                               values_from = c(Richness,Even, InvSimp)) %>%
+    select(-run)
+  colnames(BootVals_OAinPW)
+  names(BootVals_OAinPW)<-c("Rich_all_solo",
+                            "Rich_all_first",
+                            "Rich_NO_solo",
+                            "Rich_NO_first",
+                            "Even_all_solo",
+                            "Even_all_first",
+                            "Even_NO_solo",
+                            "Even_NO_first",
+                            "Div_all_solo",
+                            "Div_all_first",
+                            "Div_NO_solo",
+                            "Div_NO_first")
+  
+  BootVals_OAinPW$OA_jrnl <- "parent"
+  
+  #######################################
+  # put together in a a Table 
+  #######################################
+  
+  # P_HAT OAinPW
+  
+  # single, all
+  P_Hat<-data.frame(Table2[1:2])
+  P_Hat$P_Hat_all<-NA
+  P_Hat$P_Hat_NO<-NA
+  boot_reps<-nrow(BootVals_OAinPW)
+  ##########
+  # All countries, coauthored, High
+  colnames(BootVals_OAinPW)
+  
+  crit<-Table2 %>% 
+    select(Metric,`All Countries`,Author, OA_jrnl) %>% 
+    filter(Metric=="Diversity") %>% 
+    filter(Author=="First") %>% 
+    filter(OA_jrnl=="parent") %>% 
+    tally((BootVals_OAinPW$Div_all_first<`All Countries`)/boot_reps) 
+  P_Hat[1,3]=as.numeric(crit)
+  
+  crit<-Table2 %>% 
+    select(Metric,`All Countries`,Author, OA_jrnl) %>% 
+    filter(Metric=="Diversity") %>% 
+    filter(Author=="Single") %>% 
+    filter(OA_jrnl=="parent") %>% 
+    tally((BootVals_OAinPW$Div_all_solo<`All Countries`)/boot_reps) 
+  P_Hat[2,3]=as.numeric(crit)
+  
+  crit<-Table2 %>% 
+    select(Metric,`All Countries`,Author, OA_jrnl) %>% 
+    filter(Metric=="Eveness") %>% 
+    filter(Author=="First") %>% 
+    filter(OA_jrnl=="parent") %>% 
+    tally((BootVals_OAinPW$Even_all_first<`All Countries`)/boot_reps) 
+  P_Hat[3,3]=as.numeric(crit)
+  
+  
+  crit<-Table2 %>% 
+    select(Metric,`All Countries`,Author, OA_jrnl) %>% 
+    filter(Metric=="Eveness") %>% 
+    filter(Author=="Single") %>% 
+    filter(OA_jrnl=="parent") %>% 
+    tally((BootVals_OAinPW$Even_all_solo<`All Countries`)/boot_reps) 
+  P_Hat[4,3]=as.numeric(crit)
+  
+  crit<-Table2 %>% 
+    select(Metric,`All Countries`,Author, OA_jrnl) %>% 
+    filter(Metric=="Richness") %>% 
+    filter(Author=="First") %>% 
+    filter(OA_jrnl=="parent") %>% 
+    tally((BootVals_OAinPW$Rich_all_first<`All Countries`)/boot_reps) 
+  P_Hat[5,3]=as.numeric(crit)
+  
+  crit<-Table2 %>% 
+    select(Metric,`All Countries`,Author, OA_jrnl) %>% 
+    filter(Metric=="Richness") %>% 
+    filter(Author=="Single") %>% 
+    filter(OA_jrnl=="parent") %>% 
+    tally(BootVals_OAinPW$Rich_all_solo<`All Countries`)/boot_reps
+  P_Hat[6,3]=as.numeric(crit)
+  
+  
+  
+  # NO CHN USA
+  
+  crit<-Table2 %>% 
+    select(Metric,`All Countries`,Author, OA_jrnl) %>% 
+    filter(Metric=="Diversity") %>% 
+    filter(Author=="First") %>% 
+    filter(OA_jrnl=="parent") %>% 
+    tally((BootVals_OAinPW$Div_NO_first<`All Countries`)/boot_reps) 
+  P_Hat[1,4]=as.numeric(crit)
+  
+  crit<-Table2 %>% 
+    select(Metric,`All Countries`,Author, OA_jrnl) %>% 
+    filter(Metric=="Diversity") %>% 
+    filter(Author=="Single") %>% 
+    filter(OA_jrnl=="parent") %>% 
+    tally((BootVals_OAinPW$Div_NO_solo<`All Countries`)/boot_reps) 
+  P_Hat[2,4]=as.numeric(crit)
+  
+  crit<-Table2 %>% 
+    select(Metric,`All Countries`,Author, OA_jrnl) %>% 
+    filter(Metric=="Evenness") %>% 
+    filter(Author=="First") %>% 
+    filter(OA_jrnl=="parent") %>% 
+    tally((BootVals_OAinPW$Even_NO_first<`All Countries`)/boot_reps) 
+  P_Hat[3,4]=as.numeric(crit)
+  
+  crit<-Table2 %>% 
+    select(Metric,`All Countries`,Author, OA_jrnl) %>% 
+    filter(Metric=="Evenness") %>% 
+    filter(Author=="Single") %>% 
+    filter(OA_jrnl=="parent") %>% 
+    tally((BootVals_OAinPW$Even_NO_solo<`All Countries`)/boot_reps) 
+  P_Hat[4,4]=as.numeric(crit)
+  
+  
+  
+  #
+  crit<-Table2 %>%
+    select(Metric,`All Countries`,Author, OA_jrnl) %>%
+    filter(Metric=="Richness") %>%
+    filter(Author=="First") %>%
+    filter(OA_jrnl=="parent") %>% 
+    tally((BootVals_OAinPW$Rich_NO_first<`All Countries`)/boot_reps)
+  P_Hat[5,4]=as.numeric(crit)
+
+  crit<-Table2 %>%
+    select(Metric,`All Countries`,Author, OA_jrnl) %>%
+    filter(Metric=="Richness") %>%
+    filter(Author=="Single") %>%
+    filter(OA_jrnl=="parent") %>% 
+    tally((BootVals_OAinPW$Rich_NO_solo<`All Countries`)/boot_reps)
+  P_Hat[6,4]=as.numeric(crit)
+  #
+  
+  # 
+  
+  
+  P_Hat$P_Hat_all<-round(P_Hat$P_Hat_all,3)
+  P_Hat$P_Hat_NO<-round(P_Hat$P_Hat_NO,3)
+  P_Hat_parent <- P_Hat
+  P_Hat_parent <- na.omit(P_Hat_parent)
+  P_Hat_parent$OA_jrnl <- "parent"
+  
+  
+  P_Hat$P_Hat_all<-round(P_Hat$P_Hat_all,3)
+  P_Hat$P_Hat_NO<-round(P_Hat$P_Hat_NO,3)
+  
+  
+  #######################################
+  # P HAT Mirror
+  
+  # single, all
+  P_Hat<-data.frame(Table2[1:2])
+  P_Hat$P_Hat_all<-NA
+  P_Hat$P_Hat_NO<-NA
+  boot_reps<-nrow(BootVals_Mirror)
+  ##########
+  # All countries, coauthored, High
+  colnames(BootVals_Mirror)
+  
+  
+  crit<-Table2 %>% 
+    select(Metric,`All Countries`,Author, OA_jrnl) %>% 
+    filter(Metric=="Diversity") %>% 
+    filter(Author=="First") %>% 
+    filter(OA_jrnl=="mirror") %>% 
+    tally((BootVals_Mirror$Div_all_first<`All Countries`)/boot_reps) 
+  P_Hat[1,3]=as.numeric(crit)
+  
+  
+  crit<-Table2 %>% 
+    select(Metric,`All Countries`,Author, OA_jrnl) %>% 
+    filter(Metric=="Diversity") %>% 
+    filter(Author=="Single") %>% 
+    filter(OA_jrnl=="mirror") %>% 
+    tally((BootVals_Mirror$Div_all_solo<`All Countries`)/boot_reps) 
+  P_Hat[2,3]=as.numeric(crit)
+  
+
+  crit<-Table2 %>% 
+    select(Metric,`All Countries`,Author, OA_jrnl) %>% 
+    filter(Metric=="Eveness") %>% 
+    filter(Author=="First") %>% 
+    filter(OA_jrnl=="mirror") %>% 
+    tally((BootVals_Mirror$Even_all_first<`All Countries`)/boot_reps) 
+  P_Hat[3,3]=as.numeric(crit)
+  
+  
+  crit<-Table2 %>% 
+    select(Metric,`All Countries`,Author, OA_jrnl) %>% 
+    filter(Metric=="Eveness") %>% 
+    filter(Author=="Single") %>%
+    filter(OA_jrnl=="mirror") %>% 
+    tally((BootVals_Mirror$Even_all_solo<`All Countries`)/boot_reps) 
+  P_Hat[4,3]=as.numeric(crit)
+  
+  
+  
+  crit<-Table2 %>% 
+    select(Metric,`All Countries`,Author, OA_jrnl) %>% 
+    filter(Metric=="Richness") %>% 
+    filter(Author=="First") %>% 
+    filter(OA_jrnl=="mirror") %>% 
+    tally((BootVals_Mirror$Rich_all_first<`All Countries`)/boot_reps) 
+  P_Hat[5,3]=as.numeric(crit)
+  
+  crit<-Table2 %>% 
+    select(Metric,`All Countries`,Author, OA_jrnl) %>% 
+    filter(Metric=="Richness") %>% 
+    filter(Author=="Single") %>% 
+    filter(OA_jrnl=="mirror") %>% 
+    tally((BootVals_Mirror$Rich_all_solo<`All Countries`)/boot_reps) 
+  P_Hat[6,3]=as.numeric(crit)
+  
+  
+  # NO CHN USA
+  
+  crit<-Table2 %>% 
+    select(Metric,`All Countries`,Author, OA_jrnl) %>% 
+    filter(Metric=="Diversity") %>% 
+    filter(Author=="First") %>% 
+    filter(OA_jrnl=="mirror") %>% 
+    tally((BootVals_Mirror$Div_NO_first<`All Countries`)/boot_reps) 
+  P_Hat[1,4]=as.numeric(crit)
+  
+  crit<-Table2 %>% 
+    select(Metric,`All Countries`,Author, OA_jrnl) %>% 
+    filter(Metric=="Diversity") %>% 
+    filter(Author=="Single") %>% 
+    filter(OA_jrnl=="mirror") %>% 
+    tally((BootVals_Mirror$Div_NO_solo<`All Countries`)/boot_reps) 
+  P_Hat[2,4]=as.numeric(crit)
+  
+  crit<-Table2 %>% 
+    select(Metric,`All Countries`,Author, OA_jrnl) %>% 
+    filter(Metric=="Evenness") %>% 
+    filter(Author=="First") %>% 
+    filter(OA_jrnl=="mirror") %>% 
+    tally((BootVals_Mirror$Even_NO_first<`All Countries`)/boot_reps) 
+  P_Hat[3,4]=as.numeric(crit)
+  P_Hat$P_Hat_all<-round(P_Hat$P_Hat_all,3)
+  P_Hat$P_Hat_NO<-round(P_Hat$P_Hat_NO,3)
+  
+  crit<-Table2 %>% 
+    select(Metric,`All Countries`,Author, OA_jrnl) %>% 
+    filter(Metric=="Evenness") %>% 
+    filter(Author=="Single") %>%
+    filter(OA_jrnl=="mirror") %>% 
+    tally((BootVals_Mirror$Even_NO_solo<`All Countries`)/boot_reps) 
+  P_Hat[4,4]=as.numeric(crit)
+  
+  
+  crit<-Table2 %>% 
+    select(Metric,`All Countries`,Author, OA_jrnl) %>% 
+    filter(Metric=="Richness") %>% 
+    filter(Author=="First") %>% 
+    filter(OA_jrnl=="mirror") %>% 
+    tally((BootVals_Mirror$Rich_NO_first<`All Countries`)/boot_reps) 
+  P_Hat[5,4]=as.numeric(crit)
+  
+  
+  crit<-Table2 %>% 
+    select(Metric,`All Countries`,Author, OA_jrnl) %>% 
+    filter(Metric=="Richness") %>% 
+    filter(Author=="Single") %>% 
+    filter(OA_jrnl=="mirror") %>% 
+    tally((BootVals_Mirror$Rich_NO_solo<`All Countries`)/boot_reps) 
+  P_Hat[6,4]=as.numeric(crit)
+  
+  
+  P_Hat$P_Hat_all<-round(P_Hat$P_Hat_all,3)
+  P_Hat$P_Hat_NO<-round(P_Hat$P_Hat_NO,3)
+  
+  P_Hat_mirror <- P_Hat
+  P_Hat_mirror <- na.omit(P_Hat_mirror)
+  P_Hat_mirror$OA_jrnl <- "mirror"
+  ########################
+  # Bind into a table
+  ########################
+  
+  P_Hat <- bind_rows(P_Hat_mirror, P_Hat_parent)
+  
+  ###########################################
+  # BIND INTO TABLE
+  names(Table2)
+  Table2<-left_join(Table2,P_Hat) %>%
+    select(Metric,Author,`All Countries`,`mean_All Countries`,`SD_All Countries`,`P_Hat_all`,
+    `Without China & USA`,`mean_Without China & USA`, `SD_Without China & USA`,P_Hat_NO, OA_jrnl)
+  Table2$`mean_All Countries` <- round(Table2$`mean_All Countries`,2)
+  Table2$`SD_All Countries` <- round(Table2$`SD_All Countries`,2)
+  Table2$`mean_Without China & USA` <- round(Table2$`mean_Without China & USA`,2)
+  Table2$`SD_Without China & USA` <- round(Table2$`SD_Without China & USA`,2)
+  ######################
 Table2<-Table2 %>% 
-  select(-CIlow,-CIhigh,-CIlow1,-CIhigh1) %>% 
-  filter(author!="all") %>% 
-  arrange(desc(metric),author)
+    mutate(PW_AllCountries=paste(`mean_All Countries`,`SD_All Countries`,sep="+/-")) %>%
+    select(-`mean_All Countries`,-`SD_All Countries`) %>% 
+    mutate(PW_noUSAorCHN=paste(`mean_Without China & USA`,`SD_Without China & USA`,sep="+/-")) %>%
+    select(-`mean_Without China & USA`,-`SD_Without China & USA`) %>% 
+    select(Metric,Author,
+           `All Countries`, PW_AllCountries, P_Hat_all,
+           `Without China & USA`,PW_noUSAorCHN, P_Hat_NO,OA_jrnl)
+ 
   
 Table2$PW_AllCountries<-as.character(Table2$PW_AllCountries)
 Table2$PW_noUSAorCHN<-as.character(Table2$PW_noUSAorCHN)
-Table2$PW_AllCountries<-str_replace(Table2$PW_AllCountries, "[+]", "\u00B1")
+Table2$PW_AllCountries<-str_replace(Table2$PW_AllCountries, "[+]", " \u00B1 ")
 Table2$PW_AllCountries<-str_replace(Table2$PW_AllCountries, "[/]", "")
 Table2$PW_AllCountries<-str_replace(Table2$PW_AllCountries, "[-]", "")
-Table2$PW_noUSAorCHN<-str_replace(Table2$PW_noUSAorCHN, "[+]", "\u00B1")
+Table2$PW_noUSAorCHN<-str_replace(Table2$PW_noUSAorCHN, "[+]", " \u00B1 ")
 Table2$PW_noUSAorCHN<-str_replace(Table2$PW_noUSAorCHN, "[/]", "")
 Table2$PW_noUSAorCHN<-str_replace(Table2$PW_noUSAorCHN, "[-]", "")
-Table2$author<-str_to_title(Table2$author)
-Table2$author<-gsub("Solo","Single",Table2$author)
-names(Table2)<-c("Author","Metric","OA (All Countries)","Mean PW (All Countries)",
-                       "PW 95% CI (All Countries)", "OA (USA & CHN excluded)",
-                       "Mean PW (USA & CHN excluded)","PW 95% CI (USA & CHN excluded)")
-Table2 <- Table2 %>% select("Metric","Author","OA (All Countries)",
-                                        "Mean PW (All Countries)","PW 95% CI (All Countries)",
-                                        "OA (USA & CHN excluded)","Mean PW (USA & CHN excluded)",
-                                        "PW 95% CI (USA & CHN excluded)")
-
-Table2<-as.data.frame(Table2)
-
-# Table2$Metric <-c("Richness","","Diversity","")
-
-
-
-
-sole_ALL<-read_csv("./data_clean/sole_author_pubs_ALL_first_author.csv")
-sole_NOCHNUSA<-read_csv("./data_clean/one_author_pubsNOCHNUSA.csv")
-coauthor_ALL<-read_csv("./data_clean/coauthor_pubs_ALL_first_author.csv")
-coauthor_NOCHNUSA<-read_csv("./data_clean/coauthor_pubsNOCHNUSA.csv")
-
-
-source("./Rscript/functions/DivRichCalc.R")
-crit_solo_all<-DivRichCalc(sole_ALL,"author_first","OA")
-crit_solo_no_CHNUSA<-DivRichCalc(sole_NOCHNUSA,"author_first","OA")
-crit_first_all<-DivRichCalc(coauthor_ALL,"author_first","OA")
-crit_first_no_CHNUSA<-DivRichCalc(coauthor_NOCHNUSA,"author_first","OA")
-
-# SOLO, ALL, RICH
-R_crit_solo_all<-as.numeric(crit_solo_all[1])
-perc_R_SOLO_ALL<-SubsampledPW.results_Solo %>% 
-  tally(Richness>R_crit_solo_all)/1000
-perc_R_SOLO_ALL
-perc_R_SOLO_ALL$Author<-"Single"
-perc_R_SOLO_ALL$Dataset<-"All Countries"
-perc_R_SOLO_ALL$Metric<-"Richness"
-
-# SOLO, NO CHN USA, RICH
-R_crit_solo_no_CHNUSA<-as.numeric(crit_solo_no_CHNUSA[1])
-perc_R_SOLO_NOCHNUSA<-SubsampledPW.results_Solo_NoUSACHN %>% 
-  tally(Richness>R_crit_solo_no_CHNUSA)/1000
-perc_R_SOLO_NOCHNUSA
-perc_R_SOLO_NOCHNUSA$Author<-"Single"
-perc_R_SOLO_NOCHNUSA$Dataset<-"Without China & USA"
-perc_R_SOLO_NOCHNUSA$Metric<-"Richness"
-
-
-
-# FIRST, ALL, RICH
-R_crit_first_all<-as.numeric(crit_first_all[1])
-perc_R_first_all<-SubsampledPW.results_First %>% 
-  tally(Richness>R_crit_first_all)/1000
-perc_R_first_all
-perc_R_first_all$Author<-"First"
-perc_R_first_all$Dataset<-"All Countries"
-perc_R_first_all$Metric<-"Richness"
-
-
-# FIRST, NO CHN USA, RICH
-R_crit_first_no_CHNUSA<-as.numeric(crit_first_no_CHNUSA[1])
-perc_R_first_NOCHNUSA<-SubsampledPW.results_First_NoUSACHN %>% 
-  tally(Richness>R_crit_first_no_CHNUSA)/1000
-perc_R_first_NOCHNUSA
-perc_R_first_NOCHNUSA$Author<-"First"
-perc_R_first_NOCHNUSA$Dataset<-"Without China & USA"
-perc_R_first_NOCHNUSA$Metric<-"Richness"
-
-
-# SOLO, ALL, DIV
-Div_crit_solo_all<-as.numeric(crit_solo_all[2])
-perc_Div_SOLO_ALL<-SubsampledPW.results_Solo %>% 
-  tally(InvSimp>Div_crit_solo_all)/1000
-perc_Div_SOLO_ALL
-perc_Div_SOLO_ALL$Author<-"Single"
-perc_Div_SOLO_ALL$Dataset<-"All Countries"
-perc_Div_SOLO_ALL$Metric<-"Diversity"
-
-# SOLO, NO CHN USA, DIV
-Div_crit_solo_no_CHNUSA<-as.numeric(crit_solo_no_CHNUSA[2])
-perc_D_SOLO_NOCHNUSA<-SubsampledPW.results_Solo_NoUSACHN %>% 
-  tally(InvSimp>Div_crit_solo_no_CHNUSA)/1000
-perc_D_SOLO_NOCHNUSA
-perc_D_SOLO_NOCHNUSA$Author<-"Single"
-perc_D_SOLO_NOCHNUSA$Dataset<-"Without China & USA"
-perc_D_SOLO_NOCHNUSA$Metric<-"Diversity"
-
-
-
-# FIRST, ALL, DIV
-Div_crit_first_all<-as.numeric(crit_first_all[2])
-perc_Div_first_ALL<-SubsampledPW.results_First %>% 
-  tally(InvSimp>Div_crit_first_all)/1000
-perc_Div_first_ALL<-perc_Div_first_ALL
-perc_Div_first_ALL$Author<-"First"
-perc_Div_first_ALL$Dataset<-"All Countries"
-perc_Div_first_ALL$Metric<-"Diversity"
-
-
-# FIRST, NO CHN USA, DIV
-Div_crit_first_no_CHNUSA<-as.numeric(crit_first_no_CHNUSA[2])
-perc_D_first_NOCHNUSA<-SubsampledPW.results_First_NoUSACHN %>% 
-  tally(InvSimp>Div_crit_first_no_CHNUSA)/1000
-perc_D_first_NOCHNUSA<-perc_D_first_NOCHNUSA
-perc_D_first_NOCHNUSA$Author<-"First"
-perc_D_first_NOCHNUSA$Dataset<-"Without China & USA"
-perc_D_first_NOCHNUSA$Metric<-"Diversity"
-
-
-probs<-bind_rows(perc_R_SOLO_ALL,
-                 perc_R_SOLO_NOCHNUSA,
-                 perc_R_first_all,
-                 perc_R_first_NOCHNUSA,
-                 perc_Div_SOLO_ALL,
-                 perc_D_SOLO_NOCHNUSA,
-                 perc_Div_first_ALL,
-                 perc_D_first_NOCHNUSA)
-
-probs<-probs %>% dplyr::rename("phat"="n")
-
-
-
-probs_all<-probs %>% 
-  filter(Dataset=="All Countries") %>%
-  select(-Dataset) %>% 
-  dplyr::rename("P_Hat_All"="phat")
-
-Table2<-left_join(Table2,probs_all)
-
-probs_without<-probs %>% 
-  filter(Dataset=="Without China & USA") %>%
-  select(-Dataset) %>% 
-  dplyr::rename("P_Hat_no"="phat")
-
-Table2<-left_join(Table2,probs_without)
+names(Table2)<-c("Metric","Author","OA (All Countries)","Mean PW (All Countries)",
+                       "phat1", "OA (USA & CHN excluded)",
+                       "Mean PW (USA & CHN excluded)","phat2", "OA Source")
+# Table2 <- Table2 %>% select("Metric","Author","OA (All Countries)",
+#                                         "Mean PW (All Countries)","PW 95% CI (All Countries)",
+#                                         "OA (USA & CHN excluded)","Mean PW (USA & CHN excluded)",
+#                                         "PW 95% CI (USA & CHN excluded)")
+names(Table2)
+Table2 <- Table2 %>% arrange(`OA Source`, Metric, Author)
 
 return(Table2)
 

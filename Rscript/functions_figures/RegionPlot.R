@@ -189,8 +189,8 @@ label_data$author <- factor(label_data$author,levels = c("solo","author_first"))
                  linetype="solid", color="red")+
     geom_text(data = label_data,
               aes(x=perc,
-                  y=670,
-                  label = "OA"),color="red", size=8)
+                  y=610,
+                  label = "OA"),color="red", size=10)
   RegionPlot
   
   RegionPlot<-RegionPlot+
