@@ -11,11 +11,18 @@ p1<-ggplot(Plot_PW_div,
                color=`Effect on Diversity`,
                fill=`Effect on Diversity`)) +
   geom_bar(stat="identity")+
-  scale_fill_manual("Effect on Diversity", values = c("None" = "white", "Significant Decrease" = "gray", "Significant Increase" = "black"))+
-  scale_color_manual("Effect on Diversity", values = c("None" = "black", "Significant Decrease" = "black", "Significant Increase" = "black"))
+  scale_fill_manual("Effect on Diversity", 
+                    values = c("None" = "white", 
+                               "Significant Decrease" = "gray", 
+                               "Significant Increase" = "black"))+
+  scale_color_manual("Effect on Diversity", 
+                     values = c("None" = "black", 
+                                "Significant Decrease" = "black", 
+                                "Significant Increase" = "black"))
 
 
-textcol_first <- ifelse(Plot_PW_div$`Effect on Diversity` == "None", 'white', 'black')
+textcol_first <- 
+  ifelse(Plot_PW_div$`Effect on Diversity` == "None", 'white', 'black')
 
 p1<-p1+
   labs(y = "Change in Geographic Diversity",
@@ -44,11 +51,18 @@ p2<-ggplot(plot_PW_div_noCHN,
                fill=`Effect on Diversity`)) +
   geom_bar(stat="identity")+
   
-  scale_fill_manual("Effect on Diversity", values = c("None" = "white", "Significant Decrease" = "gray", "Significant Increase" = "black"))+
-  scale_color_manual("Effect on Diversity", values = c("None" = "black", "Significant Decrease" = "black", "Significant Increase" = "black"))
+  scale_fill_manual("Effect on Diversity", 
+                    values = c("None" = "white", 
+                               "Significant Decrease" = "gray", 
+                               "Significant Increase" = "black"))+
+  scale_color_manual("Effect on Diversity", 
+                     values = c("None" = "black", 
+                                "Significant Decrease" = "black", 
+                                "Significant Increase" = "black"))
 
 
-textcol_second <- ifelse(plot_PW_div_noCHN$`Effect on Diversity` == "None", 'white', 'black')
+textcol_second <- 
+  ifelse(plot_PW_div_noCHN$`Effect on Diversity` == "None", 'white', 'black')
 
 p2<-p2+
   labs(y = "Change in Geographic Diversity",
@@ -64,10 +78,6 @@ p2<-p2+
     plot.margin =unit(c(1,1,1,1.5), "lines")  
     )
 p2
-
-
-
-
 
 return(list(p1,p2))
 

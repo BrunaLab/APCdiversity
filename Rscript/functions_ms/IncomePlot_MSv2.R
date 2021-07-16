@@ -1,4 +1,6 @@
-IncomePlot_MSv2 <- function(DataSet, Subsampled_Countries, countries, sole_ALL, sole_NOCHNUSA, first_ALL, first_NOCHNUSA) {
+IncomePlot_MSv2 <- function(DataSet, Subsampled_Countries, 
+                            countries, sole_ALL, sole_NOCHNUSA,
+                            first_ALL, first_NOCHNUSA) {
   # DataSet<-BootMirror_RichDiv
   # Subsampled_Countries<-BootMirror_Countries
   # countries<-"All"
@@ -44,13 +46,20 @@ IncomePlot_MSv2 <- function(DataSet, Subsampled_Countries, countries, sole_ALL, 
 
 
 
-  levels(Subsampled_Countries$IncomeGroup)[levels(Subsampled_Countries$IncomeGroup) == "Low income"] <- "Low\nIncome"
-  levels(Subsampled_Countries$IncomeGroup)[levels(Subsampled_Countries$IncomeGroup) == "Lower middle income"] <- "Lower-middle\nIncome"
-  levels(Subsampled_Countries$IncomeGroup)[levels(Subsampled_Countries$IncomeGroup) == "Upper middle income"] <- "Upper-middle\nIncome"
-  levels(Subsampled_Countries$IncomeGroup)[levels(Subsampled_Countries$IncomeGroup) == "High income"] <- "High\nIncome"
+  levels(Subsampled_Countries$IncomeGroup)[levels(Subsampled_Countries$IncomeGroup) == "Low income"] <-
+    "Low\nIncome"
+  levels(Subsampled_Countries$IncomeGroup)[levels(Subsampled_Countries$IncomeGroup) == "Lower middle income"] <-
+    "Lower-middle\nIncome"
+  levels(Subsampled_Countries$IncomeGroup)[levels(Subsampled_Countries$IncomeGroup) == "Upper middle income"] <-
+    "Upper-middle\nIncome"
+  levels(Subsampled_Countries$IncomeGroup)[levels(Subsampled_Countries$IncomeGroup) == "High income"] <- 
+    "High\nIncome"
 
   Subsampled_Countries$IncomeGroup <- ordered(Subsampled_Countries$IncomeGroup,
-    levels = c("Low\nIncome", "Lower-middle\nIncome", "Upper-middle\nIncome", "High\nIncome")
+    levels = c("Low\nIncome", 
+               "Lower-middle\nIncome", 
+               "Upper-middle\nIncome", 
+               "High\nIncome")
   )
 
 
@@ -106,10 +115,14 @@ IncomePlot_MSv2 <- function(DataSet, Subsampled_Countries, countries, sole_ALL, 
   AllPubs$IncomeGroup <- as.factor(AllPubs$IncomeGroup)
   levels(AllPubs$IncomeGroup)
 
-  levels(AllPubs$IncomeGroup)[levels(AllPubs$IncomeGroup) == "Low"] <- "Low\nIncome"
-  levels(AllPubs$IncomeGroup)[levels(AllPubs$IncomeGroup) == "Lower middle"] <- "Lower-middle\nIncome"
-  levels(AllPubs$IncomeGroup)[levels(AllPubs$IncomeGroup) == "Upper middle"] <- "Upper-middle\nIncome"
-  levels(AllPubs$IncomeGroup)[levels(AllPubs$IncomeGroup) == "High"] <- "High\nIncome"
+  levels(AllPubs$IncomeGroup)[levels(AllPubs$IncomeGroup) == "Low"] <-
+    "Low\nIncome"
+  levels(AllPubs$IncomeGroup)[levels(AllPubs$IncomeGroup) == "Lower middle"] <-
+    "Lower-middle\nIncome"
+  levels(AllPubs$IncomeGroup)[levels(AllPubs$IncomeGroup) == "Upper middle"] <- 
+    "Upper-middle\nIncome"
+  levels(AllPubs$IncomeGroup)[levels(AllPubs$IncomeGroup) == "High"] <- 
+    "High\nIncome"
   levels(as.factor(AllPubs$IncomeGroup))
   levels(as.factor(AllPubs$author))
 
@@ -125,7 +138,10 @@ IncomePlot_MSv2 <- function(DataSet, Subsampled_Countries, countries, sole_ALL, 
     mutate(perc = n / sum(n) * 100)
 
   OA_percs$IncomeGroup <- ordered(OA_percs$IncomeGroup,
-    levels = c("Low\nIncome", "Lower-middle\nIncome", "Upper-middle\nIncome", "High\nIncome")
+    levels = c("Low\nIncome", 
+               "Lower-middle\nIncome", 
+               "Upper-middle\nIncome", 
+               "High\nIncome")
   )
   OA_percs$color <- NA
 
@@ -145,32 +161,43 @@ IncomePlot_MSv2 <- function(DataSet, Subsampled_Countries, countries, sole_ALL, 
 
 
   author.labels <- c(author_first = "First Authors", solo = "Single Authors")
-  color.labels <- c("Low\nIncome" = "#A6CEE3", "Lower-middle\nIncome" = "#1F78B4", "Upper-middle\nIncome" = "#B2DF8A", "High\nIncome" = "#33A02C")
-  Subsampled_Income_summary_plot$author <- as.factor(Subsampled_Income_summary_plot$author)
-  Subsampled_Income_summary_plot$author <- ordered(Subsampled_Income_summary_plot$author, levels = c("solo", "author_first"))
+  color.labels <- c("Low\nIncome" = "#A6CEE3", 
+                    "Lower-middle\nIncome" = "#1F78B4",
+                    "Upper-middle\nIncome" = "#B2DF8A",
+                    "High\nIncome" = "#33A02C")
+  Subsampled_Income_summary_plot$author <- 
+    as.factor(Subsampled_Income_summary_plot$author)
+  Subsampled_Income_summary_plot$author <- 
+    ordered(Subsampled_Income_summary_plot$author, 
+            levels = c("solo", "author_first"))
   #
   # DATA SELECTION FOR Figure
 
   # if (((vars[3]=="All")==TRUE)) {
   if (((countries == "All") == TRUE)) {
-    fig_data <- Subsampled_Income_summary_plot %>% filter(Dataset == "All Countries")
+    fig_data <- Subsampled_Income_summary_plot %>% 
+      filter(Dataset == "All Countries")
     label_data <- OA_percs %>% filter(Dataset == "All Countries")
     # } else if (((vars[3]=="No_CHN_USA")==TRUE)) {
   } else if (((countries == "No_CHN_USA") == TRUE)) {
-    fig_data <- Subsampled_Income_summary_plot %>% filter(Dataset == "CHN & USA excluded")
-    label_data <- OA_percs %>% filter(Dataset == "CHN & USA excluded")
+    fig_data <- Subsampled_Income_summary_plot %>% 
+      filter(Dataset == "CHN & USA excluded")
+    label_data <- OA_percs %>% 
+      filter(Dataset == "CHN & USA excluded")
   } else {
     stop("Please enter 'All' or 'No_CHN_USA' ")
   }
 
   # label_data<-label_data %>% dplyr::rename("ArticleCat"="JrnlType")
-  Subsampled_Income_summary_plot$author <- factor(Subsampled_Income_summary_plot$author,
+  Subsampled_Income_summary_plot$author <- 
+    factor(Subsampled_Income_summary_plot$author,
     levels = c("solo", "author_first")
   )
 
 
   # label_data<-label_data %>% dplyr::rename("ArticleCat"="ArticleType")
-  label_data$author <- factor(label_data$author, levels = c("solo", "author_first"))
+  label_data$author <- factor(label_data$author, 
+                              levels = c("solo", "author_first"))
   label_data$ArticleCat <- "OA"
 
   # as.factor(Subsampled_Income_summary_plot$ArticleCat)
@@ -197,7 +224,10 @@ IncomePlot_MSv2 <- function(DataSet, Subsampled_Countries, countries, sole_ALL, 
     scale_fill_manual(
       values = c("#F7FBFF", "#9ECAE1", "#4292C6", "#084594"),
       name = "National Income Category",
-      breaks = c("High\nIncome", "Upper-middle\nIncome", "Lower-middle\nIncome", "Low\nIncome")
+      breaks = c("High\nIncome", 
+                 "Upper-middle\nIncome", 
+                 "Lower-middle\nIncome",
+                 "Low\nIncome")
     ) +
 
     # scale_color_manual(values=c("#F7FBFF","#9ECAE1","#4292C6","#084594"),
@@ -264,7 +294,9 @@ IncomePlot_MSv2 <- function(DataSet, Subsampled_Countries, countries, sole_ALL, 
       # plot.margin =unit(c(1,1,1,1.5), "lines")   #plot margin - top, right, bottom, left
     )
   facet_labels <- c("A", "B", "C", "D", "E", "F", "G", "H")
-  IncomePlot <- tag_facet(IncomePlot, open = "", close = "", tag_pool = facet_labels, vjust = 0.5, hjust = -1, size = 10)
+  IncomePlot <- tag_facet(IncomePlot, open = "", close = "", 
+                          tag_pool = facet_labels, 
+                          vjust = 0.5, hjust = -1, size = 10)
   IncomePlot
 
   # P_HAT
@@ -726,10 +758,14 @@ IncomePlot_MSv2 <- function(DataSet, Subsampled_Countries, countries, sole_ALL, 
   ###########
   P_Hat
 
-  levels(P_Hat$IncomeGroup)[levels(P_Hat$IncomeGroup) == "Low\nIncome"] <- "Low"
-  levels(P_Hat$IncomeGroup)[levels(P_Hat$IncomeGroup) == "Lower-middle\nIncome"] <- "Lower middle"
-  levels(P_Hat$IncomeGroup)[levels(P_Hat$IncomeGroup) == "Upper-middle\nIncome"] <- "Upper middle"
-  levels(P_Hat$IncomeGroup)[levels(P_Hat$IncomeGroup) == "High\nIncome"] <- "High"
+  levels(P_Hat$IncomeGroup)[levels(P_Hat$IncomeGroup) == 
+                              "Low\nIncome"] <- "Low"
+  levels(P_Hat$IncomeGroup)[levels(P_Hat$IncomeGroup) ==
+                              "Lower-middle\nIncome"] <- "Lower middle"
+  levels(P_Hat$IncomeGroup)[levels(P_Hat$IncomeGroup) == 
+                              "Upper-middle\nIncome"] <- "Upper middle"
+  levels(P_Hat$IncomeGroup)[levels(P_Hat$IncomeGroup) ==
+                              "High\nIncome"] <- "High"
 
 
   P_Hat <- P_Hat %>%

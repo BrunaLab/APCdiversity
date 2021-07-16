@@ -1,4 +1,5 @@
-DivBootFig_MSv2 <- function(Boot_RichDiv, sole_ALL, sole_NOCHNUSA, first_ALL, first_NOCHNUSA) {
+DivBootFig_MSv2 <- function(Boot_RichDiv, sole_ALL, 
+                            sole_NOCHNUSA, first_ALL, first_NOCHNUSA) {
   # Boot_RichDiv<-BootMirror_RichDiv
   library(ggplot2)
   library(tidyr)
@@ -7,8 +8,14 @@ DivBootFig_MSv2 <- function(Boot_RichDiv, sole_ALL, sole_NOCHNUSA, first_ALL, fi
   library(egg)
   levels(as.factor(Boot_RichDiv$Dataset))
   Boot_RichDiv <- Boot_RichDiv %>%
-    mutate(Dataset = ifelse(Dataset == "all countries", "All Countries", Dataset)) %>%
-    mutate(Dataset = ifelse(Dataset == "CHN & USA excluded", "China & USA excluded", Dataset))
+    mutate(Dataset = ifelse(Dataset == 
+                              "all countries", 
+                            "All Countries", 
+                            Dataset)) %>%
+    mutate(Dataset = ifelse(Dataset ==
+                              "CHN & USA excluded", 
+                            "China & USA excluded", 
+                            Dataset))
 
 
 
@@ -16,30 +23,38 @@ DivBootFig_MSv2 <- function(Boot_RichDiv, sole_ALL, sole_NOCHNUSA, first_ALL, fi
 
   # OA Mirror
 
-  OAdiv_first_ALL_OAmirror <- DivRichCalc(first_ALL, "author_first", "OA", "OA")
+  OAdiv_first_ALL_OAmirror <- DivRichCalc(first_ALL, 
+                                          "author_first", "OA", "OA")
   OAdiv_first_ALL_OAmirror <- as.numeric(OAdiv_first_ALL_OAmirror[2])
 
-  OAdiv_first_NOCHNUSA_OAmirror <- DivRichCalc(first_NOCHNUSA, "author_first", "OA", "OA")
+  OAdiv_first_NOCHNUSA_OAmirror <- DivRichCalc(first_NOCHNUSA,
+                                               "author_first", "OA", "OA")
   OAdiv_first_NOCHNUSA_OAmirror <- as.numeric(OAdiv_first_NOCHNUSA_OAmirror[2])
 
-  OAdiv_sole_ALL_OAmirror <- DivRichCalc(sole_ALL, "author_first", "OA", "OA")
+  OAdiv_sole_ALL_OAmirror <- DivRichCalc(sole_ALL, 
+                                         "author_first", "OA", "OA")
   OAdiv_sole_ALL_OAmirror <- as.numeric(OAdiv_sole_ALL_OAmirror[2])
 
-  OAdiv_sole_NOCHNUSA_OAmirror <- DivRichCalc(sole_NOCHNUSA, "author_first", "OA", "OA")
+  OAdiv_sole_NOCHNUSA_OAmirror <- DivRichCalc(sole_NOCHNUSA,
+                                              "author_first", "OA", "OA")
   OAdiv_sole_NOCHNUSA_OAmirror <- as.numeric(OAdiv_sole_NOCHNUSA_OAmirror[2])
 
   # OA - Parent
 
-  OAdiv_first_ALL_OAparent <- DivRichCalc(first_ALL, "author_first", "PW", "OA")
+  OAdiv_first_ALL_OAparent <- DivRichCalc(first_ALL,
+                                          "author_first", "PW", "OA")
   OAdiv_first_ALL_OAparent <- as.numeric(OAdiv_first_ALL_OAparent[2])
 
-  OAdiv_first_NOCHNUSA_OAparent <- DivRichCalc(first_NOCHNUSA, "author_first", "PW", "OA")
+  OAdiv_first_NOCHNUSA_OAparent <- DivRichCalc(first_NOCHNUSA, 
+                                               "author_first", "PW", "OA")
   OAdiv_first_NOCHNUSA_OAparent <- as.numeric(OAdiv_first_NOCHNUSA_OAparent[2])
 
-  OAdiv_sole_ALL_OAparent <- DivRichCalc(sole_ALL, "author_first", "PW", "OA")
+  OAdiv_sole_ALL_OAparent <- DivRichCalc(sole_ALL,
+                                         "author_first", "PW", "OA")
   OAdiv_sole_ALL_OAparent <- as.numeric(OAdiv_sole_ALL_OAparent[2])
 
-  OAdiv_sole_NOCHNUSA_OAparent <- DivRichCalc(sole_NOCHNUSA, "author_first", "PW", "OA")
+  OAdiv_sole_NOCHNUSA_OAparent <- DivRichCalc(sole_NOCHNUSA, 
+                                              "author_first", "PW", "OA")
   OAdiv_sole_NOCHNUSA_OAparent <- as.numeric(OAdiv_sole_NOCHNUSA_OAparent[2])
 
 
@@ -69,16 +84,19 @@ DivBootFig_MSv2 <- function(Boot_RichDiv, sole_ALL, sole_NOCHNUSA, first_ALL, fi
     group_by(author, Dataset, BootType) %>%
     summarize(mean(InvSimp)) %>%
     mutate(Dataset = ifelse(Dataset == "all", "All Countries", Dataset)) %>%
-    mutate(Dataset = ifelse(Dataset == "no_CHN_USA", "China & USA excluded", Dataset))
+    mutate(Dataset = ifelse(Dataset == 
+                              "no_CHN_USA", "China & USA excluded", Dataset))
 
 
 
   # means_bootstrap_results$BootType<-gsub("MirrorvOAinPW","Mirror",means_bootstrap_results$BootType)
   # means_bootstrap_results$BootType<-gsub("OAinPWvPW","OAinPW",means_bootstrap_results$BootType)
   #
-  figure_values <- inner_join(means_bootstrap_results, OA_Diversity, by = c("author", "Dataset"))
+  figure_values <- inner_join(means_bootstrap_results, 
+                              OA_Diversity, by = c("author", "Dataset"))
   figure_values <- figure_values %>%
-    select(author, Dataset, "ArticleCat" = Articles_Value, "mean_Div" = `mean(InvSimp)`, "OA_Div" = value)
+    select(author, Dataset, "ArticleCat" = Articles_Value, 
+           "mean_Div" = `mean(InvSimp)`, "OA_Div" = value)
   # names(figure_values)<-c("author","Dataset", "ArticleCat","mean_Div", "OA_Div")
 
   # figure_values<-figure_values %>% filter(ArticleCat=="allOA")
@@ -144,8 +162,10 @@ DivBootFig_MSv2 <- function(Boot_RichDiv, sole_ALL, sole_NOCHNUSA, first_ALL, fi
     geom_hline((aes(yintercept = -Inf)), color = "black") +
     geom_vline((aes(xintercept = -Inf)), color = "black") +
     guides(fill = guide_legend("Article\nCat.")) +
-    scale_x_continuous(breaks = seq(0, 30, by = 5), expand = c(0.1, 0.02)) +
-    scale_y_continuous(limits = c(0, 600), breaks = seq(0, 600, by = 100), expand = c(0, 0.1)) +
+    scale_x_continuous(breaks = seq(0, 30, by = 5), 
+                       expand = c(0.1, 0.02)) +
+    scale_y_continuous(limits = c(0, 600), 
+                       breaks = seq(0, 600, by = 100), expand = c(0, 0.1)) +
     # scale_y_continuous(expand = c(0,0))+
     xlab("Geographic Diversity, D (Reciprocal of Simpson's Index)") +
     labs(x = "Geographic Diversity", y = "Frequency") +
@@ -166,7 +186,10 @@ DivBootFig_MSv2 <- function(Boot_RichDiv, sole_ALL, sole_NOCHNUSA, first_ALL, fi
 
     # OA Value - MIRROR
     geom_segment(
-      data = subset(filter(figure_values, author == "author_first" & Dataset == "All Countries" & ArticleCat2 == "OA-mirror")),
+      data = subset(filter(figure_values, 
+                           author == "author_first" & 
+                             Dataset == "All Countries" & 
+                             ArticleCat2 == "OA-mirror")),
       aes(x = OA_Div, y = 0, xend = OA_Div, yend = yALL_Div),
       colour = "red", linetype = "dashed"
     ) +
@@ -203,7 +226,9 @@ DivBootFig_MSv2 <- function(Boot_RichDiv, sole_ALL, sole_NOCHNUSA, first_ALL, fi
     #           parse=TRUE,size=2)+
     # OA Value
     geom_segment(
-      data = subset(filter(figure_values, author == "solo" & Dataset == "All Countries" & ArticleCat2 == "OA-mirror")),
+      data = subset(filter(figure_values, author == "solo" &
+                             Dataset == "All Countries" &
+                             ArticleCat2 == "OA-mirror")),
       aes(x = OA_Div, y = 0, xend = OA_Div, yend = ySolo_Div),
       colour = "red", linetype = "dashed"
     ) +
@@ -239,7 +264,9 @@ DivBootFig_MSv2 <- function(Boot_RichDiv, sole_ALL, sole_NOCHNUSA, first_ALL, fi
     #
     # OA Value
     geom_segment(
-      data = subset(filter(figure_values, author == "author_first" & Dataset == "China & USA excluded" & ArticleCat2 == "OA-mirror")),
+      data = subset(filter(figure_values, author == "author_first" & 
+                             Dataset == "China & USA excluded" & 
+                             ArticleCat2 == "OA-mirror")),
       aes(x = OA_Div, y = 0, xend = OA_Div, yend = yWO_Div),
       colour = "red", linetype = "dashed"
     ) +
@@ -276,7 +303,9 @@ DivBootFig_MSv2 <- function(Boot_RichDiv, sole_ALL, sole_NOCHNUSA, first_ALL, fi
     #
     # OA Value
     geom_segment(
-      data = subset(filter(figure_values, author == "solo" & Dataset == "China & USA excluded" & ArticleCat2 == "OA-mirror")),
+      data = subset(filter(figure_values, author == "solo" &
+                             Dataset == "China & USA excluded" & 
+                             ArticleCat2 == "OA-mirror")),
       aes(x = OA_Div, y = 0, xend = OA_Div, yend = ySolo_Div - 10),
       colour = "red", linetype = "dashed"
     )
@@ -306,7 +335,8 @@ DivBootFig_MSv2 <- function(Boot_RichDiv, sole_ALL, sole_NOCHNUSA, first_ALL, fi
       axis.text.y = element_text(size = 8),
       axis.title.x = element_text(colour = "black", size = 10, vjust = -0.5),
       axis.title.y = element_text(colour = "black", size = 10, hjust = 0.5, ),
-      strip.text.x = element_text(size = 10, margin = margin(0, 0, 3, 0, "lines")),
+      strip.text.x = element_text(size = 10, 
+                                  margin = margin(0, 0, 3, 0, "lines")),
       strip.text.y = element_text(size = 10, angle = 0),
       strip.background.y = element_rect(fill = NA, colour = NA),
       strip.background.x = element_rect(fill = NA, colour = NA),
@@ -320,7 +350,8 @@ DivBootFig_MSv2 <- function(Boot_RichDiv, sole_ALL, sole_NOCHNUSA, first_ALL, fi
     )
 
   facet_labels <- c("A", "B", "C", "D")
-  pDiv <- tag_facet(pDiv, open = "", close = "", tag_pool = facet_labels, vjust = -1)
+  pDiv <- tag_facet(pDiv, open = "", close = "",
+                    tag_pool = facet_labels, vjust = -1)
   pDiv
 
 

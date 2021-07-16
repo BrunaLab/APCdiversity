@@ -31,7 +31,8 @@ SummaryTable <- function(DataSet, MirrorPairs) {
     arrange(pair_key)
   Table1$pair_key <- as.factor(Table1$pair_key)
   # ungroup(Table1) %>%
-  Table1 <- Table1 %>% pivot_wider(values_from = n, names_from = c(JrnlType, ArticleType))
+  Table1 <- Table1 %>% pivot_wider(values_from = n, 
+                                   names_from = c(JrnlType, ArticleType))
   APC <- MirrorPairs %>% select(APC, pair_key, Journal, JrnlType)
   APC$pair_key <- as.factor(APC$pair_key)
   PW_journals <- MirrorPairs %>%

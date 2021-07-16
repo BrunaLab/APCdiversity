@@ -49,10 +49,14 @@ n_OA_plots <- function(AllData, n_countries) {
   plot_data <- left_join(plot_data, Codes)
 
   plot_data$IncomeGroup <- as.factor(plot_data$IncomeGroup)
-  levels(plot_data$IncomeGroup)[levels(plot_data$IncomeGroup) == "Low"] <- "Low"
-  levels(plot_data$IncomeGroup)[levels(plot_data$IncomeGroup) == "Lower middle"] <- "Lower-middle"
-  levels(plot_data$IncomeGroup)[levels(plot_data$IncomeGroup) == "Upper middle"] <- "Upper-middle"
-  levels(plot_data$IncomeGroup)[levels(plot_data$IncomeGroup) == "High"] <- "High"
+  levels(plot_data$IncomeGroup)[levels(plot_data$IncomeGroup) == 
+                                  "Low"] <- "Low"
+  levels(plot_data$IncomeGroup)[levels(plot_data$IncomeGroup) == 
+                                  "Lower middle"] <- "Lower-middle"
+  levels(plot_data$IncomeGroup)[levels(plot_data$IncomeGroup) == 
+                                  "Upper middle"] <- "Upper-middle"
+  levels(plot_data$IncomeGroup)[levels(plot_data$IncomeGroup) == 
+                                  "High"] <- "High"
   plot_data$IncomeGroup <- ordered(plot_data$IncomeGroup,
     levels = c("Low", "Lower-middle", "Upper-middle", "High")
   )
@@ -64,7 +68,8 @@ n_OA_plots <- function(AllData, n_countries) {
   plot_data$color[plot_data$IncomeGroup == "High"] <- "'#F7FBFF'"
 
 
-  color.labels <- c("Low" = "#084594", "Lower-middle" = "#4292C6", "Upper-middle" = "#9ECAE1", "High" = "#F7FBFF")
+  color.labels <- c("Low" = "#084594", "Lower-middle" = "#4292C6",
+                    "Upper-middle" = "#9ECAE1", "High" = "#F7FBFF")
 
   library(RColorBrewer)
   library(ggrepel)
@@ -143,8 +148,12 @@ n_OA_plots <- function(AllData, n_countries) {
       name = "National Income Category",
       breaks = c("High", "Upper-middle", "Lower-middle", "Low")
     ) +
-    scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 10), expand = c(0, 0.1)) +
-    scale_x_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 10), expand = c(0, 0.1))
+    scale_y_continuous(limits = c(0, 100), 
+                       breaks = seq(0, 100, by = 10),
+                       expand = c(0, 0.1)) +
+    scale_x_continuous(limits = c(0, 100),
+                       breaks = seq(0, 100, by = 10),
+                       expand = c(0, 0.1))
 
 
   p1 <- p1 +

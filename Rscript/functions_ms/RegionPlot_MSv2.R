@@ -56,7 +56,10 @@ RegionPlot_MSv2 <- function(DataSet,
   Subsampled_Countries$Code <- as.factor(Subsampled_Countries$Code)
   Subsampled_Countries$Country <- as.factor(Subsampled_Countries$Country)
   Subsampled_Countries$IncomeGroup <- ordered(Subsampled_Countries$IncomeGroup,
-    levels = c("Low income", "Lower middle income", "Upper middle income", "High income")
+    levels = c("Low income", 
+               "Lower middle income",
+               "Upper middle income",
+               "High income")
   )
 
   Subsampled_Countries$Region <- ordered(Subsampled_Countries$Region,
@@ -172,18 +175,26 @@ RegionPlot_MSv2 <- function(DataSet,
 
   # author.labels <- c(author_first = "First Authors", author_last = "Last Authors", solo= "Single Authors")
   author.labels <- c(author_first = "First Authors", solo = "Single Authors")
-  color.labels <- c("Low" = "#A6CEE3", "Lower middle" = "#1F78B4", "Upper middle" = "#B2DF8A", "High" = "#33A02C")
-  Subsampled_Region_summary_plot$author <- as.factor(Subsampled_Region_summary_plot$author)
-  Subsampled_Region_summary_plot$author <- ordered(Subsampled_Region_summary_plot$author, levels = c("solo", "author_first", "author_last", "author_all"))
+  color.labels <- c("Low" = "#A6CEE3", 
+                    "Lower middle" = "#1F78B4",
+                    "Upper middle" = "#B2DF8A",
+                    "High" = "#33A02C")
+  Subsampled_Region_summary_plot$author <- 
+    as.factor(Subsampled_Region_summary_plot$author)
+  Subsampled_Region_summary_plot$author <- 
+    ordered(Subsampled_Region_summary_plot$author, 
+            levels = c("solo", "author_first", "author_last", "author_all"))
 
   # DATA SELECTION FOR Figure
   # if (((vars[3]=="All")==TRUE)) {
   if (((countries == "All") == TRUE)) {
-    fig_data <- Subsampled_Region_summary_plot %>% filter(Dataset == "All Countries")
+    fig_data <- Subsampled_Region_summary_plot %>% 
+      filter(Dataset == "All Countries")
     label_data <- OA_percs %>% filter(Dataset == "All Countries")
     # } else if (((vars[3]=="no_CHN_USA")==TRUE)) {
   } else if (((countries == "no_CHN_USA") == TRUE)) {
-    fig_data <- Subsampled_Region_summary_plot %>% filter(Dataset == "CHN & USA excluded")
+    fig_data <- Subsampled_Region_summary_plot %>% 
+      filter(Dataset == "CHN & USA excluded")
     label_data <- OA_percs %>% filter(Dataset == "CHN & USA excluded")
   } else {
     stop("Please enter 'All' or 'no_CHN_USA' ")
@@ -251,7 +262,10 @@ RegionPlot_MSv2 <- function(DataSet,
       size = 0.5
     ) +
     # scale_fill_manual(values=c("#DEEBF7","#C6DBEF","#9ECAE1","#6BAED6","#4292C6","#2171B5","#084594"))+
-    scale_fill_manual(values = c("#084594", "#2171B5", "#4292C6", "#6BAED6", "#9ECAE1", "#C6DBEF", "#DEEBF7")) +
+    scale_fill_manual(values = c("#084594", "#2171B5", 
+                                 "#4292C6", "#6BAED6", 
+                                 "#9ECAE1", "#C6DBEF", 
+                                 "#DEEBF7")) +
     # ,
     #                     name="National Income Category",
     #                     breaks=c("High\nIncome", "Upper-middle\nIncome","Lower-middle\nIncome","Low\nIncome"))+
@@ -269,7 +283,9 @@ RegionPlot_MSv2 <- function(DataSet,
     ) +
     geom_hline((aes(yintercept = -Inf)), color = "black") +
     geom_vline((aes(xintercept = -Inf)), color = "black") +
-    scale_y_continuous(limits = c(0, 800), breaks = seq(0, 800, by = 200), expand = c(0, 0.1)) +
+    scale_y_continuous(limits = c(0, 800), 
+                       breaks = seq(0, 800, by = 200), 
+                       expand = c(0, 0.1)) +
     # scale_x_continuous(limits = c(0, 60),breaks = seq(0,60, by=10),expand=c(0,0.1))+
     coord_cartesian(clip = "off") +
     # xlim(-5,80)+
@@ -342,8 +358,11 @@ RegionPlot_MSv2 <- function(DataSet,
       legend.text = element_text(size = 20),
       plot.margin = unit(c(3, 1, 1, 1.5), "lines") # plot margin - top, right, bottom, left
     )
-  facet_labels <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N")
-  RegionPlot <- tag_facet(RegionPlot, open = "", close = "", tag_pool = facet_labels, vjust = 0.5, hjust = -1, size = 10)
+  facet_labels <- c("A", "B", "C", "D", "E", "F", 
+                    "G", "H", "I", "J", "K", "L", "M", "N")
+  RegionPlot <- tag_facet(RegionPlot, open = "", 
+                          close = "", tag_pool = facet_labels,
+                          vjust = 0.5, hjust = -1, size = 10)
   RegionPlot
 
 

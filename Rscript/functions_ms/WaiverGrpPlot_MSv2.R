@@ -10,7 +10,8 @@ WaiverGrpPlot_MSv2 <- function(DataSet,
   # countries<-"All"
 
   # Subsampled_Countries<-BootMirror_Countries
-  Subsampled_Countries <- left_join(Subsampled_Countries, WaiverCountries) %>% replace_na(list(WaiverGroup = "no waiver"))
+  Subsampled_Countries <- left_join(Subsampled_Countries, WaiverCountries) %>% 
+    replace_na(list(WaiverGroup = "no waiver"))
   # levels(as.factor(Subsampled_Countries$WaiverGroup))
 
 
@@ -32,7 +33,9 @@ WaiverGrpPlot_MSv2 <- function(DataSet,
     mutate(Dataset = ifelse(Dataset == "All", "All Countries", Dataset)) %>%
     # mutate(Dataset = ifelse(Dataset == "first_ALL", "All Countries", Dataset)) %>%
     # mutate(Dataset = ifelse(Dataset == "sole_NOCHNUSA","CHN & USA excluded", Dataset)) %>%
-    mutate(Dataset = ifelse(Dataset == "no_CHN_USA", "CHN & USA excluded", Dataset))
+    mutate(Dataset = ifelse(Dataset == "no_CHN_USA", 
+                            "CHN & USA excluded",
+                            Dataset))
   # mutate(Dataset = ifelse(Dataset == "CHN & USA excluded", "Without China & USA", Dataset)) %>%
   # mutate(Dataset = ifelse(Dataset == "CHN & USA excluded", "Without China & USA", Dataset))
 
@@ -45,9 +48,13 @@ WaiverGrpPlot_MSv2 <- function(DataSet,
     # mutate(author = ifelse(Dataset == "first_NOCHNUSA", "author_first", author)) %>%
     # mutate(author = ifelse(Dataset == "first_ALL", "author_first", author)) %>%
     # mutate(Dataset = ifelse(Dataset == "sole_ALL", "All Countries", Dataset)) %>%
-    mutate(Dataset = ifelse(Dataset == "All", "All Countries", Dataset)) %>%
+    mutate(Dataset = ifelse(Dataset == "All", 
+                            "All Countries",
+                            Dataset)) %>%
     # mutate(Dataset = ifelse(Dataset == "sole_NOCHNUSA","CHN & USA excluded", Dataset)) %>%
-    mutate(Dataset = ifelse(Dataset == "no_CHN_USA", "CHN & USA excluded", Dataset))
+    mutate(Dataset = ifelse(Dataset == "no_CHN_USA", 
+                            "CHN & USA excluded", 
+                            Dataset))
 
   # vars<-list(DataSet,Subsampled_Countries,countries,sole_ALL,sole_NOCHNUSA,first_ALL,first_NOCHNUSA)
 
@@ -59,12 +66,20 @@ WaiverGrpPlot_MSv2 <- function(DataSet,
   # countries<-countries
 
 
-  Subsampled_Countries$WaiverGroup <- as.factor(Subsampled_Countries$WaiverGroup)
-  Subsampled_Countries$WaiverGroup <- as.factor(Subsampled_Countries$WaiverGroup)
-  Subsampled_Countries$Code <- as.factor(Subsampled_Countries$Code)
-  Subsampled_Countries$Country <- as.factor(Subsampled_Countries$Country)
-  Subsampled_Countries$IncomeGroup <- ordered(Subsampled_Countries$IncomeGroup,
-    levels = c("Low income", "Lower middle income", "Upper middle income", "High income")
+  Subsampled_Countries$WaiverGroup <- 
+    as.factor(Subsampled_Countries$WaiverGroup)
+  Subsampled_Countries$WaiverGroup <- 
+    as.factor(Subsampled_Countries$WaiverGroup)
+  Subsampled_Countries$Code <- 
+    as.factor(Subsampled_Countries$Code)
+  Subsampled_Countries$Country <- 
+    as.factor(Subsampled_Countries$Country)
+  Subsampled_Countries$IncomeGroup <- 
+    ordered(Subsampled_Countries$IncomeGroup,
+    levels = c("Low income", 
+               "Lower middle income",
+               "Upper middle income",
+               "High income")
   )
 
   # Subsampled_Countries$WaiverGroup <- ordered(Subsampled_Countries$WaiverGroup,
@@ -167,7 +182,8 @@ WaiverGrpPlot_MSv2 <- function(DataSet,
   AllPubs$IncomeGroup <- as.factor(AllPubs$IncomeGroup)
   levels(AllPubs$IncomeGroup)
 
-  AllPubs <- left_join(AllPubs, WaiverCountries, by = "Code") %>% replace_na(list(WaiverGroup = "no waiver"))
+  AllPubs <- left_join(AllPubs, WaiverCountries, by = "Code") %>% 
+    replace_na(list(WaiverGroup = "no waiver"))
 
   OAData <- AllPubs %>%
     filter(ArticleType == "OA") %>%
@@ -191,18 +207,25 @@ WaiverGrpPlot_MSv2 <- function(DataSet,
 
   # author.labels <- c(author_first = "First Authors", author_last = "Last Authors", solo= "Single Authors")
   author.labels <- c(author_first = "First Authors", solo = "Single Authors")
-  color.labels <- c("GroupA" = "#A6CEE3", "GroupB" = "#1F78B4", "no waiver" = "#B2DF8A")
-  Subsampled_Waiver_summary_plot$author <- as.factor(Subsampled_Waiver_summary_plot$author)
-  Subsampled_Waiver_summary_plot$author <- ordered(Subsampled_Waiver_summary_plot$author, levels = c("solo", "author_first", "author_last", "author_all"))
+  color.labels <- c("GroupA" = "#A6CEE3", 
+                    "GroupB" = "#1F78B4", 
+                    "no waiver" = "#B2DF8A")
+  Subsampled_Waiver_summary_plot$author <-
+    as.factor(Subsampled_Waiver_summary_plot$author)
+  Subsampled_Waiver_summary_plot$author <-
+    ordered(Subsampled_Waiver_summary_plot$author, 
+            levels = c("solo", "author_first", "author_last", "author_all"))
 
   # DATA SELECTION FOR Figure
   # if (((vars[3]=="All")==TRUE)) {
   if (((countries == "All") == TRUE)) {
-    fig_data <- Subsampled_Waiver_summary_plot %>% filter(Dataset == "All Countries")
+    fig_data <- Subsampled_Waiver_summary_plot %>%
+      filter(Dataset == "All Countries")
     label_data <- OA_percs %>% filter(Dataset == "All Countries")
     # } else if (((vars[3]=="no_CHN_USA")==TRUE)) {
   } else if (((countries == "no_CHN_USA") == TRUE)) {
-    fig_data <- Subsampled_Waiver_summary_plot %>% filter(Dataset == "CHN & USA excluded")
+    fig_data <- Subsampled_Waiver_summary_plot %>%
+      filter(Dataset == "CHN & USA excluded")
     label_data <- OA_percs %>% filter(Dataset == "CHN & USA excluded")
   } else {
     stop("Please enter 'All' or 'no_CHN_USA' ")
@@ -246,13 +269,18 @@ WaiverGrpPlot_MSv2 <- function(DataSet,
   label_data$WaiverGroup <- WaiverGroup
   label_data <- label_data %>% dplyr::rename("ArticleCat" = "ArticleType")
 
-  fig_data$author <- factor(fig_data$author, levels = c("solo", "author_first"))
+  fig_data$author <- factor(fig_data$author,
+                            levels = c("solo", "author_first"))
 
-  label_data$author <- factor(label_data$author, levels = c("solo", "author_first"))
+  label_data$author <- factor(label_data$author, 
+                              levels = c("solo", "author_first"))
   # as.factor(fig_data$ArticleCat)
   # as.factor(fig_data$author)
   # filter(fig_data,author=="author_first")
-  WaiverGroupPlot <- ggplot(fig_data, aes(x = n, fill = WaiverGroup, Color = ArticleCat)) +
+  WaiverGroupPlot <- ggplot(fig_data, 
+                            aes(x = n, 
+                                fill = WaiverGroup, 
+                                Color = ArticleCat)) +
     geom_histogram(
       position = "identity",
       bins = 100,
@@ -274,7 +302,9 @@ WaiverGrpPlot_MSv2 <- function(DataSet,
     ) +
     geom_hline((aes(yintercept = -Inf)), color = "black") +
     geom_vline((aes(xintercept = -Inf)), color = "black") +
-    scale_y_continuous(limits = c(0, 400), breaks = seq(0, 400, by = 100), expand = c(0, 0.1)) +
+    scale_y_continuous(limits = c(0, 400),
+                       breaks = seq(0, 400, by = 100), 
+                       expand = c(0, 0.1)) +
     # scale_x_continuous(limits = c(0, 60),breaks = seq(0,60, by=10),expand=c(0,0.1))+
     coord_cartesian(clip = "off") +
     # xlim(-5,80)+
@@ -334,9 +364,12 @@ WaiverGrpPlot_MSv2 <- function(DataSet,
     theme(
       axis.text.x = element_text(size = 20),
       axis.text.y = element_text(size = 20),
-      axis.title.x = element_text(colour = "black", size = 25, vjust = -0.5),
-      axis.title.y = element_text(colour = "black", size = 25, vjust = 2),
-      strip.text.x = element_text(size = 20, margin = margin(5, 0, 3, 0, "lines")),
+      axis.title.x = element_text(colour = "black", 
+                                  size = 25, vjust = -0.5),
+      axis.title.y = element_text(colour = "black", 
+                                  size = 25, vjust = 2),
+      strip.text.x = element_text(size = 20, 
+                                  margin = margin(5, 0, 3, 0, "lines")),
       strip.text.y = element_text(size = 30, angle = 0),
       strip.background.x = element_rect(fill = NA, colour = NA),
       strip.background.y = element_rect(fill = NA, colour = NA),
@@ -347,7 +380,9 @@ WaiverGrpPlot_MSv2 <- function(DataSet,
       plot.margin = unit(c(3, 1, 1, 1.5), "lines") # plot margin - top, right, bottom, left
     )
   facet_labels <- c("A", "B", "C", "D", "E", "F")
-  WaiverGroupPlot <- tag_facet(WaiverGroupPlot, open = "", close = "", tag_pool = facet_labels, vjust = 0.5, hjust = -1, size = 10)
+  WaiverGroupPlot <- tag_facet(WaiverGroupPlot, open = "",
+                               close = "", tag_pool = facet_labels, 
+                               vjust = 0.5, hjust = -1, size = 10)
   WaiverGroupPlot
 
 

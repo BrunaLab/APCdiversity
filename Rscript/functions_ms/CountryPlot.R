@@ -1,14 +1,6 @@
 CountryPlot <- function(DataSet, AuPosition, JrnlType, ArticleType, cutoff) {
   library(tidyverse)
-  # DataSet<-sole_ALL
-  # DataSet<-first_ALL
-  # AuPosition<-"author_first"
-  # ArticleType<-"OA"
-  # ArticleType<-"PW"
-  # JrnlType<-"both"
-  # JrnlType<-"PW"
-  # JrnlType<-"OA"
-  # cutoff<-12
+  
   vars <- list(DataSet, AuPosition, JrnlType, ArticleType, cutoff)
 
   if ((vars[2] == "author_first") == TRUE &
@@ -55,8 +47,10 @@ CountryPlot <- function(DataSet, AuPosition, JrnlType, ArticleType, cutoff) {
     )
 
   AllGeo$IncomeGroup <- as.factor(AllGeo$IncomeGroup)
-  levels(AllGeo$IncomeGroup)[levels(AllGeo$IncomeGroup) == "Lower middle"] <- "Lower-middle"
-  levels(AllGeo$IncomeGroup)[levels(AllGeo$IncomeGroup) == "Upper middle"] <- "Upper-middle"
+  levels(AllGeo$IncomeGroup)[levels(AllGeo$IncomeGroup) == 
+                               "Lower middle"] <- "Lower-middle"
+  levels(AllGeo$IncomeGroup)[levels(AllGeo$IncomeGroup) == 
+                               "Upper middle"] <- "Upper-middle"
 
   AllGeo$IncomeGroup <- ordered(AllGeo$IncomeGroup,
     levels = c("Low", "Lower-middle", "Upper-middle", "High")
@@ -83,9 +77,12 @@ CountryPlot <- function(DataSet, AuPosition, JrnlType, ArticleType, cutoff) {
   AllGeo$IncomeGroup <- droplevels(AllGeo$IncomeGroup)
   levels(AllGeo$IncomeGroup)
 
-  cutoff <- as.numeric(vars[5]) # This is how many countries you want on the chart, all the rest will be in "OTHER"
-  # cutoff = 20 # This is how many countries you want on the chart, all the rest will be in "OTHER"
-  AllGeo2 <- arrange(AllGeo, desc(perc)) %>% select(Code, n, perc, IncomeGroup, JrnlType)
+  cutoff <- as.numeric(vars[5]) # This is how many countries you want 
+                                # on the chart, all the rest will be in "OTHER"
+                                # cutoff = 20 # This is how many countries you 
+                                # want on the chart, rest will be in "OTHER"
+  AllGeo2 <- arrange(AllGeo, desc(perc)) %>% 
+    select(Code, n, perc, IncomeGroup, JrnlType)
   most.common.authors <- slice(AllGeo, 1:cutoff)
   lst.common.authors <- slice(AllGeo, (cutoff + 1):nrow(AllGeo))
   # lst.common.authors$Code<-"all others"
@@ -98,9 +95,12 @@ CountryPlot <- function(DataSet, AuPosition, JrnlType, ArticleType, cutoff) {
     lst.common.authors$IncomeGroup,
     sep = " ", collapse = NULL
   )
-  # lst.common.authors$Code<-paste(lst.common.authors$n_countries,lst.common.authors$IncomeGroup,"income countries", sep = " ", collapse = NULL)
+  
+  # lst.common.authors$Code <- 
+  # paste(lst.common.authors$n_countries,lst.common.authors$IncomeGroup,
+  # "income countries", sep = " ", collapse = NULL)
   # lst.common.authors$Code<-gsub("income countries","",lst.common.authors$Code)
-  #
+  
   lst.common.authors$IncomeGroup <- ordered(lst.common.authors$IncomeGroup,
     levels = c(
       "Low",
@@ -125,9 +125,12 @@ CountryPlot <- function(DataSet, AuPosition, JrnlType, ArticleType, cutoff) {
 
   most.common.authors <- bind_rows(most.common.authors, lst.common.authors)
 
-  # This is needed to put them in order in the plot with OTHER at the end of the graph
-  order <- rev(seq(1:nrow(most.common.authors))) # REV is what makes it go tyop to bottom if flipped coordinates
-  most.common.authors$Code <- factor(most.common.authors$Code, most.common.authors$Code[levels = order])
+  # This is needed to put them in order in 
+  # the plot with OTHER at the end of the graph
+  # REV is what makes it go top to bottom if flipped coordinates
+  order <- rev(seq(1:nrow(most.common.authors))) 
+  most.common.authors$Code <- 
+    factor(most.common.authors$Code, most.common.authors$Code[levels = order])
   # rm(order,AllGeo,lst.common.authors)
   most.common.authors
 

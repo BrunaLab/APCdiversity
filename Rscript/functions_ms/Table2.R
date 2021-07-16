@@ -93,11 +93,14 @@ Table2 <- function(sole_ALL, sole_NOCHNUSA, first_ALL, first_NOCHNUSA) {
   OAeven_first_ALL_OApool <- DivRichCalc(first_ALL, "author_first", "OA", "OA")
   OAeven_first_ALL_OApool <- as.numeric(OAeven_first_ALL_OApool[5])
 
-  OAdiv_first_NOCHNUSA_OApool <- DivRichCalc(first_NOCHNUSA, "author_first", "OA", "OA")
+  OAdiv_first_NOCHNUSA_OApool <- DivRichCalc(first_NOCHNUSA, 
+                                             "author_first", "OA", "OA")
   OAdiv_first_NOCHNUSA_OApool <- as.numeric(OAdiv_first_NOCHNUSA_OApool[2])
-  OArich_first_NOCHNUSA_OApool <- DivRichCalc(first_NOCHNUSA, "author_first", "OA", "OA")
+  OArich_first_NOCHNUSA_OApool <- DivRichCalc(first_NOCHNUSA,
+                                              "author_first", "OA", "OA")
   OArich_first_NOCHNUSA_OApool <- as.numeric(OArich_first_NOCHNUSA_OApool[1])
-  OAeven_first_NOCHNUSA_OApool <- DivRichCalc(first_NOCHNUSA, "author_first", "OA", "OA")
+  OAeven_first_NOCHNUSA_OApool <- DivRichCalc(first_NOCHNUSA,
+                                              "author_first", "OA", "OA")
   OAeven_first_NOCHNUSA_OApool <- as.numeric(OAeven_first_NOCHNUSA_OApool[5])
 
 
@@ -109,11 +112,14 @@ Table2 <- function(sole_ALL, sole_NOCHNUSA, first_ALL, first_NOCHNUSA) {
   OAeven_sole_ALL_OApool <- as.numeric(OAeven_sole_ALL_OApool[5])
 
 
-  OAdiv_sole_NOCHNUSA_OApool <- DivRichCalc(sole_NOCHNUSA, "author_first", "OA", "OA")
+  OAdiv_sole_NOCHNUSA_OApool <- DivRichCalc(sole_NOCHNUSA,
+                                            "author_first", "OA", "OA")
   OAdiv_sole_NOCHNUSA_OApool <- as.numeric(OAdiv_sole_NOCHNUSA_OApool[2])
-  OArich_sole_NOCHNUSA_OApool <- DivRichCalc(sole_NOCHNUSA, "author_first", "OA", "OA")
+  OArich_sole_NOCHNUSA_OApool <- DivRichCalc(sole_NOCHNUSA,
+                                             "author_first", "OA", "OA")
   OArich_sole_NOCHNUSA_OApool <- as.numeric(OArich_sole_NOCHNUSA_OApool[1])
-  OAeven_sole_NOCHNUSA_OApool <- DivRichCalc(sole_NOCHNUSA, "author_first", "OA", "OA")
+  OAeven_sole_NOCHNUSA_OApool <- DivRichCalc(sole_NOCHNUSA,
+                                             "author_first", "OA", "OA")
   OAeven_sole_NOCHNUSA_OApool <- as.numeric(OAeven_sole_NOCHNUSA_OApool[5])
 
 
@@ -163,12 +169,14 @@ Table2 <- function(sole_ALL, sole_NOCHNUSA, first_ALL, first_NOCHNUSA) {
   OA_Diversity$OA <- round(OA_Diversity$OA, 1)
 
   Observed <- bind_rows(OA_Richness, OA_Diversity, OA_Evenness)
-  Observed$Metric <- c(rep("Richness", 4), rep("Diversity", 4), rep("Evenness", 4))
+  Observed$Metric <- c(rep("Richness", 4),
+                       rep("Diversity", 4), rep("Evenness", 4))
 
   Observed <- Observed %>%
     select(Metric, Author, Dataset, OA) %>%
     arrange(desc(Metric), Dataset, desc(Author))
-  Observed <- pivot_wider(Observed, names_from = Dataset, values_from = c(OA))
+  Observed <- pivot_wider(Observed,
+                          names_from = Dataset, values_from = c(OA))
 
   Observed_mirror_OA <- Observed
   Observed_mirror_OA$OA_jrnl <- "mirror"
@@ -184,11 +192,14 @@ Table2 <- function(sole_ALL, sole_NOCHNUSA, first_ALL, first_NOCHNUSA) {
   OAeven_first_ALL_OApool <- DivRichCalc(first_ALL, "author_first", "PW", "OA")
   OAeven_first_ALL_OApool <- as.numeric(OAeven_first_ALL_OApool[5])
 
-  OAdiv_first_NOCHNUSA_OApool <- DivRichCalc(first_NOCHNUSA, "author_first", "PW", "OA")
+  OAdiv_first_NOCHNUSA_OApool <- DivRichCalc(first_NOCHNUSA,
+                                             "author_first", "PW", "OA")
   OAdiv_first_NOCHNUSA_OApool <- as.numeric(OAdiv_first_NOCHNUSA_OApool[2])
-  OArich_first_NOCHNUSA_OApool <- DivRichCalc(first_NOCHNUSA, "author_first", "PW", "OA")
+  OArich_first_NOCHNUSA_OApool <- DivRichCalc(first_NOCHNUSA, 
+                                              "author_first", "PW", "OA")
   OArich_first_NOCHNUSA_OApool <- as.numeric(OArich_first_NOCHNUSA_OApool[1])
-  OAeven_first_NOCHNUSA_OApool <- DivRichCalc(first_NOCHNUSA, "author_first", "PW", "OA")
+  OAeven_first_NOCHNUSA_OApool <- DivRichCalc(first_NOCHNUSA,
+                                              "author_first", "PW", "OA")
   OAeven_first_NOCHNUSA_OApool <- as.numeric(OAeven_first_NOCHNUSA_OApool[5])
 
 
@@ -200,11 +211,14 @@ Table2 <- function(sole_ALL, sole_NOCHNUSA, first_ALL, first_NOCHNUSA) {
   OAeven_sole_ALL_OApool <- as.numeric(OAeven_sole_ALL_OApool[5])
 
 
-  OAdiv_sole_NOCHNUSA_OApool <- DivRichCalc(sole_NOCHNUSA, "author_first", "PW", "OA")
+  OAdiv_sole_NOCHNUSA_OApool <- DivRichCalc(sole_NOCHNUSA, 
+                                            "author_first", "PW", "OA")
   OAdiv_sole_NOCHNUSA_OApool <- as.numeric(OAdiv_sole_NOCHNUSA_OApool[2])
-  OArich_sole_NOCHNUSA_OApool <- DivRichCalc(sole_NOCHNUSA, "author_first", "PW", "OA")
+  OArich_sole_NOCHNUSA_OApool <- DivRichCalc(sole_NOCHNUSA, 
+                                             "author_first", "PW", "OA")
   OArich_sole_NOCHNUSA_OApool <- as.numeric(OArich_sole_NOCHNUSA_OApool[1])
-  OAeven_sole_NOCHNUSA_OApool <- DivRichCalc(sole_NOCHNUSA, "author_first", "PW", "OA")
+  OAeven_sole_NOCHNUSA_OApool <- DivRichCalc(sole_NOCHNUSA, 
+                                             "author_first", "PW", "OA")
   OAeven_sole_NOCHNUSA_OApool <- as.numeric(OAeven_sole_NOCHNUSA_OApool[5])
 
 
@@ -254,7 +268,8 @@ Table2 <- function(sole_ALL, sole_NOCHNUSA, first_ALL, first_NOCHNUSA) {
   OA_Diversity$OA <- round(OA_Diversity$OA, 1)
 
   Observed <- bind_rows(OA_Richness, OA_Diversity, OA_Evenness)
-  Observed$Metric <- c(rep("Richness", 4), rep("Diversity", 4), rep("Evenness", 4))
+  Observed$Metric <- c(rep("Richness", 4), 
+                       rep("Diversity", 4), rep("Evenness", 4))
 
   Observed <- Observed %>%
     select(Metric, Author, Dataset, OA) %>%
@@ -334,14 +349,19 @@ Table2 <- function(sole_ALL, sole_NOCHNUSA, first_ALL, first_NOCHNUSA) {
 
 
 
-  means_mirror <- bind_rows(Rich_means_Mirror, Div_means_Mirror, Even_means_Mirror)
+  means_mirror <- bind_rows(Rich_means_Mirror, 
+                            Div_means_Mirror,
+                            Even_means_Mirror)
   means_mirror$author <- gsub("author_first", "First", means_mirror$author)
   means_mirror$author <- gsub("solo", "Single", means_mirror$author)
-  means_mirror$Dataset <- gsub("CHN & USA excluded", "Without China & USA", means_mirror$Dataset)
+  means_mirror$Dataset <- gsub("CHN & USA excluded", 
+                               "Without China & USA", means_mirror$Dataset)
   means_mirror <- means_mirror %>%
     select(metric, author, Dataset, mean, SD) %>%
     dplyr::rename("Author" = "author", "Metric" = "metric")
-  means_mirror <- pivot_wider(means_mirror, names_from = Dataset, values_from = c(mean, SD))
+  means_mirror <- pivot_wider(means_mirror, 
+                              names_from = Dataset, 
+                              values_from = c(mean, SD))
 
   means_mirror$OA_jrnl <- "mirror"
 
@@ -378,14 +398,24 @@ Table2 <- function(sole_ALL, sole_NOCHNUSA, first_ALL, first_NOCHNUSA) {
 
 
 
-  means_OAinPW <- bind_rows(Rich_means_OAinPW, Div_means_OAinPW, Even_means_OAinPW)
-  means_OAinPW$author <- gsub("author_first", "First", means_OAinPW$author)
-  means_OAinPW$author <- gsub("solo", "Single", means_OAinPW$author)
-  means_OAinPW$Dataset <- gsub("CHN & USA excluded", "Without China & USA", means_OAinPW$Dataset)
+  means_OAinPW <- bind_rows(Rich_means_OAinPW, 
+                            Div_means_OAinPW, 
+                            Even_means_OAinPW)
+  means_OAinPW$author <- gsub("author_first", 
+                              "First", 
+                              means_OAinPW$author)
+  means_OAinPW$author <- gsub("solo", 
+                              "Single", 
+                              means_OAinPW$author)
+  means_OAinPW$Dataset <- gsub("CHN & USA excluded", 
+                               "Without China & USA", 
+                               means_OAinPW$Dataset)
   means_OAinPW <- means_OAinPW %>%
     select(metric, author, Dataset, mean, SD) %>%
     dplyr::rename("Author" = "author", "Metric" = "metric")
-  means_OAinPW <- pivot_wider(means_OAinPW, names_from = Dataset, values_from = c(mean, SD))
+  means_OAinPW <- pivot_wider(means_OAinPW,
+                              names_from = Dataset,
+                              values_from = c(mean, SD))
 
   means_OAinPW$OA_jrnl <- "parent"
 
@@ -445,7 +475,8 @@ Table2 <- function(sole_ALL, sole_NOCHNUSA, first_ALL, first_NOCHNUSA) {
 
 
 
-  BootVals_Mirror <- BootMirror_RichDiv %>% select(Richness, Even, InvSimp, author, Dataset)
+  BootVals_Mirror <- BootMirror_RichDiv %>% 
+    select(Richness, Even, InvSimp, author, Dataset)
   boot_runs_Mirror <- BootVals_Mirror %>%
     group_by(author, Dataset) %>%
     summarize(n = n())
@@ -479,7 +510,8 @@ Table2 <- function(sole_ALL, sole_NOCHNUSA, first_ALL, first_NOCHNUSA) {
   #######################################
 
 
-  BootVals_OAinPW <- BootOAinPW_RichDiv %>% select(Richness, Even, InvSimp, author, Dataset)
+  BootVals_OAinPW <- BootOAinPW_RichDiv %>% 
+    select(Richness, Even, InvSimp, author, Dataset)
   boot_runs_OAinPW <- BootVals_OAinPW %>%
     group_by(author, Dataset) %>%
     summarize(n = n())
@@ -781,18 +813,28 @@ Table2 <- function(sole_ALL, sole_NOCHNUSA, first_ALL, first_NOCHNUSA) {
   names(Table2)
   Table2 <- left_join(Table2, P_Hat) %>%
     select(
-      Metric, Author, `All Countries`, `mean_All Countries`, `SD_All Countries`, `P_Hat_all`,
-      `Without China & USA`, `mean_Without China & USA`, `SD_Without China & USA`, P_Hat_NO, OA_jrnl
+      Metric, Author, `All Countries`, 
+      `mean_All Countries`, `SD_All Countries`, `P_Hat_all`,
+      `Without China & USA`, `mean_Without China & USA`,
+      `SD_Without China & USA`, P_Hat_NO, OA_jrnl
     )
-  Table2$`mean_All Countries` <- round(Table2$`mean_All Countries`, 2)
-  Table2$`SD_All Countries` <- round(Table2$`SD_All Countries`, 2)
-  Table2$`mean_Without China & USA` <- round(Table2$`mean_Without China & USA`, 2)
-  Table2$`SD_Without China & USA` <- round(Table2$`SD_Without China & USA`, 2)
+  Table2$`mean_All Countries` <-
+    round(Table2$`mean_All Countries`, 2)
+  Table2$`SD_All Countries` <- 
+    round(Table2$`SD_All Countries`, 2)
+  Table2$`mean_Without China & USA` <- 
+    round(Table2$`mean_Without China & USA`, 2)
+  Table2$`SD_Without China & USA` <- 
+    round(Table2$`SD_Without China & USA`, 2)
   ######################
   Table2 <- Table2 %>%
-    mutate(PW_AllCountries = paste(`mean_All Countries`, `SD_All Countries`, sep = "+/-")) %>%
+    mutate(PW_AllCountries = paste(`mean_All Countries`, 
+                                   `SD_All Countries`, 
+                                   sep = "+/-")) %>%
     select(-`mean_All Countries`, -`SD_All Countries`) %>%
-    mutate(PW_noUSAorCHN = paste(`mean_Without China & USA`, `SD_Without China & USA`, sep = "+/-")) %>%
+    mutate(PW_noUSAorCHN = paste(`mean_Without China & USA`,
+                                 `SD_Without China & USA`,
+                                 sep = "+/-")) %>%
     select(-`mean_Without China & USA`, -`SD_Without China & USA`) %>%
     select(
       Metric, Author,
