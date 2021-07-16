@@ -3,7 +3,6 @@ title             : "Assessing the effect of article processing charges on the g
 shorttitle        : "APCs & author diversity"
 
 author: 
-  
   - name          : "Audrey C. Smith"
     affiliation   : "1"
     role:         # Contributorship roles (e.g., CRediT, https://casrai.org/credit/)
@@ -137,10 +136,6 @@ knitr::opts_knit$set(eval.after = "fig.cap")
 library("papaja")
 r_refs("APCpaper_QSS.bib")
 knitr::opts_chunk$set(echo = FALSE,message=FALSE,warning=FALSE)
-# library(dplyr)
-# library(tidyr)
-# library(ggplot2)
-# library(readr)
 library(tidyverse)
 library(gridExtra)
 library(kableExtra)
@@ -151,354 +146,359 @@ library(citr)
 # devtools::install_github("crsh/papaja")
 ```
 
-```{r cached=TRUE}
+```{r load_data, cached=TRUE}
 knitr::opts_chunk$set(echo = FALSE)
-MirrorPairs<-read_csv("./data_clean/MirrorPairs.csv",col_types = cols())
-WaiverCountries<-read_csv("./data_clean/WaiverCountries.csv",col_types = cols())
+MirrorPairs <- read_csv("./data_clean/MirrorPairs.csv", col_types = cols())
+WaiverCountries <- read_csv("./data_clean/WaiverCountries.csv", col_types = cols())
+AllData <- read_csv(file = "./data_clean/all_data_analysis.csv", col_types = cols())
 
-AllData<-read_csv(file="./data_clean/all_data_analysis.csv",col_types = cols())
-AllData_missing<-AllData %>% 
-  filter(AuthorNum==1) %>% 
-  filter(is.na(First_Author_Country)) %>% 
-  select(refID) 
-AllData<-AllData %>% filter(!refID %in% AllData_missing$refID) 
+AllData_missing <- AllData %>%
+  filter(AuthorNum == 1) %>%
+  filter(is.na(First_Author_Country)) %>%
+  select(refID)
+AllData <- AllData %>% filter(!refID %in% AllData_missing$refID)
 rm(AllData_missing)
 
-# Need to generate subsets of sole-author pubs, coauthor pubs 
-sole_ALL <- AllData %>%
-  filter(author=="solo") %>% 
-  mutate(Dataset="All Countries") %>% 
+# df of single author pubs (all countries)
+single_ALL <- AllData %>%
+  filter(author == "solo") %>%
+  mutate(Dataset = "All Countries") %>%
   drop_na("Code")
-# n_distinct(sole_ALL$refID)
+# n_distinct(single_ALL$refID)
 
-first_ALL<- AllData %>%
-  filter(author=="coauthored") %>% 
-  filter(AuthorNum==1) %>% 
-  mutate(author="author_first") 
+# df of coauthored pubs (all countries)
+first_ALL <- AllData %>%
+  filter(author == "coauthored") %>%
+  filter(AuthorNum == 1) %>%
+  mutate(author = "author_first")
 
-# subset of data with no first authors form CHN or USA
-sole_NOCHNUSA <- AllData %>%
-  filter(author=="solo") %>% 
-  filter(Code!="CHN") %>% 
-  filter(Code!="USA") %>% 
-  mutate(Dataset="CHN & USA excluded")
+# df of single author pubs (no first authors from CHN or USA)
+single_NOCHNUSA <- AllData %>%
+  filter(author == "solo") %>%
+  filter(Code != "CHN") %>%
+  filter(Code != "USA") %>%
+  mutate(Dataset = "CHN & USA excluded")
 
-first_NOCHNUSA<- AllData %>%
-  filter(author=="coauthored") %>% 
-  filter(AuthorNum==1) %>% 
-  filter(Code!="CHN") %>% 
-  filter(Code!="USA") %>% 
-  mutate(Dataset="CHN & USA excluded") %>% 
-  mutate(author="author_first") 
+# df of coauthored pubs (no first authors from CHN or USA)
+first_NOCHNUSA <- AllData %>%
+  filter(author == "coauthored") %>%
+  filter(AuthorNum == 1) %>%
+  filter(Code != "CHN") %>%
+  filter(Code != "USA") %>%
+  mutate(Dataset = "CHN & USA excluded") %>%
+  mutate(author = "author_first")
 
-  
-# # Bootstrap Runs - COUNTRIES
-BootOAinPW_Countries<-read_csv("./output/BootOAinPW_Countries.csv")
-BootMirror_Countries<-read_csv("./output/BootMirror_Countries.csv")
+# Load Bootstrap Runs - COUNTRIES
+BootOAinPW_Countries <- read_csv("./output/BootOAinPW_Countries.csv")
+BootMirror_Countries <- read_csv("./output/BootMirror_Countries.csv")
 
+# Load Bootstrap Runs - DIVERSITY
+BootOAinPW_RichDiv <- read_csv("./output/BootOAinPW_RichDiv.csv")
 
-
-# # Bootstrap Runs - Diversity
-BootOAinPW_RichDiv<-read_csv("./output/BootOAinPW_RichDiv.csv")
-# # Bootstrap Runs - OA in Mirror
-BootMirror_RichDiv<-read_csv("./output/BootMirror_RichDiv.csv")
+# Load Bootstrap Runs - OA in Mirror Journals
+BootMirror_RichDiv <- read_csv("./output/BootMirror_RichDiv.csv")
 
 ```
 
 ```{r apcstats, echo = FALSE, warning=FALSE,message = FALSE}
-APC<-MirrorPairs %>% 
-  filter(JrnlType=="OA") %>% 
-  summarize(medianAPC=median(APC),
-            avg_APC=mean(APC),
-            sd_APC=sd(APC),
-            maxAPC=max(APC),
-            minAPC=min(APC))
-APC_stats<-round(APC,2)
-max<-APC_stats[4]
-min<-APC_stats[5]
-mean<-APC_stats[2]
-sd<-APC_stats[3]
-median<-APC_stats[1]
+# Summary of APCs - Mirror Journals
+APC <- MirrorPairs %>%
+  filter(JrnlType == "OA") %>%
+  summarize(
+    medianAPC = median(APC),
+    avg_APC = mean(APC),
+    sd_APC = sd(APC),
+    maxAPC = max(APC),
+    minAPC = min(APC)
+  )
+APC_stats <- round(APC, 2)
+max <- APC_stats[4]
+min <- APC_stats[5]
+mean <- APC_stats[2]
+sd <- APC_stats[3]
+median <- APC_stats[1]
 
+# Summary of APCs - Parent (Subscription) Journals
+APC_parent <- MirrorPairs %>%
+  filter(JrnlType == "PW") %>%
+  filter(is.na(APC) == FALSE) %>%
+  summarize(
+    medianAPC = median(APC),
+    avg_APC = mean(APC),
+    sd_APC = sd(APC),
+    maxAPC = max(APC),
+    minAPC = min(APC)
+  )
 
-APC_parent<-MirrorPairs %>% 
-  filter(JrnlType=="PW") %>% 
-  filter(is.na(APC)==FALSE) %>% 
-  summarize(medianAPC=median(APC),
-            avg_APC=mean(APC),
-            sd_APC=sd(APC),
-            maxAPC=max(APC),
-            minAPC=min(APC))
-APC_parent_stats<-round(APC_parent,2)
-max_parent<-APC_parent_stats[4]
-min_parent<-APC_parent_stats[5]
-mean_parent<-APC_parent_stats[2]
-sd_parent<-APC_parent_stats[3]
-median_parent<-APC_parent_stats[1]
+APC_parent_stats <- round(APC_parent, 2)
+max_parent <- APC_parent_stats[4]
+min_parent <- APC_parent_stats[5]
+mean_parent <- APC_parent_stats[2]
+sd_parent <- APC_parent_stats[3]
+median_parent <- APC_parent_stats[1]
 
+# Difference between APCs for Mirror & Parent journal APCs (if there is one)
+APC_mirror <- MirrorPairs %>%
+  filter(JrnlType == "OA")
+APC_parent <- MirrorPairs %>%
+  filter(JrnlType == "PW")
+APC_diff <- inner_join(APC_mirror, APC_parent, by = "pair_key")
 
-APC_mirror<-MirrorPairs %>% 
-  filter(JrnlType=="OA")
-
-APC_parent<-MirrorPairs %>% 
-  filter(JrnlType=="PW")
-
-APC_diff <- inner_join(APC_mirror,APC_parent,by="pair_key")
-
-APC_diff$APC_diff <- APC_diff$APC.y-APC_diff$APC.x
-APC_diff <-  na.omit(APC_diff)
+APC_diff$APC_diff <- APC_diff$APC.y - APC_diff$APC.x
+APC_diff <- na.omit(APC_diff)
 APC_diff_mean <- mean(APC_diff$APC_diff)
 APC_diff_range <- range(APC_diff$APC_diff)
 APC_diff_median <- median(APC_diff$APC_diff)
-diff_conditional <- APC_diff %>% 
+diff_conditional <- APC_diff %>%
   select(APC_diff) %>%
-  filter(APC_diff!=0) %>% 
-  summarize(avg_diff=mean(APC_diff),
-            sd_diff=sd(APC_diff))
+  filter(APC_diff != 0) %>%
+  summarize(
+    avg_diff = mean(APC_diff),
+    sd_diff = sd(APC_diff)
+  )
 
 
 ```
 
 ```{r njournals, echo = FALSE, warning=FALSE,message = FALSE}
-n_journals <- AllData %>% 
-  group_by(JrnlType) %>% 
-  summarize(n=n_distinct(Journal))
-n_journals_tot<-sum(n_journals$n)
+# No. of journals by jrnl type
+n_journals <- AllData %>%
+  group_by(JrnlType) %>%
+  summarize(n = n_distinct(Journal))
+n_journals_tot <- sum(n_journals$n)
 
-njournalsOA<-as.numeric(n_journals[1,2])
-njournalsPW<-as.numeric(n_journals[2,2])
+njournalsOA <- as.numeric(n_journals[1, 2])
+njournalsPW <- as.numeric(n_journals[2, 2])
 ```
 
 ```{r npapers, echo=FALSE,message = FALSE,warning=FALSE}
-NumbArticles_JrnlType <- AllData %>% #number of papers per journal
-  group_by(JrnlType,ArticleType) %>% 
-  summarize(n=n_distinct(refID))
-n_OA<-as.numeric(NumbArticles_JrnlType[1,3])
-n_OAinPW<-as.numeric(NumbArticles_JrnlType[2,3])
-n_PW<-as.numeric(NumbArticles_JrnlType[3,3])
-Total_pubs<-sum(NumbArticles_JrnlType$n)
+# number of papers by journal type
+NumbArticles_JrnlType <- AllData %>%
+  group_by(JrnlType, ArticleType) %>%
+  summarize(n = n_distinct(refID))
+n_OA <- as.numeric(NumbArticles_JrnlType[1, 3])
+n_OAinPW <- as.numeric(NumbArticles_JrnlType[2, 3])
+n_PW <- as.numeric(NumbArticles_JrnlType[3, 3])
+Total_pubs <- sum(NumbArticles_JrnlType$n)
 
+# No. of Single Author papers by journal type / article type
+NumbSoloArticles_JrnlType <- single_ALL %>%
+  group_by(JrnlType, ArticleType) %>%
+  summarize(n = n_distinct(refID))
+OA_solo <- as.numeric(NumbSoloArticles_JrnlType[1, 3])
+OAinPW_solo <- as.numeric(NumbSoloArticles_JrnlType[2, 3])
+PW_solo <- as.numeric(NumbSoloArticles_JrnlType[3, 3])
 
-
-NumbSoloArticles_JrnlType<-sole_ALL %>% 
- group_by(JrnlType,ArticleType) %>% 
-  summarize(n=n_distinct(refID))
-OA_solo<-as.numeric(NumbSoloArticles_JrnlType[1,3])
-OAinPW_solo<-as.numeric(NumbSoloArticles_JrnlType[2,3])
-PW_solo<-as.numeric(NumbSoloArticles_JrnlType[3,3])
-
-NumbCoAuthoredArticles_JrnlType<-first_ALL %>% 
- group_by(JrnlType,ArticleType) %>% 
-  summarize(n=n_distinct(refID))
-OA_coauthored<-as.numeric(NumbCoAuthoredArticles_JrnlType[1,3])
-OAinPW_coauthored<-as.numeric(NumbCoAuthoredArticles_JrnlType[2,3])
-PW_coauthored<-as.numeric(NumbCoAuthoredArticles_JrnlType[3,3])
+# No. of Coauthored papers by journal type / article type
+NumbCoAuthoredArticles_JrnlType <- first_ALL %>%
+  group_by(JrnlType, ArticleType) %>%
+  summarize(n = n_distinct(refID))
+OA_coauthored <- as.numeric(NumbCoAuthoredArticles_JrnlType[1, 3])
+OAinPW_coauthored <- as.numeric(NumbCoAuthoredArticles_JrnlType[2, 3])
+PW_coauthored <- as.numeric(NumbCoAuthoredArticles_JrnlType[3, 3])
 ```
 
 ```{r ncountries, echo=FALSE,message = FALSE,warning=FALSE}
 # Total Countries: OA Mirror journals
-n_OA_countries<-AllData %>% 
-  filter(JrnlType=="OA") %>%
-  filter(AuthorNum==1) %>%
-  summarize(n=n_distinct(Code))
+n_OA_countries <- AllData %>%
+  filter(JrnlType == "OA") %>%
+  filter(AuthorNum == 1) %>%
+  summarize(n = n_distinct(Code))
 
-# Total Countries: OA in PW journals
-n_OAinPW_countries<-AllData %>% 
-  filter(ArticleType=="OA" & JrnlType=="PW") %>%
-  filter(AuthorNum==1) %>%
-  summarize(n=n_distinct(Code))
-  
-# Total Countries: PW journals
-n_PW_countries<-AllData %>% 
-  filter(ArticleType=="PW") %>%
-  filter(AuthorNum==1) %>%
-  summarize(n=n_distinct(Code))
-  
-# Total Countries: sole-authored papers
-n_countries_SOLE_authors<-sole_ALL %>% 
-  summarize(n=n_distinct(Code))
+# Total Countries: OA articles in Parent journals
+n_OAinPW_countries <- AllData %>%
+  filter(ArticleType == "OA" & JrnlType == "PW") %>%
+  filter(AuthorNum == 1) %>%
+  summarize(n = n_distinct(Code))
 
+# Total Countries: Parent journals
+n_PW_countries <- AllData %>%
+  filter(ArticleType == "PW") %>%
+  filter(AuthorNum == 1) %>%
+  summarize(n = n_distinct(Code))
 
-# Total Countries: sole-authored papers in Mirror Jrnls
-n_countries_OA_SOLE_authors<-sole_ALL %>% 
-  filter(JrnlType=="OA") %>%
-  filter(AuthorNum==1) %>%
-  summarize(n=n_distinct(Code))
+# Total Countries: single-authored papers
+n_countries_single_authors <- single_ALL %>%
+  summarize(n = n_distinct(Code))
 
-# Total Countries: sole-authored OA papers in PARENT
-n_countries_OAinPW_SOLE_authors<-sole_ALL %>% 
-  filter(ArticleType=="OA" & JrnlType=="PW") %>%
-  filter(AuthorNum==1) %>%
-  summarize(n=n_distinct(Code))
+# Total Countries: single-authored papers in Mirror journals
+n_countries_OA_single_authors <- single_ALL %>%
+  filter(JrnlType == "OA") %>%
+  filter(AuthorNum == 1) %>%
+  summarize(n = n_distinct(Code))
 
+# Total Countries: single-authored OA papers in Parent journals
+n_countries_OAinPW_single_authors <- single_ALL %>%
+  filter(ArticleType == "OA" & JrnlType == "PW") %>%
+  filter(AuthorNum == 1) %>%
+  summarize(n = n_distinct(Code))
 
-# Total Countries: sole-authored in PARENT (OA+nonOA)
-n_countries_PW_SOLE_authors<-sole_ALL %>% 
-  filter(JrnlType=="PW") %>%
-  filter(AuthorNum==1) %>%
-  summarize(n=n_distinct(Code))
+# Total Countries: single author papers in Parent (OA+nonOA)
+n_countries_PW_single_authors <- single_ALL %>%
+  filter(JrnlType == "PW") %>%
+  filter(AuthorNum == 1) %>%
+  summarize(n = n_distinct(Code))
 
-# Total Countries: sole-authored PAYWALL papers in PARENT
-n_countries_PWinPW_SOLE_authors<-sole_ALL %>% 
-  filter(ArticleType=="PW" & JrnlType=="PW") %>%
-  filter(AuthorNum==1) %>%
-  summarize(n=n_distinct(Code))
+# Total Countries: single author non-OA papers in Parent journals
+n_countries_PWinPW_single_authors <- single_ALL %>%
+  filter(ArticleType == "PW" & JrnlType == "PW") %>%
+  filter(AuthorNum == 1) %>%
+  summarize(n = n_distinct(Code))
 
+# Total Countries: Co-authored papers in Mirror Journals
+n_countries_OA_CO_authors <- first_ALL %>%
+  filter(JrnlType == "OA") %>%
+  filter(AuthorNum == 1) %>%
+  summarize(n = n_distinct(Code))
 
-# Total Countries: CO-authored papers in Mirror Jrnls
-n_countries_OA_CO_authors<-first_ALL %>% 
-  filter(JrnlType=="OA") %>%
-  filter(AuthorNum==1) %>%
-  summarize(n=n_distinct(Code))
+# Total Countries: Co-authored OA papers in Parent Journals
+n_countries_OAinPW_CO_authors <- first_ALL %>%
+  filter(ArticleType == "OA" & JrnlType == "PW") %>%
+  filter(AuthorNum == 1) %>%
+  summarize(n = n_distinct(Code))
 
-# Total Countries: CO-authored OA papers in PARENT
-n_countries_OAinPW_CO_authors<-first_ALL %>% 
-  filter(ArticleType=="OA" & JrnlType=="PW") %>%
-  filter(AuthorNum==1) %>%
-  summarize(n=n_distinct(Code))
-
-# Total Countries: CO-authored PAYWALL papers in PARENT
-n_countries_PWinPW_CO_authors<-first_ALL %>% 
-  filter(ArticleType=="PW" & JrnlType=="PW") %>%
-  filter(AuthorNum==1) %>%
-  summarize(n=n_distinct(Code))
-
-
+# Total Countries: Co-authored non-OA papers in Parent journals
+n_countries_PWinPW_CO_authors <- first_ALL %>%
+  filter(ArticleType == "PW" & JrnlType == "PW") %>%
+  filter(AuthorNum == 1) %>%
+  summarize(n = n_distinct(Code))
 
 # Total Countries: first authors of co-authored papers
-n_countries_FIRST_authors<-first_ALL %>% 
-  summarize(n=n_distinct(Code))
+n_countries_FIRST_authors <- first_ALL %>%
+  summarize(n = n_distinct(Code))
 
 # Total Countries: All papers
-countries_first_and_sole<-(c(sole_ALL$Code,
-                                     first_ALL$Code))
+countries_first_and_single <- (c(
+  single_ALL$Code,
+  first_ALL$Code
+))
 
-# Total Countries: all first authors (sole+first of authored)
-n_countries_FIRST_AND_SOLE_authors<-n_distinct(countries_first_and_sole)
-n_countries_total<-n_countries_FIRST_AND_SOLE_authors
+# Total Countries: all first authors (single+first of authored)
+n_countries_FIRST_AND_single_authors <- n_distinct(countries_first_and_single)
+n_countries_total <- n_countries_FIRST_AND_single_authors
 
-# Countries by Journal Type: Sole-authored papers                   
-n_countries_SOLE_by_jrnl<-sole_ALL %>% 
-  group_by(JrnlType) %>% 
-  summarize(n=n_distinct(Code))
-nSoleOA<-n_countries_SOLE_by_jrnl[1,2]
-nSoleOAinPW<-n_countries_SOLE_by_jrnl[2,2]
-nSolePW<-n_countries_SOLE_by_jrnl[3,2]
+# Countries by Journal Type: single-authored papers
+n_countries_single_by_jrnl <- single_ALL %>%
+  group_by(JrnlType) %>%
+  summarize(n = n_distinct(Code))
+nsingleOA <- n_countries_single_by_jrnl[1, 2]
+nsingleOAinPW <- n_countries_single_by_jrnl[2, 2]
+nsinglePW <- n_countries_single_by_jrnl[3, 2]
 
 # Countries by Journal Type: co-authored papers
-n_countries_FIRST_by_jrnl<-first_ALL %>% 
-  group_by(JrnlType) %>% 
-  summarize(n=n_distinct(Code))
-nCoOA<-n_countries_FIRST_by_jrnl[1,2]
-nCoOAinPW<-n_countries_FIRST_by_jrnl[2,2]
-nCoPW<-n_countries_FIRST_by_jrnl[3,2]
+n_countries_FIRST_by_jrnl <- first_ALL %>%
+  group_by(JrnlType) %>%
+  summarize(n = n_distinct(Code))
+nCoOA <- n_countries_FIRST_by_jrnl[1, 2]
+nCoOAinPW <- n_countries_FIRST_by_jrnl[2, 2]
+nCoPW <- n_countries_FIRST_by_jrnl[3, 2]
 
 # percent of articles with author in USA or CHN (All Papers combined)
-n_articles_first_CHN_USA<-AllData %>% 
-  filter(AuthorNum==1) %>% 
-  filter(Code=="CHN"|Code=="USA") %>% 
-  summarize(n=n_distinct(refID))
+n_articles_first_CHN_USA <- AllData %>%
+  filter(AuthorNum == 1) %>%
+  filter(Code == "CHN" | Code == "USA") %>%
+  summarize(n = n_distinct(refID))
 
-Perc_USA_orCHN<-as.numeric(round(n_articles_first_CHN_USA/Total_pubs*100,2))
+Perc_USA_orCHN <- as.numeric(round(n_articles_first_CHN_USA / Total_pubs * 100, 2))
 
 # number of OA articles with author in USA (Mirror + OA in PW)
-n_articles_first_USA_OA<-AllData %>%
-  filter(ArticleType=="OA") %>% 
-  filter(AuthorNum==1) %>% 
-  filter(Code=="USA") %>% 
-  group_by(JrnlType,ArticleType) %>% 
-  summarize(n=n_distinct(refID))
+n_articles_first_USA_OA <- AllData %>%
+  filter(ArticleType == "OA") %>%
+  filter(AuthorNum == 1) %>%
+  filter(Code == "USA") %>%
+  group_by(JrnlType, ArticleType) %>%
+  summarize(n = n_distinct(refID))
 
 # number of OA articles with author in CHN (Mirror + OA in PW)
-n_articles_first_CHN_OA<-AllData %>%
-  filter(ArticleType=="OA") %>% 
-  filter(AuthorNum==1) %>% 
-  filter(Code=="CHN") %>% 
-  group_by(JrnlType,ArticleType) %>% 
-  summarize(n=n_distinct(refID))
+n_articles_first_CHN_OA <- AllData %>%
+  filter(ArticleType == "OA") %>%
+  filter(AuthorNum == 1) %>%
+  filter(Code == "CHN") %>%
+  group_by(JrnlType, ArticleType) %>%
+  summarize(n = n_distinct(refID))
 
 # number of OA articles with author in USA (OA in PW)
-n_articles_first_USA_OAinPW<-AllData %>%
-  filter(JrnlType=="PW") %>%
-  filter(ArticleType=="OA") %>%
-  filter(AuthorNum==1) %>%
-  filter(Code=="USA") %>%
-  summarize(n=n_distinct(refID))
+n_articles_first_USA_OAinPW <- AllData %>%
+  filter(JrnlType == "PW") %>%
+  filter(ArticleType == "OA") %>%
+  filter(AuthorNum == 1) %>%
+  filter(Code == "USA") %>%
+  summarize(n = n_distinct(refID))
 
 
 
 # number of OA articles with author in USA (mirror)
-n_articles_first_USA_OAinPW<-AllData %>%
-  filter(JrnlType=="OA") %>%
-  filter(ArticleType=="OA") %>%
-  filter(AuthorNum==1) %>%
-  filter(Code=="USA") %>%
-  summarize(n=n_distinct(refID))
+n_articles_first_USA_OAinPW <- AllData %>%
+  filter(JrnlType == "OA") %>%
+  filter(ArticleType == "OA") %>%
+  filter(AuthorNum == 1) %>%
+  filter(Code == "USA") %>%
+  summarize(n = n_distinct(refID))
 
 
 # number of OA articles with author in CHN (OA in PW)
-n_articles_first_USA_OAinPW<-AllData %>%
-  filter(JrnlType=="PW") %>%
-  filter(ArticleType=="OA") %>%
-  filter(AuthorNum==1) %>%
-  filter(Code=="CHN") %>%
-  summarize(n=n_distinct(refID))
+n_articles_first_USA_OAinPW <- AllData %>%
+  filter(JrnlType == "PW") %>%
+  filter(ArticleType == "OA") %>%
+  filter(AuthorNum == 1) %>%
+  filter(Code == "CHN") %>%
+  summarize(n = n_distinct(refID))
 
 # number of OA articles with author in USA (mirror)
-n_articles_first_USA_OAinPW<-AllData %>%
-  filter(JrnlType=="OA") %>%
-  filter(ArticleType=="OA") %>%
-  filter(AuthorNum==1) %>%
-  filter(Code=="CHN") %>%
-  summarize(n=n_distinct(refID))
+n_articles_first_USA_OAinPW <- AllData %>%
+  filter(JrnlType == "OA") %>%
+  filter(ArticleType == "OA") %>%
+  filter(AuthorNum == 1) %>%
+  filter(Code == "CHN") %>%
+  summarize(n = n_distinct(refID))
 
 # number of PW articles with author in USA
-n_articles_first_USA_PW<-AllData %>%
-  filter(ArticleType=="PW") %>% 
-  filter(AuthorNum==1) %>% 
-  filter(Code=="USA") %>% 
-  summarize(n=n_distinct(refID))
+n_articles_first_USA_PW <- AllData %>%
+  filter(ArticleType == "PW") %>%
+  filter(AuthorNum == 1) %>%
+  filter(Code == "USA") %>%
+  summarize(n = n_distinct(refID))
 
 # number of PW articles with author in CHN
-n_articles_first_CHN_PW<-AllData %>%
-  filter(ArticleType=="PW") %>% 
-  filter(AuthorNum==1) %>% 
-  filter(Code=="CHN") %>% 
-  summarize(n=n_distinct(refID))
-# 
-ratioOA_USAtoCHN <- round(sum(n_articles_first_USA_OA$n)/sum(n_articles_first_CHN_OA$n))
-ratioPW_CHNtoUSA <- round(sum(n_articles_first_CHN_PW$n)/sum(n_articles_first_USA_PW$n))
+n_articles_first_CHN_PW <- AllData %>%
+  filter(ArticleType == "PW") %>%
+  filter(AuthorNum == 1) %>%
+  filter(Code == "CHN") %>%
+  summarize(n = n_distinct(refID))
+#
+ratioOA_USAtoCHN <- round(sum(n_articles_first_USA_OA$n) / sum(n_articles_first_CHN_OA$n))
+ratioPW_CHNtoUSA <- round(sum(n_articles_first_CHN_PW$n) / sum(n_articles_first_USA_PW$n))
 
 
 # Total Low-income Countries: OA in PW journals
-n_countries_low<-AllData %>% 
+n_countries_low <- AllData %>%
   # filter(ArticleType=="OA" & JrnlType=="PW") %>%
-  filter(IncomeGroup=="Low") %>%
-  filter(AuthorNum==1) %>%
-  summarize(n=n_distinct(Code))
+  filter(IncomeGroup == "Low") %>%
+  filter(AuthorNum == 1) %>%
+  summarize(n = n_distinct(Code))
 
-countries_low_freq<-AllData %>% 
+countries_low_freq <- AllData %>%
   # filter(ArticleType=="OA" & JrnlType=="PW") %>%
-  filter(IncomeGroup=="Low") %>%
-  filter(AuthorNum==1) %>%
-  group_by(Code) %>% 
-  summarize(n=n()) %>% 
+  filter(IncomeGroup == "Low") %>%
+  filter(AuthorNum == 1) %>%
+  group_by(Code) %>%
+  summarize(n = n()) %>%
   arrange(desc(n))
 
-regions_low_freq<-AllData %>% 
+regions_low_freq <- AllData %>%
   # filter(ArticleType=="OA" & JrnlType=="PW") %>%
-  filter(IncomeGroup=="Low") %>%
-  filter(AuthorNum==1) %>%
-  group_by(Region) %>% 
-  summarize(n=n()) %>% 
+  filter(IncomeGroup == "Low") %>%
+  filter(AuthorNum == 1) %>%
+  group_by(Region) %>%
+  summarize(n = n()) %>%
   arrange(desc(n))
 
 
-n_countries_high<-AllData %>% 
+n_countries_high <- AllData %>%
   # filter(ArticleType=="OA" & JrnlType=="PW") %>%
-  filter(IncomeGroup=="High") %>%
-  filter(AuthorNum==1) %>%
-  summarize(n=n_distinct(Code))
+  filter(IncomeGroup == "High") %>%
+  filter(AuthorNum == 1) %>%
+  summarize(n = n_distinct(Code))
 
 
 ```
@@ -536,12 +536,12 @@ All data analyses were carried out with code written in the R statistical progra
 
 # Results
 
-The `r njournalsOA` Mirror journals published `r n_OA` articles from their inception through the date we downloaded the article records. During the same interval, their respective Parent journals published `r n_PW+n_OAinPW` articles, of which `r n_OAinPW` were open access (Table 1). Lead authors were collectively based in `r n_countries_total` countries (i.e., all journals and article categories pooled). However, the number of countries in which authors were based varied substantially among categories (Table A3), as did the relative frequency of countries in which authors were based (i.e., Evenneness, Table A3). For example, authors of single-author publications, which accounted for `r round(OA_solo/n_OA*100,0)`% of the articles in Mirror journals (N = `r OA_solo`) but only `r round(PW_solo/(n_PW+n_OAinPW)*100,0)`% of articles in Parent journals (N = `r PW_solo`), were collectively based in N = `r n_countries_SOLE_authors` countries. However, the authors of sole-authored OA articles in Mirror and Parent journals were based in N = `r n_countries_OA_SOLE_authors` and N = `r n_countries_OAinPW_SOLE_authors`, respectively (Table 2). While `r round(Perc_USA_orCHN,0)`% of articles had a lead author whose primary institutional address was in either the United States of America (USA) or China (Fig. A1), there was an important difference among journal types in the representation of authors from these two countries. While USA authors published approximately `r ratioOA_USAtoCHN`-times more OA articles than authors based in China, authors from China published `r ratioPW_CHNtoUSA`-times more subscription-only articles in Parent journals than authors from the USA (Figs. 1, 2).
+The `r njournalsOA` Mirror journals published `r n_OA` articles from their inception through the date we downloaded the article records. During the same interval, their respective Parent journals published `r n_PW+n_OAinPW` articles, of which `r n_OAinPW` were open access (Table 1). Lead authors were collectively based in `r n_countries_total` countries (i.e., all journals and article categories pooled). However, the number of countries in which authors were based varied substantially among categories (Table A3), as did the relative frequency of countries in which authors were based (i.e., Evenneness, Table A3). For example, authors of single-author publications, which accounted for `r round(OA_solo/n_OA*100,0)`% of the articles in Mirror journals (N = `r OA_solo`) but only `r round(PW_solo/(n_PW+n_OAinPW)*100,0)`% of articles in Parent journals (N = `r PW_solo`), were collectively based in N = `r n_countries_single_authors` countries. However, the authors of single-authored OA articles in Mirror and Parent journals were based in N = `r n_countries_OA_single_authors` and N = `r n_countries_OAinPW_single_authors`, respectively (Table 2). While `r round(Perc_USA_orCHN,0)`% of articles had a lead author whose primary institutional address was in either the United States of America (USA) or China (Fig. A1), there was an important difference among journal types in the representation of authors from these two countries. While USA authors published approximately `r ratioOA_USAtoCHN`-times more OA articles than authors based in China, authors from China published `r ratioPW_CHNtoUSA`-times more subscription-only articles in Parent journals than authors from the USA (Figs. 1, 2).
 
 ## Geographic Diversity
 
 *First Authors of co-authored articles:* When all countries were included in the analyses, author Geographic Diversity was lower for subscription articles in Parent journals than for both MOA and POA articles. However, after correcting for the dominance of authors based in the USA and China the pattern was reversed -- the Geographic Diversity of authors in Mirror journals was significantly lower than that of subscription-only articles in Parent journals ($D_2^{MOA}$ = 17.7 vs $\bar{D}_2^{Psub}$ = 24.52 $\pm$ 1.37 SD); the same is true of OA articles in Parent journals ($D_2^{POA}$ = 16.5$\bar{D}_2^{Psub}$ = 24.33 $\pm$ 0.85 SD; Fig. 3, Table 2).\
-*Sole-authored articles:* The results for sole-authored articles were more complex. Author diversity was significantly lower for OA articles in Parent journals than for subscription-only articles, regardless of whether China and the USA were included in the analyses (Fig 3). In contrast the values of $D_{2}$ for Mirror journals - while lower than for subscription-only articles in Parent journals - were not significantly different in either the "All Countries" or "China and USA Excluded" comparisons (Fig. 3, Table 2).
+*Single-author articles:* The results for single author articles were more complex. Author diversity was significantly lower for OA articles in Parent journals than for subscription-only articles, regardless of whether China and the USA were included in the analyses (Fig 3). In contrast the values of $D_{2}$ for Mirror journals - while lower than for subscription-only articles in Parent journals - were not significantly different in either the "All Countries" or "China and USA Excluded" comparisons (Fig. 3, Table 2).
 
 ## Global Regions, National Income, and Waiver Categories
 
@@ -584,26 +584,26 @@ We thank N. Emery, C. Scott, and D. Forero for assistance in gathering prelimina
 \endgroup
 
 ```{r richdivfigs1, echo=FALSE,message = FALSE,cached=TRUE,warning=FALSE}
-insert_custom1<-n_OA
-insert_custom2<-n_PW
-insert_custom3<-n_OAinPW
+insert_custom1 <- n_OA
+insert_custom2 <- n_PW
+insert_custom3 <- n_OAinPW
 # Figure - Diversity
-source("./Rscript/functions_figures/DivBootFig_MSv2.R")
-DivBootFig<-DivBootFig_MSv2(BootMirror_RichDiv,sole_ALL,sole_NOCHNUSA,first_ALL,first_NOCHNUSA)
+source("./Rscript/functions_ms/DivBootFig_MSv2.R")
+DivBootFig <- DivBootFig_MSv2(BootMirror_RichDiv, single_ALL, single_NOCHNUSA, first_ALL, first_NOCHNUSA)
 
 # Figure - Richness
-source("./Rscript/functions_figures/RichBootFig_MSv2.R")
-RichBootFig<-RichBootFig_MSv2(BootMirror_RichDiv,sole_ALL,first_ALL,sole_NOCHNUSA, first_NOCHNUSA)
+source("./Rscript/functions_ms/RichBootFig_MSv2.R")
+RichBootFig <- RichBootFig_MSv2(BootMirror_RichDiv, single_ALL, first_ALL, single_NOCHNUSA, first_NOCHNUSA)
 ```
 
 ```{r richdivfigs2, echo=FALSE, message = FALSE, warning=FALSE}
-source("./Rscript/functions_figures/CountryPlot.R")
-p1<-CountryPlot(sole_ALL,"author_first","OA","OA", 15)
-p2<-CountryPlot(sole_ALL,"author_first","PW","OA", 15)
-p3<-CountryPlot(sole_ALL,"author_first","PW","PW", 15)
-p4<-CountryPlot(first_ALL,"author_first","OA","OA", 15)
-p5<-CountryPlot(first_ALL,"author_first","PW","OA", 15)
-p6<-CountryPlot(first_ALL,"author_first","PW","PW", 15)
+source("./Rscript/functions_ms/CountryPlot.R")
+p1 <- CountryPlot(single_ALL, "author_first", "OA", "OA", 15)
+p2 <- CountryPlot(single_ALL, "author_first", "PW", "OA", 15)
+p3 <- CountryPlot(single_ALL, "author_first", "PW", "PW", 15)
+p4 <- CountryPlot(first_ALL, "author_first", "OA", "OA", 15)
+p5 <- CountryPlot(first_ALL, "author_first", "PW", "OA", 15)
+p6 <- CountryPlot(first_ALL, "author_first", "PW", "PW", 15)
 ```
 
 ```{r Fig1, fig.align='center',fig.cap="For single-author papers: (A) the percentage of authors of articles in open access (OA) Mirror journals that are based in different countries, (B) the percentage of authors of OA articles in Parent journals that are based in different countries, and (C) the percentage of authors of non-OA articles in Parent journals that are based in different countries. Numbers adjacent to bars are the number of articles with lead authors based in that country.",fig.height = 9,fig.width=6}
@@ -629,16 +629,16 @@ DivBootFig
 ```
 
 ```{r IncomeRegionFIgs, cached=TRUE,echo=FALSE, message = FALSE, warning=FALSE}
-source("./Rscript/functions_figures/IncomePlot_MSv2.R")
-IncomePlot<-IncomePlot_MSv2(BootMirror_RichDiv,BootMirror_Countries,"All",sole_ALL,sole_NOCHNUSA,first_ALL,first_NOCHNUSA)
-source("./Rscript/functions_figures/RegionPlot_MSv2.R")
-RegionPlot<-RegionPlot_MSv2(BootMirror_RichDiv,BootMirror_Countries,"All",sole_ALL,sole_NOCHNUSA,first_ALL,first_NOCHNUSA)
-source("./Rscript/functions_figures/WaiverGrpPlot_MSv2.R")
-WaiverPlot<-WaiverGrpPlot_MSv2(BootMirror_RichDiv,BootMirror_Countries,"All",sole_ALL,sole_NOCHNUSA,first_ALL,first_NOCHNUSA,WaiverCountries)
+source("./Rscript/functions_ms/IncomePlot_MSv2.R")
+IncomePlot <- IncomePlot_MSv2(BootMirror_RichDiv, BootMirror_Countries, "All", single_ALL, single_NOCHNUSA, first_ALL, first_NOCHNUSA)
+source("./Rscript/functions_ms/RegionPlot_MSv2.R")
+RegionPlot <- RegionPlot_MSv2(BootMirror_RichDiv, BootMirror_Countries, "All", single_ALL, single_NOCHNUSA, first_ALL, first_NOCHNUSA)
+source("./Rscript/functions_ms/WaiverGrpPlot_MSv2.R")
+WaiverPlot <- WaiverGrpPlot_MSv2(BootMirror_RichDiv, BootMirror_Countries, "All", single_ALL, single_NOCHNUSA, first_ALL, first_NOCHNUSA, WaiverCountries)
 
-Fig_Income<-IncomePlot[[1]]
-Fig_Region<-RegionPlot[[1]]
-Fig_Waiver<-WaiverPlot[[1]]
+Fig_Income <- IncomePlot[[1]]
+Fig_Region <- RegionPlot[[1]]
+Fig_Waiver <- WaiverPlot[[1]]
 ```
 
 ```{r Fig5, echo=FALSE,message = FALSE, warning=FALSE, fig.align='center', fig.cap=paste("Percentage of first authors that are based in different global regions. The dashed line is the value for N = ",insert_custom1," articles in open access (OA) Mirror journals; histograms are values for 1000 identically sized collections of non-OA articles from Parent journals (sampled by bootstrapping from N = ",insert_custom2," articles). All countries, including the USA and China, are included."),fig.fullwidth=TRUE,fig.height = 24,fig.width=20}
@@ -654,8 +654,8 @@ Fig_Waiver
 ```
 
 ```{r mirrorVpw_OA, echo=FALSE, message = FALSE, warning=FALSE}
-source("./Rscript/functions_figures/n_OA_plots.R")
-fig_NbyN<-n_OA_plots(AllData,20)
+source("./Rscript/functions_ms/n_OA_plots.R")
+fig_NbyN <- n_OA_plots(AllData, 20)
 ```
 
 ```{r Fig8, echo=FALSE, message = FALSE, warning=FALSE, fig.align='center', fig.cap="For the 15 countries publishing the most open access (OA) articles, the number of OA articles published in Mirror vs. Parent journals. The dashed line indicates equal numbers published in both journal types; countries above the line published more articles in Parent journals than in Mirrors. Abbreviations: DNK=Denmark, AUT=Austria, NOR=Norway, KOR=South Korea, SWE=Sweden, BEL=Belgium, CHE=Switzerland, ESP=Spain, CAN=Canada, ITA=Italy, DEU=Germany, IND=India, JPN=Japan, BRA=Brazil, AUS=Australia, FRA=France, NLD=Netherlands, GBR=Great Britain, CHN=China, USA=United States of America.)", fig.fullwidth=TRUE,fig.height = 18,fig.width=18}
@@ -663,338 +663,374 @@ fig_NbyN
 ```
 
 ```{r Table1, echo=FALSE,message = FALSE,warning=FALSE}
-source("./Rscript/functions/SummaryTable.R")
-Tables<-SummaryTable(AllData, MirrorPairs)
-Table1<-Tables[2]
-Table1<-as.data.frame(Table1)
-Table1$Journal <- gsub("Gynecology", "Gyn",Table1$Journal)
-Table1$Journal <- gsub(" and ", " & ",Table1$Journal)
-Table1$Journal <- gsub("Journal", "J",Table1$Journal)
-Table1$Journal <- gsub("Reproductive Biology","Repro Bio", Table1$Journal)
-names(Table1)<-c("Title","Subscription","Open Access","Open Access","Mirror","Parent")
-Table1[4,1]<-"BiochimieSuper1"
-Table1[27,1]<-"Microelectronic EngineeringSuper2"
+source("./Rscript/functions_ms/SummaryTable.R")
+Tables <- SummaryTable(AllData, MirrorPairs)
+Table1 <- Tables[2]
+Table1 <- as.data.frame(Table1)
+Table1$Journal <- gsub("Gynecology", "Gyn", Table1$Journal)
+Table1$Journal <- gsub(" and ", " & ", Table1$Journal)
+Table1$Journal <- gsub("Journal", "J", Table1$Journal)
+Table1$Journal <- gsub("Reproductive Biology", "Repro Bio", Table1$Journal)
+names(Table1) <- c("Title", "Subscription", "Open Access", "Open Access", "Mirror", "Parent")
+Table1[4, 1] <- "BiochimieSuper1"
+Table1[27, 1] <- "Microelectronic EngineeringSuper2"
 # Table1[39,4]<-""
-Table1[39,1]<-"Total No. of Articles"
-Table1[39,5]<-""
-Table1[39,6]<-""
+Table1[39, 1] <- "Total No. of Articles"
+Table1[39, 5] <- ""
+Table1[39, 6] <- ""
 # Table1[39,4]<-sum_mirror
 # Table1<-arrange(Table1,desc(Table1[4]))
 
-tmp<-knitr::kable(Table1,
-      digits = 2,
-      align="lccccc",
-      format="latex",
-      row.names = FALSE,
-      booktabs=T,
-      linesep = "", #removes the blank line after every 5 lines
-      caption = "Parent journals published by Elsevier included in this study, the number of open access (OA) and non-OA articles they published during our focal time-frame, the number of articles published in each Mirror journal during the same time period, and the article processing charge (APC) charged by each journal for OA publication. With two exceptions the titles of Parent and Mirror journals are identical except for the 'X' at the end of Mirror versions (e.g., Research Policy X, Optical Materials X).") %>%
-    # column_spec (1, width="8cm") %>%
+tmp <- knitr::kable(Table1,
+  digits = 2,
+  align = "lccccc",
+  format = "latex",
+  row.names = FALSE,
+  booktabs = T,
+  linesep = "", # removes the blank line after every 5 lines
+  caption = "Parent journals published by Elsevier included in this study, the number of open access (OA) and non-OA articles they published during our focal time-frame, the number of articles published in each Mirror journal during the same time period, and the article processing charge (APC) charged by each journal for OA publication. With two exceptions the titles of Parent and Mirror journals are identical except for the 'X' at the end of Mirror versions (e.g., Research Policy X, Optical Materials X)."
+) %>%
+  # column_spec (1, width="8cm") %>%
   row_spec(38, hline_after = TRUE) %>%
-
-  kable_styling(bootstrap_options = c("hover"),
-                # full_width = F,
-                latex_options="scale_down",
-                font_size = 12,
-                position = "left") %>%
-  footnote(number = c("OA Mirror title: Biochimie Open", "OA Mirror title: Micro and Nano Engineering")) %>% add_header_above(c(" " = 1, "Parent Journal" = 2, "Mirror Journal" = 1, "APC (US$)"=2))
-tmp<-str_replace(tmp, "Super1", "$^{1}$")
-tmp<-str_replace(tmp, "Super2", "$^{2}$")
+  kable_styling(
+    bootstrap_options = c("hover"),
+    # full_width = F,
+    latex_options = "scale_down",
+    font_size = 12,
+    position = "left"
+  ) %>%
+  footnote(number = c("OA Mirror title: Biochimie Open", "OA Mirror title: Micro and Nano Engineering")) %>%
+  add_header_above(c(" " = 1, "Parent Journal" = 2, "Mirror Journal" = 1, "APC (US$)" = 2))
+tmp <- str_replace(tmp, "Super1", "$^{1}$")
+tmp <- str_replace(tmp, "Super2", "$^{2}$")
 knitr::asis_output(tmp)
 
 ```
 
 ```{r Table2, echo=FALSE,message = FALSE,warning=FALSE}
-source("./Rscript/functions_figures/Table2.R")
-Table2<-Table2(sole_ALL,
-               sole_NOCHNUSA,
-               first_ALL,
-               first_NOCHNUSA)
+source("./Rscript/functions_ms/Table2.R")
+Table2 <- Table2(
+  single_ALL,
+  single_NOCHNUSA,
+  first_ALL,
+  first_NOCHNUSA
+)
 
-Table2<-Table2 %>% 
+Table2 <- Table2 %>%
   mutate(`OA Source` = ifelse(`OA Source` == "parent", "Parent", `OA Source`)) %>%
   mutate(`OA Source` = ifelse(`OA Source` == "mirror", "Mirror", `OA Source`))
 
 
-Table2 <- Table2 %>% 
-  filter(Metric=="Diversity") %>% 
-  select(-Metric) %>% 
+Table2 <- Table2 %>%
+  filter(Metric == "Diversity") %>%
+  select(-Metric) %>%
   arrange(desc(Author))
 
-blank_row <-rep(NA,8)
-names(blank_row)<-names(Table2)
-single<-Table2 %>% filter(Author=="Single")
-first <-Table2 %>% filter(Author=="First")
-Table2<-bind_rows(single,blank_row,first)
+blank_row <- rep(NA, 8)
+names(blank_row) <- names(Table2)
+single <- Table2 %>% filter(Author == "Single")
+first <- Table2 %>% filter(Author == "First")
+Table2 <- bind_rows(single, blank_row, first)
 
 
-Table2$Author <-c("Single","","","First","")
+Table2$Author <- c("Single", "", "", "First", "")
 
-colnames(Table2)<-c("Author",
-                    "OA",
-                    paste("Parent PW","(mean \u00B1 SD)",sep=" "),
-                    "$\\hat{P}$",
-                    "Mirror",
-                    paste("Parent PW2","(mean \u00B1 SD)",sep=" "),
-                    "$\\hat{P2}$",
-                    "OA Source")
+colnames(Table2) <- c(
+  "Author",
+  "OA",
+  paste("Parent PW", "(mean \u00B1 SD)", sep = " "),
+  "$\\hat{P}$",
+  "Mirror",
+  paste("Parent PW2", "(mean \u00B1 SD)", sep = " "),
+  "$\\hat{P2}$",
+  "OA Source"
+)
 
-Table2 <- Table2 %>% select("Author",
-                            "OA Source", 
-                            "OA", 
-                            "Parent PW (mean ± SD)",
-                            "$\\hat{P}$",
-                            "Mirror",
-                            "Parent PW2 (mean ± SD)",
-                            "$\\hat{P2}$")
+Table2 <- Table2 %>% select(
+  "Author",
+  "OA Source",
+  "OA",
+  "Parent PW (mean ± SD)",
+  "$\\hat{P}$",
+  "Mirror",
+  "Parent PW2 (mean ± SD)",
+  "$\\hat{P2}$"
+)
 
 
-colnames(Table2)<-c("Author",
-                    "OA Source",
-                    "OA", 
-                    "Psub (mean ± SD)",
-                    "$\\hat{P}$",
-                    "OA",
-                    "Psub (mean ± SD)",
-                    "$\\hat{P}$")
+colnames(Table2) <- c(
+  "Author",
+  "OA Source",
+  "OA",
+  "Psub (mean ± SD)",
+  "$\\hat{P}$",
+  "OA",
+  "Psub (mean ± SD)",
+  "$\\hat{P}$"
+)
 
 
 # # #
 kable(Table2,
-      digits = 2,
-      format = "latex",
-      align="llrccrcc",
-      escape=FALSE,
-      row.names = FALSE,
-      booktabs=T,
-      linesep = "",
-      caption = "Geographic Diversity of lead authors publishing Open Access (i.e., OA) articles in Mirror and Parent journals vs. subscription-only, non-OA, articles in Parent journals (Psub). The value for Psub is the mean of 1000 bootstrap-generated article collections identical in size and structure to each OA group with which they are being compared (i.e., OA in Mirror, OA in Parent). Single: authors of single-authored articles; First: first authors of co-authored articles.") %>%
-  kable_styling(bootstrap_options = c("hover"),
-                # full_width = F,
-                latex_options = c("scale_down"),
-                # latex_options = c("hold_position"),
-                font_size = 12,
-                position = "center") %>% add_header_above(c(" " = 2, "All Countries" = 3, "China & USA Excluded" = 3))
+  digits = 2,
+  format = "latex",
+  align = "llrccrcc",
+  escape = FALSE,
+  row.names = FALSE,
+  booktabs = T,
+  linesep = "",
+  caption = "Geographic Diversity of lead authors publishing Open Access (i.e., OA) articles in Mirror and Parent journals vs. subscription-only, non-OA, articles in Parent journals (Psub). The value for Psub is the mean of 1000 bootstrap-generated article collections identical in size and structure to each OA group with which they are being compared (i.e., OA in Mirror, OA in Parent). Single: authors of single-authored articles; First: first authors of co-authored articles."
+) %>%
+  kable_styling(
+    bootstrap_options = c("hover"),
+    # full_width = F,
+    latex_options = c("scale_down"),
+    # latex_options = c("hold_position"),
+    font_size = 12,
+    position = "center"
+  ) %>%
+  add_header_above(c(" " = 2, "All Countries" = 3, "China & USA Excluded" = 3))
 ```
 
 ```{r Table3, echo=FALSE,message = FALSE,warning=FALSE}
-stipends<-read_csv(file="./data_clean/stipends.csv")
-stipends<-as.data.frame(stipends)
-stipends$agency<-c("CNPq","","CONACYT","","SERB","","RISTEKDIKTI","NRF","")
-source<-stipends$source
-stipends<-stipends %>% select(country, agency,degree, stipend_USD)
-names(stipends)<-c("Country","Agency","Degree","Stipend (US$)")
-stipends[5,3]<-"PhDSuper6"
-stipends[6,3]<-"PhDSuper7"
-stipends[6,1]<-""
-stipends[1,2]<-"CNPqSuper1"
-stipends[2,1]<-""
-stipends[3,2]<-"CONACYTSuper2"
-stipends[4,1]<-""
-stipends[5,2]<-"SERBSuper3"
-stipends[7,2]<-"RISTEKDIKTISuper4"
-stipends[8,2]<-"NRFSuper5"
-stipends[9,1]<-""
+stipends <- read_csv(file = "./data_clean/stipends.csv")
+stipends <- as.data.frame(stipends)
+stipends$agency <- c("CNPq", "", "CONACYT", "", "SERB", "", "RISTEKDIKTI", "NRF", "")
+source <- stipends$source
+stipends <- stipends %>% select(country, agency, degree, stipend_USD)
+names(stipends) <- c("Country", "Agency", "Degree", "Stipend (US$)")
+stipends[5, 3] <- "PhDSuper6"
+stipends[6, 3] <- "PhDSuper7"
+stipends[6, 1] <- ""
+stipends[1, 2] <- "CNPqSuper1"
+stipends[2, 1] <- ""
+stipends[3, 2] <- "CONACYTSuper2"
+stipends[4, 1] <- ""
+stipends[5, 2] <- "SERBSuper3"
+stipends[7, 2] <- "RISTEKDIKTISuper4"
+stipends[8, 2] <- "NRFSuper5"
+stipends[9, 1] <- ""
 
 foot6 <- "Min. value, Prime Minister’s Doctoral Fellowship"
 foot7 <- "Max. value, Prime Minister’s Doctoral Fellowship"
-foot1<-source[1]
-foot2<-source[3]
-foot3<-source[5]
-foot4<-source[7]
-foot5<-source[8]
-foot5<-"https://www.nrf.ac.za"
+foot1 <- source[1]
+foot2 <- source[3]
+foot3 <- source[5]
+foot4 <- source[7]
+foot5 <- source[8]
+foot5 <- "https://www.nrf.ac.za"
 # foot4<-gsub("%20Scholarships%","%20Scholarships\n%",foot4)
 # stipends[4]<-NULL
-tmp<-knitr::kable(stipends,
-                  digits = 1,
-                  format = "latex",
-                  align="lllc",
-                  row.names = FALSE,
-                  booktabs=T,
-                  linesep = "",
-                  caption = "Monthly stipends for graduate students in select countries. The value of the stipend in US currency is based on the exchange rate in December 2020.") %>%
-  kable_styling(bootstrap_options = c("hover"),
-                # latex_options = c("scale_down","hold_position"),
-                # full_width = F,
-                font_size = 12,
-                position = "center") %>% footnote(number = c(foot1,foot2,foot3,foot4,foot5,foot6,foot7))
-tmp<-str_replace(tmp, "Super1", "$^{1}$")
-tmp<-str_replace(tmp, "Super2", "$^{2}$")
-tmp<-str_replace(tmp, "Super3", "$^{3}$")
-tmp<-str_replace(tmp, "Super4", "$^{4}$")
-tmp<-str_replace(tmp, "Super5", "$^{5}$")
-tmp<-str_replace(tmp, "Super6", "$^{6}$")
-tmp<-str_replace(tmp, "Super7", "$^{7}$")
+tmp <- knitr::kable(stipends,
+  digits = 1,
+  format = "latex",
+  align = "lllc",
+  row.names = FALSE,
+  booktabs = T,
+  linesep = "",
+  caption = "Monthly stipends for graduate students in select countries. The value of the stipend in US currency is based on the exchange rate in December 2020."
+) %>%
+  kable_styling(
+    bootstrap_options = c("hover"),
+    # latex_options = c("scale_down","hold_position"),
+    # full_width = F,
+    font_size = 12,
+    position = "center"
+  ) %>%
+  footnote(number = c(foot1, foot2, foot3, foot4, foot5, foot6, foot7))
+tmp <- str_replace(tmp, "Super1", "$^{1}$")
+tmp <- str_replace(tmp, "Super2", "$^{2}$")
+tmp <- str_replace(tmp, "Super3", "$^{3}$")
+tmp <- str_replace(tmp, "Super4", "$^{4}$")
+tmp <- str_replace(tmp, "Super5", "$^{5}$")
+tmp <- str_replace(tmp, "Super6", "$^{6}$")
+tmp <- str_replace(tmp, "Super7", "$^{7}$")
 
 knitr::asis_output(tmp)
 ```
 
 ```{r Table4, echo=FALSE,message = FALSE,warning=FALSE}
-RegionTable<-RegionPlot[2]
-RegionTable<-as.data.frame(RegionTable)
+RegionTable <- RegionPlot[2]
+RegionTable <- as.data.frame(RegionTable)
 
-  Subsampled_Region_summary<-BootMirror_Countries %>%
-    filter(BootType=="MirrorvPW") %>%
-    group_by(author,Dataset,replicate,Region) %>%
-    filter(Dataset=="All Countries") %>%
-    drop_na() %>%
-    summarize(n=n()) %>%
-    mutate(perc=n/sum(n)*100)
-  # str(Subsampled_Region_summary)
-  # levels(as.factor(Subsampled_Region_summary$replicate))
-  PW_means<-Subsampled_Region_summary %>%
-    group_by(author,Dataset,Region) %>%
-    summarise(mean=mean(perc)) %>%
-    dplyr::rename("Countries"="Dataset",
-                  "Author"="author",
-                  "mean PW percentage"="mean") %>%
+Subsampled_Region_summary <- BootMirror_Countries %>%
+  filter(BootType == "MirrorvPW") %>%
+  group_by(author, Dataset, replicate, Region) %>%
+  filter(Dataset == "All Countries") %>%
+  drop_na() %>%
+  summarize(n = n()) %>%
+  mutate(perc = n / sum(n) * 100)
+# str(Subsampled_Region_summary)
+# levels(as.factor(Subsampled_Region_summary$replicate))
+PW_means <- Subsampled_Region_summary %>%
+  group_by(author, Dataset, Region) %>%
+  summarise(mean = mean(perc)) %>%
+  dplyr::rename(
+    "Countries" = "Dataset",
+    "Author" = "author",
+    "mean PW percentage" = "mean"
+  ) %>%
   mutate(Countries = ifelse(Countries == "all", "All Countries", Countries))
 
 
-  PW_means$Author<-gsub("solo", "Single",PW_means$Author)
-  PW_means$Author<-gsub("author_first", "First",PW_means$Author)
+PW_means$Author <- gsub("solo", "Single", PW_means$Author)
+PW_means$Author <- gsub("author_first", "First", PW_means$Author)
 
-  # RegionTable<-RegionTable %>% filter(ArticleCat=="OA")
+# RegionTable<-RegionTable %>% filter(ArticleCat=="OA")
 
-  RegionTable<-left_join(RegionTable,PW_means) %>%
-    select(Author,Countries,Region,`mean PW percentage`,OA_perc,P_Hat)
+RegionTable <- left_join(RegionTable, PW_means) %>%
+  select(Author, Countries, Region, `mean PW percentage`, OA_perc, P_Hat)
 #   %>%
 #   mutate(asterisk = ifelse((P_Hat >= 0.975 |P_Hat <= 0.025 ), "*", " "))
 # RegionTable$P_Hat<-paste(RegionTable$P_Hat,RegionTable$asterisk,sep="")
 # RegionTable$asterisk<-NULL
 
-RegionTable_single<-RegionTable %>%
-  select(Author,Countries,Region,'mean PW percentage',OA_perc,P_Hat) %>%
-  filter(Author=="Single")
+RegionTable_single <- RegionTable %>%
+  select(Author, Countries, Region, "mean PW percentage", OA_perc, P_Hat) %>%
+  filter(Author == "Single")
 
-RegionTable_first<-RegionTable %>%
-  select(Author,Countries,Region,'mean PW percentage',OA_perc,P_Hat) %>%
-  filter(Author=="First")
-
-
-RegionTable_single$Region <- factor(RegionTable_single$Region, levels = c("South Asia",
-                           "North America",
-                           "Sub-Saharan Africa",
-                           "Latin America & Caribbean",
-                           "Middle East & North Africa",
-                           "East Asia & Pacific",
-                           "Europe & Central Asia"))
+RegionTable_first <- RegionTable %>%
+  select(Author, Countries, Region, "mean PW percentage", OA_perc, P_Hat) %>%
+  filter(Author == "First")
 
 
-RegionTable_first$Region <- factor(RegionTable_first$Region, levels = c("South Asia",
-                           "North America",
-                           "Sub-Saharan Africa",
-                           "Latin America & Caribbean",
-                           "Middle East & North Africa",
-                           "East Asia & Pacific",
-                           "Europe & Central Asia"))
-
-RegionTable<-bind_rows(RegionTable_single,RegionTable_first)
-RegionTable<-RegionTable %>% arrange(desc(Author), Region)
-
+RegionTable_single$Region <- factor(RegionTable_single$Region, levels = c(
+  "South Asia",
+  "North America",
+  "Sub-Saharan Africa",
+  "Latin America & Caribbean",
+  "Middle East & North Africa",
+  "East Asia & Pacific",
+  "Europe & Central Asia"
+))
 
 
-blank_row <-rep(NA,6)
-names(blank_row)<-names(RegionTable)
-single<-RegionTable %>% filter(Author=="Single")
-first <-RegionTable %>% filter(Author=="First")
-RegionTable<-bind_rows(single,blank_row,first)
+RegionTable_first$Region <- factor(RegionTable_first$Region, levels = c(
+  "South Asia",
+  "North America",
+  "Sub-Saharan Africa",
+  "Latin America & Caribbean",
+  "Middle East & North Africa",
+  "East Asia & Pacific",
+  "Europe & Central Asia"
+))
+
+RegionTable <- bind_rows(RegionTable_single, RegionTable_first)
+RegionTable <- RegionTable %>% arrange(desc(Author), Region)
 
 
 
+blank_row <- rep(NA, 6)
+names(blank_row) <- names(RegionTable)
+single <- RegionTable %>% filter(Author == "Single")
+first <- RegionTable %>% filter(Author == "First")
+RegionTable <- bind_rows(single, blank_row, first)
 
 
-RegionTable<-RegionTable %>%
+
+
+
+RegionTable <- RegionTable %>%
   mutate(Author = replace(Author, Region != "South Asia", ""))
 
 
-RegionTable$Countries<-""
+RegionTable$Countries <- ""
 
 
-RegionTable<-RegionTable %>%
-  mutate(Countries = replace(Countries,
-                             ((Region == "South Asia" & Author == "Single")), "All Countries"))
-
-
-
-
-colnames(RegionTable)<-c("Author",
-                         "Countries",
-                         "Region",
-                         "non-OA Parent",
-                         "Mirror",
-                         "$\\widehat{P}$")
+RegionTable <- RegionTable %>%
+  mutate(Countries = replace(
+    Countries,
+    ((Region == "South Asia" & Author == "Single")), "All Countries"
+  ))
 
 
 
-RegionTable <- RegionTable %>%  select("Countries",
-                                       "Author",
-                                       "Region",
-                                       "non-OA Parent",
-                                       "Mirror",
-                                       "$\\widehat{P}$")
+
+colnames(RegionTable) <- c(
+  "Author",
+  "Countries",
+  "Region",
+  "non-OA Parent",
+  "Mirror",
+  "$\\widehat{P}$"
+)
+
+
+
+RegionTable <- RegionTable %>% select(
+  "Countries",
+  "Author",
+  "Region",
+  "non-OA Parent",
+  "Mirror",
+  "$\\widehat{P}$"
+)
 
 
 
 
 kable(RegionTable,
-      digits = 2,
-      align="lllccc",
-      format="latex",
-      row.names = FALSE,
-      escape= TRUE,
-      booktabs=T,
-      linesep = "", #removes the blank line after every 5 lines
-      caption = "Percentage of articles in open access (OA) Mirror journals whose authors are based in different World Bank Regions. The value for non-OA articles in Parent journals is the mean percentage of 1000 bootstrap-generated samples identical in size and structure to the articles published in Mirror journals. Single: authors of single-authored papers; First: first authors of co-authored papers.") %>%
-  kable_styling(bootstrap_options = c("hover"),
-                # full_width = F,
-                # latex_options="scale_down",
-                font_size = 12,
-                position = "center")
+  digits = 2,
+  align = "lllccc",
+  format = "latex",
+  row.names = FALSE,
+  escape = TRUE,
+  booktabs = T,
+  linesep = "", # removes the blank line after every 5 lines
+  caption = "Percentage of articles in open access (OA) Mirror journals whose authors are based in different World Bank Regions. The value for non-OA articles in Parent journals is the mean percentage of 1000 bootstrap-generated samples identical in size and structure to the articles published in Mirror journals. Single: authors of single-authored papers; First: first authors of co-authored papers."
+) %>%
+  kable_styling(
+    bootstrap_options = c("hover"),
+    # full_width = F,
+    # latex_options="scale_down",
+    font_size = 12,
+    position = "center"
+  )
 
 ```
 
 ```{r Table5, echo=FALSE,message = FALSE,warning=FALSE}
-IncomeTable<-IncomePlot[2]
-IncomeTable<-as.data.frame(IncomeTable)
+IncomeTable <- IncomePlot[2]
+IncomeTable <- as.data.frame(IncomeTable)
 
 
-  Subsampled_Income_summary<-BootMirror_Countries %>%
-    group_by(author,Dataset,replicate,IncomeGroup) %>%
-    filter(Dataset=="All Countries") %>%
-    drop_na() %>%
-    summarize(n=n()) %>%
-    mutate(perc=n/sum(n)*100)
-  # str(Subsampled_Region_summary)
-  # levels(as.factor(Subsampled_Region_summary$replicate))
+Subsampled_Income_summary <- BootMirror_Countries %>%
+  group_by(author, Dataset, replicate, IncomeGroup) %>%
+  filter(Dataset == "All Countries") %>%
+  drop_na() %>%
+  summarize(n = n()) %>%
+  mutate(perc = n / sum(n) * 100)
+# str(Subsampled_Region_summary)
+# levels(as.factor(Subsampled_Region_summary$replicate))
 
 
-  PW_means<-Subsampled_Income_summary %>%
-    group_by(author,Dataset,IncomeGroup) %>%
-    summarise(mean=mean(perc)) %>%
-    dplyr::rename("Author"="author",
-                  "PW (mean %)"="mean") %>%
-    mutate(Dataset = ifelse(Dataset == "all", "All Countries", Dataset))
-  PW_means$IncomeGroup<-gsub(" income","",PW_means$IncomeGroup)
+PW_means <- Subsampled_Income_summary %>%
+  group_by(author, Dataset, IncomeGroup) %>%
+  summarise(mean = mean(perc)) %>%
+  dplyr::rename(
+    "Author" = "author",
+    "PW (mean %)" = "mean"
+  ) %>%
+  mutate(Dataset = ifelse(Dataset == "all", "All Countries", Dataset))
+PW_means$IncomeGroup <- gsub(" income", "", PW_means$IncomeGroup)
 
-  PW_means$Author<-gsub("solo", "Single",PW_means$Author)
-  PW_means$Author<-gsub("author_first", "First",PW_means$Author)
+PW_means$Author <- gsub("solo", "Single", PW_means$Author)
+PW_means$Author <- gsub("author_first", "First", PW_means$Author)
 
-  # IncomeTable<-IncomeTable %>% filter(ArticleCat=="OA")
+# IncomeTable<-IncomeTable %>% filter(ArticleCat=="OA")
 
-  IncomeTable<-left_join(IncomeTable,PW_means) %>%
-    select(Author,Countries,IncomeGroup,`PW (mean %)`,OA_perc,P_Hat)
-  
+IncomeTable <- left_join(IncomeTable, PW_means) %>%
+  select(Author, Countries, IncomeGroup, `PW (mean %)`, OA_perc, P_Hat)
+
 #   %>%
 #     mutate(asterisk = ifelse((P_Hat >= 0.975 |P_Hat <= 0.025 ), "*", " "))
-# 
+#
 # IncomeTable$P_Hat<-paste(IncomeTable$P_Hat,IncomeTable$asterisk,sep="")
 # IncomeTable$asterisk<-NULL
 
-IncomeTable_single<-IncomeTable %>%
-  select(Author,Countries,IncomeGroup,'PW (mean %)',OA_perc,P_Hat) %>%
-  filter(Author=="Single")
+IncomeTable_single <- IncomeTable %>%
+  select(Author, Countries, IncomeGroup, "PW (mean %)", OA_perc, P_Hat) %>%
+  filter(Author == "Single")
 
 # Author<-("")
 # Countries<-("")
@@ -1007,83 +1043,97 @@ IncomeTable_single<-IncomeTable %>%
 # IncomeTable_single<-bind_rows(IncomeTable_single,foo)
 
 
-IncomeTable_first<-IncomeTable %>%
-  select(Author,Countries,IncomeGroup,'PW (mean %)',OA_perc,P_Hat) %>%
-  filter(Author=="First")
+IncomeTable_first <- IncomeTable %>%
+  select(Author, Countries, IncomeGroup, "PW (mean %)", OA_perc, P_Hat) %>%
+  filter(Author == "First")
 # IncomeTable_first[]<-lapply(IncomeTable_first, as.character)
 # IncomeTable_first<-bind_rows(IncomeTable_first,foo)
 
 
 
-IncomeTable<-bind_rows(IncomeTable_single,IncomeTable_first)
+IncomeTable <- bind_rows(IncomeTable_single, IncomeTable_first)
 
-IncomeTable$IncomeGroup<-as.character(IncomeTable$IncomeGroup)
-IncomeTable$IncomeGroup<-gsub("Upper middle","Upper-middle",IncomeTable$IncomeGroup)
-IncomeTable$IncomeGroup<-gsub("Lower middle","Lower-middle",IncomeTable$IncomeGroup)
-IncomeTable$IncomeGroup<-as.factor(IncomeTable$IncomeGroup)
+IncomeTable$IncomeGroup <- as.character(IncomeTable$IncomeGroup)
+IncomeTable$IncomeGroup <- gsub("Upper middle", "Upper-middle", IncomeTable$IncomeGroup)
+IncomeTable$IncomeGroup <- gsub("Lower middle", "Lower-middle", IncomeTable$IncomeGroup)
+IncomeTable$IncomeGroup <- as.factor(IncomeTable$IncomeGroup)
 
-blank_row <-rep(NA,6)
-names(blank_row)<-names(IncomeTable)
-single<-IncomeTable %>% filter(Author=="Single")
-first <-IncomeTable %>% filter(Author=="First")
+blank_row <- rep(NA, 6)
+names(blank_row) <- names(IncomeTable)
+single <- IncomeTable %>% filter(Author == "Single")
+first <- IncomeTable %>% filter(Author == "First")
 
-first$IncomeGroup <- 
+first$IncomeGroup <-
   ordered(first$IncomeGroup,
-          levels = c("High",
-                     "Upper-middle",
-                     "Lower-middle",
-                     "Low"))
+    levels = c(
+      "High",
+      "Upper-middle",
+      "Lower-middle",
+      "Low"
+    )
+  )
 
 
-first<-first %>% arrange(desc(Author), desc(IncomeGroup))
+first <- first %>% arrange(desc(Author), desc(IncomeGroup))
 
-single$IncomeGroup <- 
+single$IncomeGroup <-
   ordered(single$IncomeGroup,
-          levels = c("High",
-                     "Upper-middle",
-                     "Lower-middle",
-                     "Low"))
+    levels = c(
+      "High",
+      "Upper-middle",
+      "Lower-middle",
+      "Low"
+    )
+  )
 
 
-single<-single %>% arrange(desc(Author), desc(IncomeGroup))
+single <- single %>% arrange(desc(Author), desc(IncomeGroup))
 
-IncomeTable<-bind_rows(single,blank_row,first)
+IncomeTable <- bind_rows(single, blank_row, first)
 
-IncomeTable$Countries<-gsub("All Countries","",IncomeTable$Countries)
+IncomeTable$Countries <- gsub("All Countries", "", IncomeTable$Countries)
 
-IncomeTable<-IncomeTable %>%
-  mutate(Countries = replace(Countries,( (IncomeGroup == "Lower-middle")&(Author == "Single")), "All Countries"))
-
-
-IncomeTable<-IncomeTable %>%
-  mutate(Author = replace(Author,
-                          ((Author == "Single") & 
-                             (Countries !=  "All Countries")), ""))
+IncomeTable <- IncomeTable %>%
+  mutate(Countries = replace(Countries, ((IncomeGroup == "Lower-middle") & (Author == "Single")), "All Countries"))
 
 
-IncomeTable<-IncomeTable %>%
-  mutate(Author = replace(Author,
-                          ((Author == "First") & 
-                             (IncomeGroup !=  "Low")), ""))
+IncomeTable <- IncomeTable %>%
+  mutate(Author = replace(
+    Author,
+    ((Author == "Single") &
+      (Countries != "All Countries")), ""
+  ))
 
 
+IncomeTable <- IncomeTable %>%
+  mutate(Author = replace(
+    Author,
+    ((Author == "First") &
+      (IncomeGroup != "Low")), ""
+  ))
 
-# IncomeTable$OA_perc<-as.numeric(IncomeTable$OA_perc)
-colnames(IncomeTable)<-c("Author",
-                         "Countries",
-                 "Lending Group",
-                 'non-OA Parent',
-                 "Mirror",
-                 "$\\hat{P}$")
 
 
 # IncomeTable$OA_perc<-as.numeric(IncomeTable$OA_perc)
-IncomeTable <- IncomeTable %>% select("Countries",
-                                      "Author",
-                                      "Lending Group",
-                                      'non-OA Parent',
-                                      "Mirror",
-                                      "$\\hat{P}$")
+colnames(IncomeTable) <- c(
+  "Author",
+  "Countries",
+  "Lending Group",
+  "non-OA Parent",
+  "Mirror",
+  "$\\hat{P}$"
+)
+
+
+# IncomeTable$OA_perc<-as.numeric(IncomeTable$OA_perc)
+IncomeTable <- IncomeTable %>% select(
+  "Countries",
+  "Author",
+  "Lending Group",
+  "non-OA Parent",
+  "Mirror",
+  "$\\hat{P}$"
+)
 
 
 
@@ -1091,23 +1141,22 @@ IncomeTable <- IncomeTable %>% select("Countries",
 # IncomeTable$'Open Access (%)'<-as.character(IncomeTable$'Open Access (%)')
 # IncomeTable<-IncomeTable %>% replace_na(list('Open Access (%)'="-"))
 kable(IncomeTable,
-      digits = 2,
-      align="lllccc",
-      format="latex",
-      row.names = FALSE,
-      escape = FALSE,
-      booktabs=T,
-      linesep = "", #removes the blank line after every 5 lines
-      caption = "Percentage of articles in open access (OA) mirror journal whose authors are based in countries from different World Bank Lending Groups. The value for non-OA articles in Parent journals is the mean percentage of 1000 bootstrap-generated samples identical in size and structure to the articles published in Mirror journals. Single: authors of single-authored papers; First: first authors of co-authored papers.") %>%
-  kable_styling(bootstrap_options = c("hover"),
-                # full_width = F,
-                # latex_options="scale_down",
-                font_size = 12,
-                position = "center")
-```
-
-```{r echo = FALSE, results = 'asis', cache = FALSE}
-papaja::render_appendix('Smith_etal_Appendix_QSSv1.Rmd')
+  digits = 2,
+  align = "lllccc",
+  format = "latex",
+  row.names = FALSE,
+  escape = FALSE,
+  booktabs = T,
+  linesep = "", # removes the blank line after every 5 lines
+  caption = "Percentage of articles in open access (OA) mirror journal whose authors are based in countries from different World Bank Lending Groups. The value for non-OA articles in Parent journals is the mean percentage of 1000 bootstrap-generated samples identical in size and structure to the articles published in Mirror journals. Single: authors of single-authored papers; First: first authors of co-authored papers."
+) %>%
+  kable_styling(
+    bootstrap_options = c("hover"),
+    # full_width = F,
+    # latex_options="scale_down",
+    font_size = 12,
+    position = "center"
+  )
 ```
 
 ```{r echo = FALSE, results = 'asis', cache = FALSE}

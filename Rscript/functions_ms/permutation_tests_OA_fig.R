@@ -1,5 +1,6 @@
 permutation_tests_OA_fig<-function(All_boots_wide, AllData){
 
+  source("./Rscript/functions_ms/DivRichCalc.R")
   
   OA_paper_pool<-AllData %>% 
     filter(ArticleType=="OA") %>% 
