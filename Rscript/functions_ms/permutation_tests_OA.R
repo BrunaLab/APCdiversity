@@ -46,7 +46,7 @@ nOA <- OA_paper_pool %>%
 nOA$mirror
 
 
-  source("./Rscript/functions/DivRichCalc.R")
+  source("./Rscript/functions_ms/DivRichCalc.R")
   # OA_paper_pool_first
   # OA_paper_pool_solo
   # n<-n_first_mirror
@@ -96,7 +96,7 @@ nOA$mirror
     
     # BE SURE PERMUTE OA IS SET TO SAMPlE *WITHOUT* REPLACEMENT
     
-    source("./Rscript/functions/permute_OA.R")
+    source("./Rscript/functions_ms/permute_OA.R")
     
     # Sample at random without replacement from the pooled OA articles in a way
     # that mimics the number of articles in each mirror journal. 
@@ -208,7 +208,7 @@ nOA$mirror
     
     # BE SURE PERMUTE OA IS SET TO SAMPlE *WITHOUT* REPLACEMENT
     # OA_pool_noCHNUSA<-OA_paper_pool %>% filter(Code!="CHN") %>% filter(Code!="USA")
-    source("./Rscript/functions/permute_OA.R")
+    source("./Rscript/functions_ms/permute_OA.R")
     # Sample at random without replacement from the pooled OA articles in a way
     # that mimics the number of articles in each mirror journal. 
     mirror_no_sample<-permute_OA(OA_paper_pool_NOCHNUSA,n2,"perm")
@@ -287,7 +287,7 @@ nOA$mirror
     mutate(EvenDiff=Even_Mirror-Even_OAinPW) 
   colnames(All_boots_wide)
   
-  write_csv(All_boots_wide,"./output/MirrorvOAinPW_permutations.csv")
+  write_csv(All_boots_wide,"./data_clean/MirrorvOAinPW_permutations.csv")
   
 #   DivDiff<-All_boots_wide %>%
 #     select(rep,countries,DivDiff) %>% 

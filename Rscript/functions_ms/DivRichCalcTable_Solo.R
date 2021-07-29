@@ -43,7 +43,7 @@
   ##################################################
   # OA STATS _ALL COUNTRIES
   
-  source("./Rscript/functions/DivRichCalc.R") 
+  source("./Rscript/functions_ms/DivRichCalc.R") 
   
   AuPosition<-"author_first"
   Div_OA_pool_first<-DivRichCalc(sole_ALL,AuPosition,ArticleType)
@@ -70,7 +70,7 @@
   ##################################################
   # OA STATS _noChina or usa
   
-  source("./Rscript/functions/DivRichCalc.R") 
+  source("./Rscript/functions_ms/DivRichCalc.R") 
   AuPosition<-"author_first"
   # ArticleType<-"OA"
   Div_OA_pool_first_noCHNorUSA<-DivRichCalc(sole_NOCHNUSA,AuPosition,ArticleType)

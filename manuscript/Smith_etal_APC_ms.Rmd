@@ -189,14 +189,14 @@ first_NOCHNUSA <- AllData %>%
   mutate(author = "author_first")
 
 # Load Bootstrap Runs - COUNTRIES
-BootOAinPW_Countries <- read_csv("./output/BootOAinPW_Countries.csv")
-BootMirror_Countries <- read_csv("./output/BootMirror_Countries.csv")
+BootOAinPW_Countries <- read_csv("./data_clean/BootOAinPW_Countries.csv")
+BootMirror_Countries <- read_csv("./data_clean/BootMirror_Countries.csv")
 
 # Load Bootstrap Runs - DIVERSITY
-BootOAinPW_RichDiv <- read_csv("./output/BootOAinPW_RichDiv.csv")
+BootOAinPW_RichDiv <- read_csv("./data_clean/BootOAinPW_RichDiv.csv")
 
 # Load Bootstrap Runs - OA in Mirror Journals
-BootMirror_RichDiv <- read_csv("./output/BootMirror_RichDiv.csv")
+BootMirror_RichDiv <- read_csv("./data_clean/BootMirror_RichDiv.csv")
 
 ```
 

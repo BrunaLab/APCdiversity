@@ -39,7 +39,7 @@ DivRichCalcSummaryTable_sampled<-function(Dataset,
   
   
   
-  source("./Rscript/functions/DivRichCalc.R") 
+  source("./Rscript/functions_ms/DivRichCalc.R") 
   AuPosition<-"author_first"
   Div_OA_pool_first<-DivRichCalc(first_ALL,AuPosition,ArticleType)
   
@@ -63,7 +63,7 @@ DivRichCalcSummaryTable_sampled<-function(Dataset,
   ##################################################
   # OA STATS _noChina or usa
   
-  source("./Rscript/functions/DivRichCalc.R") 
+  source("./Rscript/functions_ms/DivRichCalc.R") 
   # AuPosition<-"author_first"
   # ArticleType<-"OA"
   Div_OA_pool_first_noCHNorUSA<-DivRichCalc(first_NOCHNUSA,"author_first",ArticleType)

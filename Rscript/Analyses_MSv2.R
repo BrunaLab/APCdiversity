@@ -275,7 +275,7 @@ countries_characteristics <- countries_characteristics %>%
 ####################################
 # Permutation tests
 # generate the results of permutation tests comparing mirror and oa in parent
-source("./Rscript/functions/permutation_tests_OA.R")
+source("./Rscript/functions_ms/permutation_tests_OA.R")
 All_boots_wide <- permutation_tests_OA(AllData)
 
 ########################################
@@ -490,7 +490,7 @@ All_boots_wide <- permutation_tests_OA(AllData)
 
 
 
-source("./Rscript/functions_figures/RegionPlot_MSv2.R")
+source("./Rscript/functions_ms/RegionPlot_MSv2.R")
 # countries= "all" or "no_CHNUSA"
 RegionPlot_MSv2<-RegionPlot_MSv2(Boot_RichDiv,
                           Boot_Countries,
@@ -501,7 +501,7 @@ RegionPlot_MSv2<-RegionPlot_MSv2(Boot_RichDiv,
                           first_NOCHNUSA)
 RegionPlot_MSv2[2]
 
-source("./Rscript/functions_figures/IncomePlot_MSv2.R")
+source("./Rscript/functions_ms/IncomePlot_MSv2.R")
 # countries= "all" or "no_CHNUSA"
 IncomePlot_MSv2<-IncomePlot_MSv2(Boot_RichDiv,
                                  Boot_Countries,
@@ -518,7 +518,7 @@ IncomePlot_MSv2[2]
 
 
 #####################
-source("./Rscript/functions_figures/WaiverGrpPlot_MSv2.R")
+source("./Rscript/functions_ms/WaiverGrpPlot_MSv2.R")
 # countries= "all" or "no_CHNUSA"
 WaiverGrpPlot_MSv2<-WaiverGrpPlot_MSv2(BootMirror_RichDiv,
                                        BootMirror_Countries,
@@ -538,7 +538,7 @@ WaiverPlot<-WaiverGrpPlot_MSv2(BootMirror_RichDiv,BootMirror_Countries,"All",sol
 # SAMPLED DIV/RICH: OAinPW vs PW
 ##########################################
 
-source("./Rscript/functions/bootstrap_OA_in_PW.R")
+source("./Rscript/functions_ms/bootstrap_OA_in_PW.R")
 Boot_OAinPW_SoloAll<-bootstrap_OA_in_PW(sole_ALL,"author_first","OAinPW")
 Boot_OAinPW_CoAll<-bootstrap_OA_in_PW(first_ALL,"author_first","OAinPW")
 Boot_OAinPW_SoloNoUSACHN<-bootstrap_OA_in_PW(sole_NOCHNUSA,"author_first","OAinPW")
@@ -600,7 +600,7 @@ write_csv(BootOAinPW_RichDiv, "./output/BootOAinPW_RichDiv.csv")
 write_csv(BootOAinPW_Countries,'./output/BootOAinPW_Countries.csv')
 
 ###############################
-source("./Rscript/functions/bootstrap_OA_in_PW.R")
+source("./Rscript/functions_ms/bootstrap_OA_in_PW.R")
 Boot_mirror_SoloAll<-bootstrap_OA_in_PW(sole_ALL,"author_first","mirror")
 Boot_mirror_CoAll<-bootstrap_OA_in_PW(first_ALL,"author_first","mirror")
 Boot_mirror_SoloNoUSACHN<-bootstrap_OA_in_PW(sole_NOCHNUSA,"author_first","mirror")
@@ -664,6 +664,43 @@ write_csv(BootMirror_RichDiv, "./output/BootMirror_RichDiv.csv")
 write_csv(BootMirror_Countries,'./output/BootMirror_Countries.csv')
 # Boot_RichDiv<-read_csv("./output/Boot_RichDiv.csv")
 # Boot_Countries<-read_csv("./output/Boot_Countries.csv")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # ############################
@@ -748,13 +785,13 @@ write.csv(NoReplacePW_RichDiv,'./output/Boot_RichDiv.csv',row.names = FALSE)
 # AUTHOR DIVERSITY & RICHNESS: ALL PAPERS POOLED
 #################################################
 
-source("./Rscript/functions/DivRichCalcTable_Solo.R")
+source("./Rscript/functions_ms/DivRichCalcTable_Solo.R")
 # Table2_Solo_PW<-DivRichCalcTable_Solo(sole_ALL,
 #                                    sole_NOCHNUSA,
 #                                    BootPW_SoloAll[1],
 #                                    BootPW_SoloNoUSACHN[1],
 #                                    "OA")
-source("./Rscript/functions/DivRichCalcTable_Solo.R")
+source("./Rscript/functions_ms/DivRichCalcTable_Solo.R")
 Table2_Solo_PW<-DivRichCalcTable_Solo(sole_ALL,
                                       sole_NOCHNUSA,
                                       BootPW_SoloAll[1],
@@ -768,7 +805,7 @@ Table2_Solo_PW
 #                                                    BootPW_CoNoUSACHN[1],
 #                                                    "OA")
 
-source("./Rscript/functions/DivRichCalcSummaryTable_sampled.R")
+source("./Rscript/functions_ms/DivRichCalcSummaryTable_sampled.R")
 Table2_CoAuthored_PW<-DivRichCalcSummaryTable_sampled(first_ALL,
                                                       first_NOCHNUSA,
                                                       BootPW_CoAll[1],
@@ -820,7 +857,7 @@ Table2_PW
 
 
 # Table 2 OA v OAinPW
-source("./Rscript/functions_figures/Table2_Mirror_v_OAinPW.R")
+source("./Rscript/functions_ms/Table2_Mirror_v_OAinPW.R")
 Table2_OAinPW<-Table2_Mirror_v_OAinPW(AllData,
                                       Boot_MirrorvOA_SoloAll,
                                       Boot_MirrorvOA_SoloNoUSACHN,
@@ -1154,7 +1191,7 @@ sole_NOCHNUSA<-read_csv("./data_clean/one_author_pubsNOCHNUSA.csv")
 coauthor_ALL<-read_csv("./data_clean/coauthor_pubs_ALL_first_author.csv")
 coauthor_NOCHNUSA<-read_csv("./data_clean/coauthor_pubsNOCHNUSA.csv")
 
-source("./Rscript/functions/DivRichCalc.R")
+source("./Rscript/functions_ms/DivRichCalc.R")
 crit_solo_all<-DivRichCalc(sole_ALL,"author_first","OA")
 crit_solo_no_CHNUSA<-DivRichCalc(sole_NOCHNUSA,"author_first","OA")
 crit_first_all<-DivRichCalc(coauthor_ALL,"author_first","OA")
@@ -1614,7 +1651,7 @@ hist(bray)
 # sole_ALL
 # coauthor_ALL
 
-source("./Rscript/functions/DivRichCalc.R") 
+source("./Rscript/functions_ms/DivRichCalc.R") 
 OA_data<-DivRichCalc(sole_ALL,'author_first','OA')
 OA_countries<-as.data.frame(OA_data[3])
 colnames(OA_countries)
@@ -1702,7 +1739,7 @@ hist(bray)
 # sole_ALL
 # coauthor_ALL
 
-source("./Rscript/functions/DivRichCalc.R") 
+source("./Rscript/functions_ms/DivRichCalc.R") 
 OA_data<-DivRichCalc(coauthor_ALL,'author_first','OA')
 OA_countries<-as.data.frame(OA_data[3])
 colnames(OA_countries)
@@ -1792,7 +1829,7 @@ hist(bray)
 # sole_ALL
 # coauthor_ALL
 
-source("./Rscript/functions/DivRichCalc.R") 
+source("./Rscript/functions_ms/DivRichCalc.R") 
 OA_data<-DivRichCalc(sole_NOCHNUSA,'author_first','OA')
 OA_countries<-as.data.frame(OA_data[3])
 colnames(OA_countries)
@@ -1882,7 +1919,7 @@ hist(bray)
 # sole_ALL
 # coauthor_ALL
 
-source("./Rscript/functions/DivRichCalc.R") 
+source("./Rscript/functions_ms/DivRichCalc.R") 
 OA_data<-DivRichCalc(coauthor_NOCHNUSA,'author_first','OA')
 OA_countries<-as.data.frame(OA_data[3])
 colnames(OA_countries)
@@ -1999,7 +2036,7 @@ count<-data %>% group_by(dataset,authors,cat) %>%
 ############################################################
 # Table 1: PAPERS PER JOURNAL 
 ############################################################
-source("./Rscript/functions/SummaryTable.R") 
+source("./Rscript/functions_ms/SummaryTable.R") 
 Tables<-SummaryTable(AllData)
 
 # Table1<-as.data.frame(Table1)
@@ -2129,7 +2166,7 @@ dev.off()
 # DATA PREP
 OA_papers <- coauthor_pubs %>% filter(JrnlType == "OA")
 OA_papers_boot<-sample_n(OA_papers, nrow(OA_papers), replace = TRUE)
-source("./Rscript/functions/DivRichCalc.R") 
+source("./Rscript/functions_ms/DivRichCalc.R") 
 nboot <-1000 #number of bootstrap samples
 Richness <-rep(NA, nboot)
 InvSimp <-rep(NA, nboot)

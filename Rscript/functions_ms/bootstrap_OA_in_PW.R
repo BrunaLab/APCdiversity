@@ -11,7 +11,7 @@ bootstrap_OA_in_PW<-function(Dataset,AuPosition,OAtype) {
 # Dataset<-sole_ALL 
 # AuPosition<-"author_first"
 # OAtype<-"mirror"
-source("./Rscript/functions/Prep_for_sampleOAinPW.R")
+source("./Rscript/functions_ms/Prep_for_sampleOAinPW.R")
 Prep_for_samplePW<-Prep_for_sampleOAinPW(Dataset,OAtype)
 PW_papers<-Prep_for_samplePW[1]
 n<-Prep_for_samplePW[2]
@@ -20,7 +20,7 @@ n<-Prep_for_samplePW[2]
 # This returns a list with two elements: 
 # [1] the df of sampled PW papers
 # [2] df comparing n of papers in OA journals & n of PW papers sampled
-source("./Rscript/functions/samplePW.R")
+source("./Rscript/functions_ms/samplePW.R")
 PW_sampling<-suppressMessages(samplePW(PW_papers,n))
 PW_sampling<-samplePW(PW_papers,n)
 PW_sample<-PW_sampling[1]
@@ -32,8 +32,8 @@ PW_sample_check<-PW_sampling[2]
 # THIS IS FOR MATCHED SUBSAMPLING - FIRST AUTHOR
 # 1<-Richness  2<-InvSimpsons 3<-Countries
 ############################################
-source("./Rscript/functions/samplePW.R")
-source("./Rscript/functions/DivRichCalc.R")
+source("./Rscript/functions_ms/samplePW.R")
+source("./Rscript/functions_ms/DivRichCalc.R")
 # source("./Rscript/functions/DivCalcPooledFirst.R")
 PW_papers<-as.data.frame(PW_papers)
 n<-unlist(n)

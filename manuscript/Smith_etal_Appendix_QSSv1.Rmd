@@ -29,7 +29,7 @@ grid.arrange(p1, p2, ncol = 1)
 
 knitr::opts_knit$set(eval.after = "fig.cap")
 source("./Rscript/functions_ms/permutation_tests_OA_fig.R")
-All_boots_wide <- read_csv("./output/MirrorvOAinPW_permutations.csv")
+All_boots_wide <- read_csv("./data_clean/MirrorvOAinPW_permutations.csv")
 Perm_test <- permutation_tests_OA_fig(All_boots_wide, AllData)
 P_FIG <- Perm_test[[1]]
 P_FIG
@@ -59,8 +59,8 @@ AppFig3(AllData, "author_first")
 ```
 
 ```{r TableA1, echo=FALSE,message = FALSE,warning=FALSE}
-WaiverCountries <- read.csv("./data_clean/WaiverCountries.csv")
-NON_WavierCountries <- read.csv("./data_clean/NON_WavierCountries.csv")
+WaiverCountries <- read_csv("./data_clean/WaiverCountries.csv")
+NON_WavierCountries <- read_csv("./data_clean/NON_WavierCountries.csv")
 
 
 NON_WavierCountries$WaiverGroup <- "no waiver"

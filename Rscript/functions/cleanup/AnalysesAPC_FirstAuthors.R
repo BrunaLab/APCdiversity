@@ -19,10 +19,9 @@ NON_WavierCountries <- read_csv("./data_clean/NON_WavierCountries.csv")
 
 
 # World Bank data on national income categories
-CountryData <- read.csv("data_raw/CLASS.csv", header = TRUE)
-CountryData <- CountryData[-1, ]
+CountryData <- read_csv("data_raw/CLASS.csv")
 CountryData <- CountryData %>%
-  select(Code, Region, IncomeGroup = Income.group) %>%
+  select(Code, Region, IncomeGroup = `Income group`) %>%
   filter(Region == "East Asia & Pacific" |
     Region == "Europe & Central Asia" |
     Region == "Latin America & Caribbean" |
@@ -30,6 +29,7 @@ CountryData <- CountryData %>%
     Region == "North America" |
     Region == "South Asia" |
     Region == "Sub-Saharan Africa")
+CountryData$Region <- as.factor(CountryData$Region)
 CountryData$Region <- droplevels(CountryData$Region)
 levels(CountryData$Region)
 
@@ -316,6 +316,7 @@ country_check <- full_join(ADC, WC, by = "Code") %>%
 
 ########################################
 # SAMPLED DIV/RICH: 1st AUTHOR PUBS (all)
+source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
 source("./Rscript/functions/SubSamplePWvsOA_comparison.R")
 SubsampledPW.results_First_Co_All <- SubSamplePWvsOA_comparison(coauthor_pubs_ALL_first_author, "author_first")
 
