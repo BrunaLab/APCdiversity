@@ -124,8 +124,8 @@ n_OA_plots <- function(AllData, n_countries) {
 
 
   p1 <- ggplot(plot_data, aes(
-    x = perc_pw,
-    y = perc_oa,
+    x = perc_oa,
+    y = perc_pw,
     color = IncomeGroup,
     fill = IncomeGroup,
     label = Code
@@ -137,8 +137,8 @@ n_OA_plots <- function(AllData, n_countries) {
       position = position_dodge(width = 0.2)
     ) +
     geom_abline(
-      intercept = 0,
-      slope = 1,
+      intercept = 100,
+      slope = -1,
       color = "darkgray",
       size = 1.5,
       linetype = "dashed"
@@ -168,8 +168,8 @@ n_OA_plots <- function(AllData, n_countries) {
     ) +
 
     labs(
-      x = "OA Articles in Parent journals (%)",
-      y = "Articles in Mirror journals (%)"
+      y = "OA Articles in Parent journals (%)",
+      x = "Articles in Mirror journals (%)"
     ) +
     theme(
       # legend.position = "right",

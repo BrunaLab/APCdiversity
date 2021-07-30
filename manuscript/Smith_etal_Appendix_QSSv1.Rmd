@@ -25,11 +25,12 @@ grid.arrange(p1, p2, ncol = 1)
 \newpage
 ```
 
-```{r FigA3, echo=FALSE, message = FALSE,warning=FALSE, fig.align='center', fig.cap=paste("Results of permutation tests comparing author Diversity, Richness, and Evenness of open access articles published in Parent and Mirror journals. The line indicates the observed difference between the two populations, while the bars represent the frequency in 5000 permutations of the difference between two groups identical in size and structure to the observed collections but to which articles were assigned at random without replacement. Results are shown for analyses including all countries (A-C) and when excluding artciles by first- and single-authors based in China or the USA (D-F)."), fig.fullwidth=TRUE,message = FALSE,warning=FALSE}
+```{r FigA3, echo=FALSE, message = FALSE,warning=FALSE, fig.align='center', fig.cap=paste("Results of permutation tests comparing author Diversity, Richness, and Evenness of open access articles published in Parent and Mirror journals. The line indicates the observed difference between the two populations, while the bars represent the frequency in 5000 permutations of the difference between two groups identical in size and structure to the observed collections but to which articles were assigned at random without replacement. Results are shown for analyses including all countries (A-C) and when excluding articles by first- and single-authors based in China or the USA (D-F). Note also that these analyses were conducted by pooling first- and single-author articles within each journal type; we were unable to do permutation tests comparing by authorship category (e.g., single-author in Mirror vs. Parent, first-author in Mirror vs. Parent) because several journals had no articles in one of the categories; alternative attempts to test for differences using bootstrapping did not suggest there were significant differences in diversity when comparing by category."), fig.fullwidth=TRUE,message = FALSE,warning=FALSE}
 
 knitr::opts_knit$set(eval.after = "fig.cap")
 source("./Rscript/functions_ms/permutation_tests_OA_fig.R")
 All_boots_wide <- read_csv("./data_clean/MirrorvOAinPW_permutations.csv")
+AllData <- read_csv("./data_clean/all_data_analysis.csv")
 Perm_test <- permutation_tests_OA_fig(All_boots_wide, AllData)
 P_FIG <- Perm_test[[1]]
 P_FIG
@@ -382,4 +383,75 @@ kable(Table2,
     position = "center"
   ) %>%
   add_header_above(c(" " = 3, "All Countries" = 3, "China & USA Excluded" = 3))
+```
+
+
+
+```{r TableA4, echo=FALSE,message = FALSE,warning=FALSE}
+Articles_JrnlxAuthor <- AllData %>%
+  group_by(author, ArticleType,JrnlType) %>%
+  filter(AuthorNum == 1) %>%
+  summarize(n1 = n_distinct(refID))
+# sum(Articles_JrnlxAuthor$n)
+
+Articles_JrnlxAuthor_noCHNUSA <- AllData %>%
+  group_by(author, ArticleType,JrnlType) %>%
+  filter(AuthorNum == 1) %>%
+  filter(Code != "CHN") %>%
+  filter(Code != "USA") %>%
+  summarize(n2 = n_distinct(refID))
+# sum(Articles_JrnlxAuthor_noCHNUSA$n)
+
+TableA4 <- left_join(Articles_JrnlxAuthor,Articles_JrnlxAuthor_noCHNUSA) %>% 
+  mutate(ArticleCategory=paste(ArticleType,JrnlType,sep=""), .before=2) %>% 
+  ungroup() %>% 
+  select(-ArticleType,-JrnlType)
+
+TableA4 <- dplyr::rename(TableA4,
+                         Author=author,
+                         AllCountries = n1, 
+                         ChinaUSAexcluded = n2) 
+
+
+TableA4$Author <- gsub("coauthored","Coauthored", TableA4$Author)
+TableA4$Author <- gsub("solo","Single Author", TableA4$Author)
+TableA4$ArticleCategory <- gsub("OAOA","OA - Mirror", TableA4$ArticleCategory)
+TableA4$ArticleCategory <- gsub("OAPW","OA in Parent", TableA4$ArticleCategory)
+TableA4$ArticleCategory <- gsub("PWPW","non-OA in Parent", TableA4$ArticleCategory)
+TableA4[2, 1] <- ""
+TableA4[3, 1] <- ""
+TableA4[5, 1] <- ""
+TableA4[6, 1] <- ""
+
+Totals <- c("","",sum(TableA4$AllCountries),sum(TableA4$ChinaUSAexcluded))
+
+TableA4 <- rbind(TableA4,Totals)
+colnames(TableA4) <- c(
+  "Author",
+  "Category",
+  "All Countries",
+  "China and USA Excluded"
+  )
+
+# TableA4
+# 
+kable(TableA4,
+  # digits = 2,
+  format = "latex",
+  align = "llcc",
+  escape = FALSE,
+  row.names = FALSE,
+  booktabs = T,
+  linesep = "",
+  caption = "Number of Open Access (OA) and non-OA articles in Mirror and Parent journals. Values are given for both the collection of articles with all countries included and the one from which first authors based in China or the USA are excluded.") %>%
+  row_spec(6, hline_after = TRUE) %>%
+  kable_styling(
+    bootstrap_options = c("hover"),
+    # full_width = F,
+    latex_options = c("scale_down"),
+    # latex_options = c("hold_position"),
+    font_size = 12,
+    position = "center") %>%
+  add_header_above(c(" " = 2, "Number of Articles" = 2))
+
 ```

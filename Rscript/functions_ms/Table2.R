@@ -1,7 +1,7 @@
 Table2 <- function(sole_ALL, sole_NOCHNUSA, first_ALL, first_NOCHNUSA) {
-  BootOAinPW_RichDiv <- read_csv("./output/BootOAinPW_RichDiv.csv")
+  BootOAinPW_RichDiv <- read_csv("./data_clean/BootOAinPW_RichDiv.csv")
   # BootOAinPW_Countries<-read_csv("./output/BootOAinPW_Countries.csv")
-  BootMirror_RichDiv <- read_csv("./output/BootMirror_RichDiv.csv")
+  BootMirror_RichDiv <- read_csv("./data_clean/BootMirror_RichDiv.csv")
   # BootMirror_Countries<-read_csv("./output/BootMirror_Countries.csv")
 
   library(tidyverse)

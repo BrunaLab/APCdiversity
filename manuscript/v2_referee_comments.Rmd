@@ -2,7 +2,7 @@
 title: "v2_decision"
 author: "Emilio bruna"
 date: "6/11/2021"
-output: html_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -25,13 +25,18 @@ Overall, I am very satisfied with how my comments and suggestions were taken int
 
 2. The distinction between single and first authors could be better reflected in the discussion.
 
+    * We have added a new item to the "Future directions" section clarifying some of these distinctions and their importance. 
+
 
 3. Some issues, like the relevance of single/first author distinction, could be mentioned already in the introduction. 
 
-
+    * The potential for differences in the ability to pay APCs based on having coauthors or not is now in the introduction.
+    
 Please find my detailed comments and suggestions below. 
 
 1. Page 4 (lines 63-66): OA citation advantage is found also in case of self-archived articles published in subscription journals. Green OA could be mentioned in this context. 
+
+    * We added a Green OA to this sentence
 
 
 2. Page 5 (line 95): Here Elsevier’s mirror concept is introduced. It would be great if authors could, in the introduction or discussion, say something about the adoption (if any) of the same or similar concept by other publishers. Are the Elsevier Mirror journals the only option for this type of analysis? As regards the potential future analyses, is it possible to say anything on the development of this concept at Elsevier or elsewhere? 
@@ -40,30 +45,32 @@ Please find my detailed comments and suggestions below.
 
 3. Page 7 (131-133): As regards the third prediction, please clarify if you mean by “lead authors” both single and first authors, or only the latter: “Third, that any such reductions would be due to OA articles having fewer lead authors from the low-income countries predominantly located in the Global South”. 
 
-    * both single and first
+    * both single and first. We recognize this term might well conflate two different kidns of authorship, without this shorthand reporting the results would have quickly became cumbersome (First- and single authors)". The results suggest there may be important differences between the two worth investigating, sowhich we now make clearer in the discussion.
 
 4. Page 8 (164-165): Please explain here in more detail your interpretation of results: “We found no difference in the Geographic Diversity of authors of these two groups of OA articles (Table A2, Figure A3)“. In Table A2, Geographic diversity of MOA is lower than POA for all countries (11.97 vs 13.28) but larger (18.29 vs 17.33) when China & USA are excluded. However, according to Table 2, there appear to be relatively large differences between MOA and POA in case of single authors. 
 
-
+    * Though the diversity of OA articles published in Mirror and Parent journals (all authors pooled) was indeed lower (all countries) or higher (no China / USA), it was not significantly different when China and the USA were excluded to correct for their numerical dominance. While we would have liked to have done permutation tests comparing by authorship category (e.g., single-author in Mirror vs. Parent, first-author in Mirror vs. Parent) we wewre unable to because several journals had no articles in one of the categories. We attempted to get at this using alternative attempts to test for differences using bootstrapping (sampling in permutation tests is without replacement) and found nothing to suggest were significant differences in diversity when comparing by category. We explain this in further detail in the legend to Figure A3, and made a subtle change to the text reporting the results.  
 
 5. Page 9 (lines 190-195): the distinction between single and co-authored papers is introduced here because of “the potential insights into financial constraints”. Perhaps this topic could be discussed already in the introduction as one of the factors potentially influencing the submission decisions. 
 
-    * ok, easy add
+    * The potential for differences in the ability to pay APCs based on having coauthors or not is now in the introduction.
     
 6. It is also important to recognize that co-authorship patterns differ considerably between fields, and the possible implications of this. It might be helpful to provide here (on page 9) a clear presentation of the number of Psub, POA and MOA articles that are single- or co-authored, for all countries and excluding China & US (like table 1). 
 
-    * True, but this is really going to have the biggest impact on last authors, which we dont analyze
+    * We include a reference to potentially different disciplinary norms regarding coauthorhsip and author order in the "futre directions" section. We also included the requested table in the Appendix. We thank the referee for the suggestion, as it gave us the idea to emphasize the one non-significant difference in author diversity was for a comparison representing <3% of articles.
 
 7. Page 11 (line 253): please use “Single-authored” instead of “Sole-authored articles”, terminology should be consistent throughout the paper. 
 
-    * Single-author (not authored)?
+    * We changed to 'single-author' throughout. 
 
 8. Please explain here in more detail what the difference in Table 2 between POA and PSub (10.3 vs 9.9) means, as this result would seem to suggest that there is no difference in geographic diversity of POA and Psub when China & US are excluded. 
 
-
+    * We realized thanks to the referees question that a missing word ("not") meant that the text and table gave contradictory summaries of the results. We have corrected this, and also focused the text on wether or not the differences in Diversity were significant (to avoid confusion in cases where values were lower but not significantly so).   
+    
+    
 9. According to Table 2 it also seems that the geographic diversity is much larger for single-authored MOA (17.4) than POA (10.3). 
 
-
+    * Comparisons ofd D2 across journal types or authors is not appropriate because the sample sizes can be very different and diversity indices - including D2 - are sample-size dependent. This was the motivation behind our bootstrapping approach. We have added this note to the legend of the relevant table to help prevent readers from making these inappropriate comparisons.
 
 10. Page 13 (lines 290-292): It is stated that “We found that the Geographic Diversity of authors publishing Open Access articles, for which APCs are required, was significantly lower than that of authors publishing subscription-only articles.” It should be clarified to what extent this holds true for first as well as single authors. The distinction between single and first authors is currently not appropriately reflected in the discussion. There are several unanswered questions: what may explain that single-authors are more frequent (21%) in Mirror journals Parent journals (2%), what are the differences in geographic diversity between MOA and POA, and most importantly what are the potential insights into financial constraints? 
 
@@ -71,6 +78,7 @@ Please find my detailed comments and suggestions below.
 
 11.  Page 36 Figure 7: consider using share instead of number of articles 
 
+    * Done.
 
 
 **Reviewer 2 Comments to the Author**
@@ -84,6 +92,8 @@ I think the revised article is much more explicit in terms of methods and analys
 
 2. Now if by ’situation-specific the authors mean that non-cOAlition S funders (e.g. NIH, China) may allow for publication in mirror journals, while cOAlition S funders do not, that should be more clearly indicated. As it stands now the sentence is confusing. 
 
-    * Yes, we meant "funders"  generally, so clarify
+    * Yes, we meant "funders"  generally. We have clarified this in the text, as well as made clear that cOAlitionS funders have clarified that they do not consider mirror journals 'PlanS' compliant. 
 
 3. Typos: 409: Ludo Waltman, and provided feedback -> and Ludo Waltman provided feedback
+
+    * Corrected.

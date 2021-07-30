@@ -1,4 +1,7 @@
 AppFig1 <- function(AllData) {
+  
+  library(tidyverse)
+  
   AllGeo <- AllData %>%
     group_by(refID) %>%
     filter(AuthorNum == 1)

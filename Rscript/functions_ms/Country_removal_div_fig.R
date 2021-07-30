@@ -1,8 +1,8 @@
 Country_removal_div_fig<-function(){
 
 
-Plot_PW_div<-read_csv("./output/div_remove_one_country.csv")
-plot_PW_div_noCHN<-read_csv("./output/div_remove_second_country.csv")
+Plot_PW_div<-read_csv("./data_clean/div_remove_one_country.csv")
+plot_PW_div_noCHN<-read_csv("./data_clean/div_remove_second_country.csv")
 
 # effect of removing each country
 p1<-ggplot(Plot_PW_div, 
