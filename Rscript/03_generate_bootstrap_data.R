@@ -55,8 +55,10 @@ first_NOCHNUSA<- AllData %>%
 ####################################
 # Permutation tests
 # generate the results of permutation tests comparing mirror and oa in parent
+# This will save all the results to the clean_data folder. No need to have in 
+# memory as not used in any further analyses
 source("./Rscript/functions_ms/permutation_tests_OA.R")
-All_boots_wide <- permutation_tests_OA(AllData)
+permutation_tests_OA(AllData)
 
 
 ##########################################
@@ -194,8 +196,8 @@ write_csv(BootMirror_Countries,'./data_clean/BootMirror_Countries.csv')
 
 
 ## Data from permutation test results 
-source("./Rscript/functions_ms/permutation_tests_OA.R")
-permutation_tests_OA(AllData)
+# source("./Rscript/functions_ms/permutation_tests_OA.R")
+# permutation_tests_OA(AllData)
 
 # summary(boot_results_countries)
 # write.csv(Boot_Countries, "./data_clean/Boot_Countries.csv", row.names = FALSE)

@@ -49,7 +49,8 @@ n_OA_plots <- function(AllData, n_countries) {
     ungroup() %>%
     arrange(Code)
 
-  plot_data <- left_join(plot_data, Codes)
+  plot_data <- left_join(plot_data, Codes) %>% 
+    arrange(perc_pw)
 
   plot_data$IncomeGroup <- as.factor(plot_data$IncomeGroup)
   levels(plot_data$IncomeGroup)[levels(plot_data$IncomeGroup) == 
@@ -71,6 +72,21 @@ n_OA_plots <- function(AllData, n_countries) {
   plot_data$color[plot_data$IncomeGroup == "High"] <- "'#F7FBFF'"
 
 
+  
+  
+  # for stacked percent bar chart
+  # plot_data2 <- plot_data %>% 
+  #   select(Code, perc_pw, perc_oa, IncomeGroup) %>% 
+  #   pivot_longer(perc_pw:perc_oa, names_to = "Income", values_to = "perc") %>% 
+  #   pivot_wider(names_from = Code, values_from = perc)
+  # # ggplot(plot_data2, aes(fill=IncomeGroup, y=IncomeGroup, x=Code)) + 
+  # #   geom_bar(position="fill", stat="identity")
+  # ggplot(plot_data2, aes(x = reorder(Code,-perc), y = perc, fill = Income)) +
+  #   geom_col(position = "fill")
+  
+  
+  
+  
   color.labels <- c("Low" = "#084594", "Lower-middle" = "#4292C6",
                     "Upper-middle" = "#9ECAE1", "High" = "#F7FBFF")
 
@@ -78,8 +94,10 @@ n_OA_plots <- function(AllData, n_countries) {
   library(ggrepel)
 
   p1 <- ggplot(plot_data, aes(
-    x = perc_oa,
-    y = perc_pw,
+    # x = perc_oa, # this is for percentage 
+    # y = perc_pw, # this is for percentage
+    x = nOA,
+    y = nPW,
     color = IncomeGroup,
     fill = IncomeGroup,
     label = Code
@@ -90,6 +108,7 @@ n_OA_plots <- function(AllData, n_countries) {
       shape = 21,
       position = position_dodge(width = 0.2)
     ) +
+    geom_abline(intercept = 0, slope = 1,lty="dashed")+
     # geom_hline(
     #   yintercept = 50,
     #   color = "darkgray",
@@ -107,11 +126,18 @@ n_OA_plots <- function(AllData, n_countries) {
       name = "National Income Category",
       breaks = c("High", "Upper-middle", "Lower-middle", "Low")
     ) +
-    scale_x_continuous(limits = c(0, 50), 
-                       breaks = seq(0, 50, by = 10),
-                       expand = c(0, 0.1)) +
-    scale_y_continuous(limits = c(50, 100),
-                       breaks = seq(50, 100, by = 10),
+    # this would be for percentage
+    # scale_x_continuous(limits = c(0, 50), 
+    #                    breaks = seq(0, 50, by = 10),
+    #                    expand = c(0, 0.1)) +
+    # scale_y_continuous(limits = c(50, 100),
+    #                    breaks = seq(50, 100, by = 10),
+    #                    expand = c(0, 0.1))
+    scale_x_continuous(limits = c(0, 350), 
+                     breaks = seq(0, 350, by = 25),
+                     expand = c(0, 0.1)) +
+    scale_y_continuous(limits = c(0, 350),
+                       breaks = seq(0, 350, by = 25),
                        expand = c(0, 0.1))
 
 
@@ -121,13 +147,13 @@ n_OA_plots <- function(AllData, n_countries) {
       segment.color = "black",
       color = "black",
       size = 7,
-      box.padding = 0.2,
-      max.overlaps = 25
+      box.padding = 0.35,
+      max.overlaps = 45
     ) +
 
     labs(
-      y = "OA Articles in Parent journals (%)",
-      x = "Articles in Mirror journals (%)"
+      y = "OA Articles in Parent journals",
+      x = "Articles in Mirror journals"
     ) +
     theme(
       # legend.position = "right",

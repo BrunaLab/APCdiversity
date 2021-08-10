@@ -845,6 +845,63 @@ AllData$ArticleType<-as.factor(AllData$ArticleType)
 levels(AllData$Journal)
 levels(as.factor(AllData$Region))
 
+
+
+
+AllData$Code[AllData$author_country_biblio2 == "algeria"] <- "DZA"
+AllData$Code[AllData$author_country_biblio2 == "argentina"] <- "ARG"
+AllData$Code[AllData$author_country_biblio2 == "australia"] <- "AUS"
+AllData$Code[AllData$author_country_biblio2 == "austria"] <- "AUT"
+AllData$Code[AllData$author_country_biblio2 == "bahrain"] <- "BHR"
+AllData$Code[AllData$author_country_biblio2 == "bangladesh"] <- "BGD"
+AllData$Code[AllData$author_country_biblio2 == "belgium"] <- "BEL"
+AllData$Code[AllData$author_country_biblio2 == "bolivia"] <- "BOL"
+AllData$Code[AllData$author_country_biblio2 == "brazil"] <- "BRA"
+AllData$Code[AllData$author_country_biblio2 == "canada"] <- "CAN"
+AllData$Code[AllData$author_country_biblio2 == "chile"] <- "CHL"
+AllData$Code[AllData$author_country_biblio2 == "china"] <- "CHN"
+AllData$Code[AllData$author_country_biblio2 == "costa rica"] <- "CRI"
+AllData$Code[AllData$author_country_biblio2 == "czech republic"] <- "CZE"
+AllData$Code[AllData$author_country_biblio2 == "denmark"] <- "DNK"
+AllData$Code[AllData$author_country_biblio2 == "ecuador"] <- "ECU"
+AllData$Code[AllData$author_country_biblio2 == "egypt"] <- "EGY"
+AllData$Code[AllData$author_country_biblio2 == "ethiopia"] <- "ETH"
+AllData$Code[AllData$author_country_biblio2 == "france"] <- "FRA"
+AllData$Code[AllData$author_country_biblio2 == "germany"] <- "DEU"
+AllData$Code[AllData$author_country_biblio2 == "ghana"] <- "GHA"
+AllData$Code[AllData$author_country_biblio2 == "greece"] <- "GRC"
+AllData$Code[AllData$author_country_biblio2 == "haiti"] <- "HTI"
+AllData$Code[AllData$author_country_biblio2 == "hungary"] <- "HUN"
+AllData$Code[AllData$author_country_biblio2 == "india"] <- "IND"
+AllData$Code[AllData$author_country_biblio2 == "indonesia"] <- "IDN"
+AllData$Code[AllData$author_country_biblio2 == "iran"] <- "IRN"
+AllData$Code[AllData$author_country_biblio2 == "iraq"] <- "IRQ"
+AllData$Code[AllData$author_country_biblio2 == "ireland"] <- "IRL"
+AllData$Code[AllData$author_country_biblio2 == "israel"] <- "ISR"
+AllData$Code[AllData$author_country_biblio2 == "italy"] <- "ITA"
+AllData$Code[AllData$author_country_biblio2 == "malaysia"] <- "MYS"
+AllData$Code[AllData$author_country_biblio2 == "malta"] <- "MLT"
+AllData$Code[AllData$author_country_biblio2 == "myanmar"] <- "MMR"
+AllData$Code[AllData$author_country_biblio2 == "nepal"] <- "NPL"
+AllData$Code[AllData$author_country_biblio2 == "netherlands"] <- "NLD"
+AllData$Code[AllData$author_country_biblio2 == "nigeria"] <- "NGA"
+AllData$Code[AllData$author_country_biblio2 == "norway"] <- "NOR"
+AllData$Code[AllData$author_country_biblio2 == "portugal"] <- "PRT"
+AllData$Code[AllData$author_country_biblio2 == "saudi arabia"] <- "SAU"
+AllData$Code[AllData$author_country_biblio2 == "south korea"] <- "KOR"
+AllData$Code[AllData$author_country_biblio2 == "spain"] <- "ESP"
+AllData$Code[AllData$author_country_biblio2 == "sri lanka"] <- "LKA"
+AllData$Code[AllData$author_country_biblio2 == "sweden"] <- "SWE"
+AllData$Code[AllData$author_country_biblio2 == "tajikistan"] <- "TJK"
+AllData$Code[AllData$author_country_biblio2 == "turkey"] <- "TUR"
+AllData$Code[AllData$author_country_biblio2 == "UK"] <- "GBR"
+
+
+
+
+
+
+
 AllData<-write_csv(AllData, "./data_clean/all_data_analysis.csv")
 
 
