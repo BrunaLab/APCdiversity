@@ -142,6 +142,7 @@ library(gridExtra)
 library(kableExtra)
 library(egg)
 library(magick)
+library(here)
 # library(citr)
 # library(devtools)
 # devtools::install_github("crsh/papaja")
@@ -149,9 +150,10 @@ library(magick)
 
 ```{r load_data, cached=TRUE}
 knitr::opts_chunk$set(echo = FALSE)
-MirrorPairs <- read_csv("./data_clean/MirrorPairs.csv", col_types = cols())
-WaiverCountries <- read_csv("./data_clean/WaiverCountries.csv", col_types = cols())
-AllData <- read_csv(file = "./data_clean/all_data_analysis.csv", col_types = cols())
+
+MirrorPairs <- read_csv(here("data_clean", "MirrorPairs.csv"))
+WaiverCountries <- read_csv(here("data_clean","WaiverCountries.csv"))
+AllData <- read_csv(here("data_clean","all_data_analysis.csv"))
 
 AllData_missing <- AllData %>%
   filter(AuthorNum == 1) %>%
@@ -190,14 +192,14 @@ first_NOCHNUSA <- AllData %>%
   mutate(author = "author_first")
 
 # Load Bootstrap Runs - COUNTRIES
-BootOAinPW_Countries <- read_csv("./data_clean/BootOAinPW_Countries.csv")
-BootMirror_Countries <- read_csv("./data_clean/BootMirror_Countries.csv")
+BootOAinPW_Countries <- read_csv(here("data_clean","BootOAinPW_Countries.csv"))
+BootMirror_Countries <- read_csv(here("data_clean","BootMirror_Countries.csv"))
 
 # Load Bootstrap Runs - DIVERSITY
-BootOAinPW_RichDiv <- read_csv("./data_clean/BootOAinPW_RichDiv.csv")
+BootOAinPW_RichDiv <- read_csv(here("data_clean","BootOAinPW_RichDiv.csv"))
 
 # Load Bootstrap Runs - OA in Mirror Journals
-BootMirror_RichDiv <- read_csv("./data_clean/BootMirror_RichDiv.csv")
+BootMirror_RichDiv <- read_csv(here("data_clean","BootMirror_RichDiv.csv"))
 
 ```
 
