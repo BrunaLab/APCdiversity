@@ -1,7 +1,6 @@
-AppFig1 <- function(AllData) {
-  
+fig_a1 <- function(AllData) {
   library(tidyverse)
-  
+
   AllGeo <- AllData %>%
     group_by(refID) %>%
     filter(AuthorNum == 1)
@@ -17,10 +16,10 @@ AppFig1 <- function(AllData) {
 
   AllGeo$IncomeGroup <- as.factor(AllGeo$IncomeGroup)
 
-  levels(AllGeo$IncomeGroup)[levels(AllGeo$IncomeGroup) == 
-                               "Lower middle"] <- "Lower-middle"
   levels(AllGeo$IncomeGroup)[levels(AllGeo$IncomeGroup) ==
-                               "Upper middle"] <- "Upper-middle"
+    "Lower middle"] <- "Lower-middle"
+  levels(AllGeo$IncomeGroup)[levels(AllGeo$IncomeGroup) ==
+    "Upper middle"] <- "Upper-middle"
 
   AllGeo$IncomeGroup <- ordered(AllGeo$IncomeGroup,
     levels = c("Low", "Lower-middle", "Upper-middle", "High")
@@ -90,8 +89,10 @@ AppFig1 <- function(AllData) {
 
   # This is needed to put them in order in the plot with OTHER at the end of the graph
   order <- rev(seq(1:nrow(most.common.authors))) # REV is what makes it go tyop to bottom if flipped coordinates
-  most.common.authors$Code <- factor(most.common.authors$Code,
-                                     most.common.authors$Code[levels = order])
+  most.common.authors$Code <- factor(
+    most.common.authors$Code,
+    most.common.authors$Code[levels = order]
+  )
   # rm(order,AllGeo,lst.common.authors)
   most.common.authors
 
@@ -99,12 +100,16 @@ AppFig1 <- function(AllData) {
   label_x <- "First author country"
 
 
-  AppFig1 <- ggplot(most.common.authors, 
-                    aes(x = Code, y = perc, fill = IncomeGroup)) +
+  AppFig1 <- ggplot(
+    most.common.authors,
+    aes(x = Code, y = perc, fill = IncomeGroup)
+  ) +
     geom_bar(stat = "identity", colour = "black", size = 0.1) +
     geom_text(aes(label = n), hjust = -.2, size = 2) +
-    scale_y_continuous(limits = c(0, 40), 
-                       breaks = seq(0, 40, by = 5), expand = c(0, 0.1)) +
+    scale_y_continuous(
+      limits = c(0, 40),
+      breaks = seq(0, 40, by = 5), expand = c(0, 0.1)
+    ) +
     # geom_text(size = 3, position = position_stack(vjust = 0.5))+
     xlab("Country") +
     ylab("Percentage of Articles") +
@@ -129,9 +134,11 @@ AppFig1 <- function(AllData) {
       axis.text.x = element_text(size = 8),
       axis.text.y = element_text(size = 8),
       axis.title.x = element_text(colour = "black", size = 12, vjust = -0.5),
-      axis.title.y = element_text(colour = "black",
-                                  size = 12, hjust = 0.5, 
-                                  vjust = 0.5, angle = 90),
+      axis.title.y = element_text(
+        colour = "black",
+        size = 12, hjust = 0.5,
+        vjust = 0.5, angle = 90
+      ),
       plot.title = element_text(size = 8),
       legend.text = element_text(colour = "black", size = 8, vjust = 0.5),
       legend.title = element_text(size = 8),

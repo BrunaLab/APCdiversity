@@ -1,4 +1,4 @@
-Country_removal_div_fig<-function(){
+fig_a_country_removal_div<-function(){
 
 
 Plot_PW_div<-read_csv("./data_clean/div_remove_one_country.csv")

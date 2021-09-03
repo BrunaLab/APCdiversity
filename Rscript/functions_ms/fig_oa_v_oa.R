@@ -1,4 +1,4 @@
-n_OA_plots <- function(AllData, n_countries) {
+fig_oa_v_oa <- function(AllData, n_countries) {
   # n_countries<-20
   AllData$Journal <- as.factor(AllData$Journal)
   AllData$Code <- as.factor(AllData$Code)

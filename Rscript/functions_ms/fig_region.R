@@ -1,4 +1,4 @@
-RegionPlot_MSv2 <- function(DataSet,
+fig_region <- function(DataSet,
                             Subsampled_Countries,
                             countries,
                             sole_ALL,

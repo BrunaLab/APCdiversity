@@ -1,4 +1,4 @@
-DivBootFig_shannon <- function(BootMirror_RichDiv,
+fig_a_divboot_shannon <- function(BootMirror_RichDiv,
                                sole_ALL,
                                first_ALL,
                                sole_NOCHNUSA,

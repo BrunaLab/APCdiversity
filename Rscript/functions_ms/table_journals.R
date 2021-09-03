@@ -1,4 +1,4 @@
-SummaryTable <- function(DataSet, MirrorPairs) {
+table_journals <- function(DataSet, MirrorPairs) {
   library(tidyr)
   library(dplyr)
 

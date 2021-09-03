@@ -1,10 +1,12 @@
-IncomePlot_MSv2 <- function(DataSet, Subsampled_Countries, 
+fig_income <- function(DataSet, Subsampled_Countries, 
                             countries, sole_ALL, sole_NOCHNUSA,
                             first_ALL, first_NOCHNUSA) {
   # DataSet<-BootMirror_RichDiv
   # Subsampled_Countries<-BootMirror_Countries
   # countries<-"All"
   # countries<-"No_CHN_USA"
+  # sole_NOCHNUSA<-single_NOCHNUSA
+  # sole_ALL<-single_ALL
   library(tidyverse)
   library(RColorBrewer)
   library(ggExtra)

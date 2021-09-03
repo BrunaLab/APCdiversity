@@ -1,4 +1,4 @@
-WaiverGrpPlot_MSv2 <- function(DataSet,
+fig_waiver_grp <- function(DataSet,
                                Subsampled_Countries,
                                countries,
                                sole_ALL,

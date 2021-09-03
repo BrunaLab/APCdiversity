@@ -1,5 +1,10 @@
-CountryPlot <- function(DataSet, AuPosition, JrnlType, ArticleType, cutoff) {
+fig_countries <- function(DataSet, AuPosition, JrnlType, ArticleType, cutoff) {
   library(tidyverse)
+  # DataSet<-single_ALL
+  # AuPosition<-"author_first"
+  # JrnlType<-"OA"
+  # ArticleType<-"OA"
+  # cutoff<-15
   
   vars <- list(DataSet, AuPosition, JrnlType, ArticleType, cutoff)
 

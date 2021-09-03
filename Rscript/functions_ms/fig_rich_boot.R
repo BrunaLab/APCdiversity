@@ -1,4 +1,4 @@
-RichBootFig_MSv2 <- function(Boot_RichDiv, sole_ALL, first_ALL, sole_NOCHNUSA, first_NOCHNUSA) {
+fig_rich_boot <- function(Boot_RichDiv, sole_ALL, first_ALL, sole_NOCHNUSA, first_NOCHNUSA) {
   library(ggplot2)
   library(tidyr)
   library(dplyr)

@@ -1,4 +1,4 @@
-DivBootFig_MSv2 <- function(Boot_RichDiv, sole_ALL, 
+fig_div_boot <- function(Boot_RichDiv, sole_ALL, 
                             sole_NOCHNUSA, first_ALL, first_NOCHNUSA) {
   # Boot_RichDiv<-BootMirror_RichDiv
   library(ggplot2)
