@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2022/dev) (preloaded format=pdflatex 2021.8.31)  3 SEP 2021 15:07
+This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2022/dev) (preloaded format=pdflatex 2021.8.31)  9 SEP 2021 14:22
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -831,13 +831,10 @@ File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
 (Font)              Font shape `T1/lmtt/b/n' tried instead on input line 235.
 [10] [11] [12] [13] [14] [15] [16] [17] [18] [19] [20] [21] [22] [23] [24] [25]
-[26] [27]
-\openout4 = `Smith_etal_APC_ms.fff'.
-
-(Smith_etal_APC_ms.fff)
+[26] [27] [28]
 \openout3 = `Smith_etal_APC_ms.ttt'.
 
-(Smith_etal_APC_ms.ttt) [28] (./Smith_etal_APC_ms.ttt
+(Smith_etal_APC_ms.ttt) [29] (./Smith_etal_APC_ms.ttt
 LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 7
 9.
 (/Users/emiliobruna/Library/TinyTeX/texmf-dist/tex/latex/lm/ts1lmr.fd
@@ -847,143 +844,37 @@ Overfull \hbox (42.84969pt too wide) in paragraph at lines 118--139
  [][] 
  []
 
-) [29
+) [30
 
 
-] [30] [31] (./Smith_etal_APC_ms.fff
-<Smith_etal_APC_ms_files/figure-latex/Fig1-1.pdf, id=369, 400.49625pt x 625.336
-24pt>
-File: Smith_etal_APC_ms_files/figure-latex/Fig1-1.pdf Graphic file (type pdf)
-<use Smith_etal_APC_ms_files/figure-latex/Fig1-1.pdf>
-Package pdftex.def Info: Smith_etal_APC_ms_files/figure-latex/Fig1-1.pdf  used 
-on input line 5.
-(pdftex.def)             Requested size: 400.50748pt x 625.35379pt.
+] [31] [32] [33
 
-LaTeX Warning: Float too large for page by 57.42377pt on input line 10.
+] [34
 
-<Smith_etal_APC_ms_files/figure-latex/Fig2-1.pdf, id=370, 400.49625pt x 625.336
-24pt>
-File: Smith_etal_APC_ms_files/figure-latex/Fig2-1.pdf Graphic file (type pdf)
-<use Smith_etal_APC_ms_files/figure-latex/Fig2-1.pdf>
-Package pdftex.def Info: Smith_etal_APC_ms_files/figure-latex/Fig2-1.pdf  used 
-on input line 15.
-(pdftex.def)             Requested size: 400.50748pt x 625.35379pt.
+] [35
 
-LaTeX Warning: Float too large for page by 57.42377pt on input line 20.
+]
 
-<Smith_etal_APC_ms_files/figure-latex/Fig4-1.pdf, id=371, 434.62375pt x 292.091
-25pt>
-File: Smith_etal_APC_ms_files/figure-latex/Fig4-1.pdf Graphic file (type pdf)
-<use Smith_etal_APC_ms_files/figure-latex/Fig4-1.pdf>
-Package pdftex.def Info: Smith_etal_APC_ms_files/figure-latex/Fig4-1.pdf  used 
-on input line 25.
-(pdftex.def)             Requested size: 434.6492pt x 292.10834pt.
-<Smith_etal_APC_ms_files/figure-latex/Fig5-1.pdf, id=372, 1415.2875pt x 1608.00
-75pt>
-File: Smith_etal_APC_ms_files/figure-latex/Fig5-1.pdf Graphic file (type pdf)
-<use Smith_etal_APC_ms_files/figure-latex/Fig5-1.pdf>
-Package pdftex.def Info: Smith_etal_APC_ms_files/figure-latex/Fig5-1.pdf  used 
-on input line 35.
-(pdftex.def)             Requested size: 469.74576pt x 533.71115pt.
-<Smith_etal_APC_ms_files/figure-latex/Fig6-1.pdf, id=373, 1439.3775pt x 1642.13
-5pt>
-File: Smith_etal_APC_ms_files/figure-latex/Fig6-1.pdf Graphic file (type pdf)
-<use Smith_etal_APC_ms_files/figure-latex/Fig6-1.pdf>
-Package pdftex.def Info: Smith_etal_APC_ms_files/figure-latex/Fig6-1.pdf  used 
-on input line 45.
-(pdftex.def)             Requested size: 469.74686pt x 535.91762pt.
-<Smith_etal_APC_ms_files/figure-latex/Fig7-1.pdf, id=374, 1414.28375pt x 1608.0
-075pt>
-File: Smith_etal_APC_ms_files/figure-latex/Fig7-1.pdf Graphic file (type pdf)
-<use Smith_etal_APC_ms_files/figure-latex/Fig7-1.pdf>
-Package pdftex.def Info: Smith_etal_APC_ms_files/figure-latex/Fig7-1.pdf  used 
-on input line 55.
-(pdftex.def)             Requested size: 469.75789pt x 534.10373pt.
-<Smith_etal_APC_ms_files/figure-latex/Fig8-1.pdf, id=375, 1266.7325pt x 1273.75
-874pt>
-File: Smith_etal_APC_ms_files/figure-latex/Fig8-1.pdf Graphic file (type pdf)
-<use Smith_etal_APC_ms_files/figure-latex/Fig8-1.pdf>
-Package pdftex.def Info: Smith_etal_APC_ms_files/figure-latex/Fig8-1.pdf  used 
-on input line 65.
-(pdftex.def)             Requested size: 469.74677pt x 472.35234pt.
-) [32 <./Smith_etal_APC_ms_files/figure-latex/Fig1-1.pdf>] [33 <./Smith_etal_AP
-C_ms_files/figure-latex/Fig2-1.pdf>] [34 <./Smith_etal_APC_ms_files/figure-late
-x/Fig4-1.pdf>] [35 <./Smith_etal_APC_ms_files/figure-latex/Fig5-1.pdf>] [36 <./
-Smith_etal_APC_ms_files/figure-latex/Fig6-1.pdf>] [37 <./Smith_etal_APC_ms_file
-s/figure-latex/Fig7-1.pdf>] [38 <./Smith_etal_APC_ms_files/figure-latex/Fig8-1.
-pdf>]
-<Smith_etal_APC_ms_files/figure-latex/FigA1-3-1.pdf, id=471, 427.5975pt x 302.1
-2875pt>
-File: Smith_etal_APC_ms_files/figure-latex/FigA1-3-1.pdf Graphic file (type pdf
-)
-<use Smith_etal_APC_ms_files/figure-latex/FigA1-3-1.pdf>
-Package pdftex.def Info: Smith_etal_APC_ms_files/figure-latex/FigA1-3-1.pdf  us
-ed on input line 722.
-(pdftex.def)             Requested size: 427.59645pt x 302.128pt.
-[39
-
-
- <./Smith_etal_APC_ms_files/figure-latex/FigA1-3-1.pdf>]
-<Smith_etal_APC_ms_files/figure-latex/FigA2-4-1.pdf, id=485, 1707.37875pt x 112
-9.21875pt>
-File: Smith_etal_APC_ms_files/figure-latex/FigA2-4-1.pdf Graphic file (type pdf
-)
-<use Smith_etal_APC_ms_files/figure-latex/FigA2-4-1.pdf>
-Package pdftex.def Info: Smith_etal_APC_ms_files/figure-latex/FigA2-4-1.pdf  us
-ed on input line 734.
-(pdftex.def)             Requested size: 650.45198pt x 430.1931pt.
-[40 <./Smith_etal_APC_ms_files/figure-latex/FigA2-4-1.pdf>]
-<Smith_etal_APC_ms_files/figure-latex/FigA3-5-1.pdf, id=498, 433.62pt x 292.091
-25pt>
-File: Smith_etal_APC_ms_files/figure-latex/FigA3-5-1.pdf Graphic file (type pdf
-)
-<use Smith_etal_APC_ms_files/figure-latex/FigA3-5-1.pdf>
-Package pdftex.def Info: Smith_etal_APC_ms_files/figure-latex/FigA3-5-1.pdf  us
-ed on input line 746.
-(pdftex.def)             Requested size: 433.63878pt x 292.10388pt.
-<Smith_etal_APC_ms_files/figure-latex/FigA4-6-1.pdf, id=499, 434.62375pt x 292.
-09125pt>
-File: Smith_etal_APC_ms_files/figure-latex/FigA4-6-1.pdf Graphic file (type pdf
-)
-<use Smith_etal_APC_ms_files/figure-latex/FigA4-6-1.pdf>
-Package pdftex.def Info: Smith_etal_APC_ms_files/figure-latex/FigA4-6-1.pdf  us
-ed on input line 755.
-(pdftex.def)             Requested size: 434.6492pt x 292.10834pt.
-<Smith_etal_APC_ms_files/figure-latex/FigA5-7-1.pdf, id=500, 1121.18875pt x 128
-5.80376pt>
-File: Smith_etal_APC_ms_files/figure-latex/FigA5-7-1.pdf Graphic file (type pdf
-)
-<use Smith_etal_APC_ms_files/figure-latex/FigA5-7-1.pdf>
-Package pdftex.def Info: Smith_etal_APC_ms_files/figure-latex/FigA5-7-1.pdf  us
-ed on input line 764.
-(pdftex.def)             Requested size: 469.76694pt x 538.739pt.
-[41
-
-
- <./Smith_etal_APC_ms_files/figure-latex/FigA3-5-1.pdf>] [42 <./Smith_etal_APC_
-ms_files/figure-latex/FigA4-6-1.pdf>] [43 <./Smith_etal_APC_ms_files/figure-lat
-ex/FigA5-7-1.pdf>]
-
-LaTeX Warning: Text page 44 contains only floats.
+LaTeX Warning: Text page 36 contains only floats.
 
 
 Overfull \vbox (0.32692pt too high) has occurred while \output is active []
 
-[44
+[36
 
-] AED endfloat: Processing end Figures and Tables [45] [46] (./Smith_etal_APC_m
+] AED endfloat: Processing end Figures and Tables [37] [38] (./Smith_etal_APC_m
 s.aux)
 Package rerunfilecheck Info: File `Smith_etal_APC_ms.out' has not changed.
 (rerunfilecheck)             Checksum: 9D78C6354BD445DC2DC9D2777BD268C2;1700.
  ) 
 Here is how much of TeX's memory you used:
- 17742 strings out of 480559
- 280855 string characters out of 5902115
- 688901 words of memory out of 5000000
- 34662 multiletter control sequences out of 15000+600000
- 485381 words of font info for 181 fonts, out of 8000000 for 9000
+ 17572 strings out of 480559
+ 274568 string characters out of 5902115
+ 683675 words of memory out of 5000000
+ 34551 multiletter control sequences out of 15000+600000
+ 484455 words of font info for 170 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 72i,13n,80p,3214b,552s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 72i,13n,80p,3214b,554s stack positions out of 5000i,500n,10000p,200000b,80000s
 pdfTeX warning (dest): name{Hfootnote.4} has been referenced but does not exi
 st, replaced by a fixed one
 
@@ -1017,11 +908,12 @@ ers/emiliobruna/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmss8.pfb></Us
 ers/emiliobruna/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></U
 sers/emiliobruna/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy6.pfb></U
 sers/emiliobruna/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></U
-sers/emiliobruna/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtk10.pfb>
-Output written on Smith_etal_APC_ms.pdf (46 pages, 442618 bytes).
+sers/emiliobruna/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></
+Users/emiliobruna/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt12.pfb>
+Output written on Smith_etal_APC_ms.pdf (38 pages, 369207 bytes).
 PDF statistics:
- 682 PDF objects out of 1000 (max. 8388607)
- 557 compressed objects within 6 object streams
- 162 named destinations out of 1000 (max. 500000)
- 43165 words of extra memory for PDF output out of 51595 (max. 10000000)
+ 522 PDF objects out of 1000 (max. 8388607)
+ 440 compressed objects within 5 object streams
+ 142 named destinations out of 1000 (max. 500000)
+ 43105 words of extra memory for PDF output out of 51595 (max. 10000000)
 
