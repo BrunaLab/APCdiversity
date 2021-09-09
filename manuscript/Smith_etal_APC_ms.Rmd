@@ -618,6 +618,7 @@ DivBootFig <- fig_div_boot(BootMirror_RichDiv, single_ALL, single_NOCHNUSA, firs
 # Figure - Richness
 source("./Rscript/functions_ms/fig_rich_boot.R")
 RichBootFig <- fig_rich_boot(BootMirror_RichDiv, single_ALL, first_ALL, single_NOCHNUSA, first_NOCHNUSA)
+
 ```
 
 ```{r richdivfigs2, echo=FALSE, message = FALSE, warning=FALSE}
@@ -631,12 +632,23 @@ p6 <- fig_countries(first_ALL, "author_first", "PW", "PW", 15)
 ```
 
 ```{r Fig1, fig.align='center',fig.cap="For single-author papers: (A) the percentage of authors of articles in open access (OA) Mirror journals that are based in different countries, (B) the percentage of authors of OA articles in Parent journals that are based in different countries, and (C) the percentage of authors of non-OA articles in Parent journals that are based in different countries. Numbers adjacent to bars are the number of articles with lead authors based in that country.",fig.height = 9,fig.width=6}
-grid.arrange(p1, p2, p3, ncol = 1)
+tiff("./manuscript/figs_final/fig_01", units="in", width=6, height=8, res=700)
+fig01<-grid.arrange(p1, p2, p3, ncol = 1)
+fig01
+# insert ggplot code
+dev.off()
+# ggsave(fig01, path = "./Rscript/manuscript/figs_final", width = 5, height = 8, device='tiff', dpi=700)
 ```
 
 ```{r Fig2, fig.align='center',fig.cap="For coauthored papers: (A) the percentage of authors of articles in open access (OA) Mirror journals that are based in different countries, (B) the percentage of authors of OA articles in Parent journals that are based in different countries, and (C) the percentage of authors of non-OA articles in Parent journals that are based in different countries. Numbers adjacent to bars are the number of articles with lead authors based in that country.",fig.height = 9,fig.width=6}
 # coauthored, first author, OA
-grid.arrange(p4, p5, p6, ncol = 1)
+
+
+tiff("./manuscript/figs_final/fig_02", units="in", width=6, height=8, res=700)
+fig02<-grid.arrange(p4, p5, p6, ncol = 1)
+fig02
+# insert ggplot code
+dev.off()
 ```
 
 <!-- # ```{r Fig3, fig.align='center', fig.cap=paste("Author Geographic Richness for N = ", insert_custom1," Open Access articles (red bar) and 1000 identically sized collections of non-OA articles selected by bootstrapping from a pool of ",insert_custom2, " articles."), fig.fullwidth=TRUE} -->
@@ -647,9 +659,11 @@ grid.arrange(p4, p5, p6, ncol = 1)
 
 <!-- fig.cap=paste("Author Geographic Diversity ($D_2$) for the N = ", insert_custom3, " open access articles in Parent jorunals (dashed line), the N = ", insert_custom1, " articles in Mirror journals (solid line), and 1000 bootstrap-selected samples from the N = ",insert_custom2, " subscription-only articles in Parent journals. The bootstrap samples were identical in size and structure to the collection of articles published in Mirror journals.") -->
 
-```{r Fig4, fig.align='center', fig.cap=paste("Geographic Diversity ($D_2$) of authors publishing N = ", insert_custom1, " articles in Mirror journals (dashed line) and 1000 collections of N = ", insert_custom1, " non-OA articles in Parent journals (sampled from N = ",insert_custom2, " articles by bootstrapping)."),fig.fullwidth=TRUE}
+```{r Fig3, fig.align='center', fig.cap=paste("Geographic Diversity ($D_2$) of authors publishing N = ", insert_custom1, " articles in Mirror journals (dashed line) and 1000 collections of N = ", insert_custom1, " non-OA articles in Parent journals (sampled from N = ",insert_custom2, " articles by bootstrapping)."),fig.fullwidth=TRUE}
 # DivBootFig[[1]]
+tiff("./manuscript/figs_final/fig_03", units="in", width=6, height=6, res=700)
 DivBootFig
+dev.off()
 ```
 
 ```{r IncomeRegionFIgs, cached=TRUE,echo=FALSE, message = FALSE, warning=FALSE}
@@ -665,25 +679,43 @@ Fig_Region <- RegionPlot[[1]]
 Fig_Waiver <- WaiverPlot[[1]]
 ```
 
-```{r Fig5, echo=FALSE,message = FALSE, warning=FALSE, fig.align='center', fig.cap=paste("Percentage of first authors that are based in different global regions. The dashed line is the value for N = ",insert_custom1," articles in open access (OA) Mirror journals; histograms are values for 1000 identically sized collections of non-OA articles from Parent journals (sampled by bootstrapping from N = ",insert_custom2," articles). All countries, including the USA and China, are included."),fig.fullwidth=TRUE,fig.height = 24,fig.width=20}
+```{r Fig4, echo=FALSE,message = FALSE, warning=FALSE, fig.align='center', fig.cap=paste("Percentage of first authors that are based in different global regions. The dashed line is the value for N = ",insert_custom1," articles in open access (OA) Mirror journals; histograms are values for 1000 identically sized collections of non-OA articles from Parent journals (sampled by bootstrapping from N = ",insert_custom2," articles). All countries, including the USA and China, are included."),fig.fullwidth=TRUE,fig.height = 24,fig.width=20}
+
+tiff("./manuscript/figs_final/fig_04", units="cm", width=35, height=45, res=700)
+
 Fig_Region
+
+dev.off()
 ```
 
-```{r Fig6, echo=FALSE, message = FALSE, warning=FALSE, fig.align='center', fig.cap=paste("Percentage of first authors that are based in different World Bank Lending Groups. The dashed line is the value for N = ",insert_custom1," articles in open access (OA) Mirror journals; histograms are values for 1000 identically sized collections of non-OA articles from Parent journals (sampled by bootstrapping from N = ",insert_custom2," articles). All countries, including the USA and China, are included."), fig.fullwidth=TRUE,fig.height = 24,fig.width=20}
+```{r Fig5, echo=FALSE, message = FALSE, warning=FALSE, fig.align='center', fig.cap=paste("Percentage of first authors that are based in different World Bank Lending Groups. The dashed line is the value for N = ",insert_custom1," articles in open access (OA) Mirror journals; histograms are values for 1000 identically sized collections of non-OA articles from Parent journals (sampled by bootstrapping from N = ",insert_custom2," articles). All countries, including the USA and China, are included."), fig.fullwidth=TRUE,fig.height = 24,fig.width=20}
+
+tiff("./manuscript/figs_final/fig_05", units="cm", width=35, height=45, res=700)
 Fig_Income
+dev.off()
 ```
 
-```{r Fig7, echo=FALSE, message = FALSE, warning=FALSE, fig.align='center', fig.cap=paste("Percentage of first authors that are based in different Elsevier Waiver Groups. The solid line is the value for N = ",insert_custom1," articles in Mirror journals; histograms are values for 1000 identically sized collections of subscription articles from Parent journals (sampled by bootstrapping from N = ",insert_custom2," articles)."), fig.fullwidth=TRUE,fig.height = 24,fig.width=20}
+```{r Fig6, echo=FALSE, message = FALSE, warning=FALSE, fig.align='center', fig.cap=paste("Percentage of first authors that are based in different Elsevier Waiver Groups. The solid line is the value for N = ",insert_custom1," articles in Mirror journals; histograms are values for 1000 identically sized collections of subscription articles from Parent journals (sampled by bootstrapping from N = ",insert_custom2," articles)."), fig.fullwidth=TRUE,fig.height = 24,fig.width=20}
+tiff("./manuscript/figs_final/fig_06", units="cm", width=35, height=45, res=700)
 Fig_Waiver
+dev.off()
 ```
 
 ```{r mirrorVpw_OA, echo=FALSE, message = FALSE, warning=FALSE}
+
+
 source("./Rscript/functions_ms/fig_oa_v_oa.R")
 fig_NbyN <- fig_oa_v_oa(AllData, 20)
+
 ```
 
-```{r Fig8, echo=FALSE, message = FALSE, warning=FALSE, fig.align='center', fig.cap="For the 20 countries publishing the most open access (OA) articles, the number of OA articles published in Mirror Journals vs. OA articles published in Parent journals. Abbreviations: DNK=Denmark, AUT=Austria, NOR=Norway, KOR=South Korea, SWE=Sweden, BEL=Belgium, CHE=Switzerland, ESP=Spain, CAN=Canada, ITA=Italy, DEU=Germany, IND=India, JPN=Japan, BRA=Brazil, AUS=Australia, FRA=France, NLD=Netherlands, GBR=Great Britain, CHN=China, USA=United States of America.)", fig.fullwidth=TRUE,fig.height = 18,fig.width=18}
+```{r Fig7, echo=FALSE, message = FALSE, warning=FALSE, fig.align='center', fig.cap="For the 20 countries publishing the most open access (OA) articles, the number of OA articles published in Mirror Journals vs. OA articles published in Parent journals. Abbreviations: DNK=Denmark, AUT=Austria, NOR=Norway, KOR=South Korea, SWE=Sweden, BEL=Belgium, CHE=Switzerland, ESP=Spain, CAN=Canada, ITA=Italy, DEU=Germany, IND=India, JPN=Japan, BRA=Brazil, AUS=Australia, FRA=France, NLD=Netherlands, GBR=Great Britain, CHN=China, USA=United States of America.)", fig.fullwidth=TRUE,fig.height = 18,fig.width=18}
+
+tiff("./manuscript/figs_final/fig_07", units="cm", width=35, height=35, res=700)
+
 fig_NbyN
+
+dev.off()
 ```
 
 ```{r Table1, echo=FALSE,message = FALSE,warning=FALSE}
@@ -1188,3 +1220,8 @@ kable(IncomeTable,
 ```{r echo = FALSE, results = 'asis', cache = FALSE}
 papaja::render_appendix('Smith_etal_Appendix_QSSv1.Rmd')
 ```
+
+```{r echo = FALSE, results = 'asis', cache = FALSE}
+papaja::render_appendix('Smith_etal_Appendix_QSSv1.Rmd')
+```
+
