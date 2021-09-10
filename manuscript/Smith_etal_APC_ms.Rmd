@@ -1219,3 +1219,8 @@ kable(IncomeTable,
 <!-- papaja::render_appendix('Smith_etal_Appendix_QSSv1.Rmd') -->
 <!-- ``` -->
 
+
+```{r echo = FALSE, results = 'asis', cache = FALSE}
+papaja::render_appendix('Smith_etal_Appendix_QSSv1.Rmd')
+```
+
