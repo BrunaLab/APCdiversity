@@ -1,0 +1,161 @@
+\begin{table*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+
+\caption{\label{tab:Table1}Parent journals published by Elsevier included in this study, the number of open access (OA) and non-OA articles they published during our focal time-frame, the number of articles published in each Mirror journal during the same time period, and the article processing charge (APC) charged by each journal for OA publication. With two exceptions the titles of Parent and Mirror journals are identical except for the 'X' at the end of Mirror versions (e.g., Research Policy X, Optical Materials X).}
+\resizebox{\linewidth}{!}{
+\fontsize{12}{14}\selectfont
+\begin{tabular}[t]{lccccc}
+\toprule
+\multicolumn{1}{c}{ } & \multicolumn{2}{c}{Parent Journal} & \multicolumn{1}{c}{Mirror Journal} & \multicolumn{2}{c}{APC (US\$)} \\
+\cmidrule(l{3pt}r{3pt}){2-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-6}
+Title & Subscription & Open Access & Open Access & Mirror & Parent\\
+\midrule
+Analytica Chimica Acta & 1289 & 8 & 19 & 1850 & 3500\\
+Atherosclerosis & 265 & 127 & 5 & 2308 & 3200\\
+Atmospheric Environment & 1015 & 41 & 67 & 1400 & 1400\\
+Biochimie$^{1}$ & 835 & 71 & 49 & 1318 & 2880\\
+Biosensors \& Bioelectronics & 1170 & 0 & 9 & 3500 & 4080\\
+Chaos, Solitons \& Fractals & 673 & 0 & 15 & 2200 & 2200\\
+Chemical Engineering Science & 1022 & 22 & 45 & 3500 & 3500\\
+Chemical Physics Letters & 1137 & 15 & 23 & 3050 & 3050\\
+Contraception & 183 & 16 & 21 & 3200 & 3200\\
+Cytokine & 425 & 47 & 7 & 3400 & 3400\\
+Ecological Engineering & 437 & 18 & 13 & 2600 & 3400\\
+Energy Conversion \& Management & 1713 & 29 & 17 & 3100 & 3100\\
+European J of Obstetrics, Gyn, \& Repro Bio & 527 & 36 & 84 & 2500 & 2500\\
+Expert Systems With Applications & 1084 & 22 & 10 & 2200 & 2640\\
+Food Chemistry & 3028 & 49 & 44 & 2800 & 2800\\
+Gene & 1079 & 14 & 21 & 3400 & 3400\\
+International J of Pharmaceutics & 1293 & 36 & 38 & 3700 & 3700\\
+J of Asian Earth Sciences & 602 & 6 & 10 & 2600 & 2600\\
+J of Biomedical Informatics & 108 & 132 & 15 & 2350 & 2800\\
+J of Biotechnology & 301 & 16 & 10 & 2820 & 3200\\
+J of Computational Physics & 970 & 25 & 35 & 2800 & 2800\\
+J of Dentistry & 208 & 16 & 5 & 3000 & 3000\\
+J of Hydrology & 1417 & 42 & 37 & 3200 & 3200\\
+J of Non-Crystalline Solids & 750 & 11 & 33 & 2200 & 2200\\
+J of Structural Biology & 152 & 37 & 17 & 2750 & 3310\\
+Materials Letters & 2494 & 12 & 30 & 2000 & 3100\\
+Microelectronic Engineering$^{2}$ & 547 & 26 & 39 & 2020 & 2200\\
+Nutrition & 416 & 26 & 2 & 2050 & 2850\\
+Optical Materials & 1020 & 32 & 34 & 1500 & 2200\\
+Research Policy & 197 & 58 & 2 & 2400 & 2760\\
+Respiratory Medicine & 267 & 31 & 14 & 3500 & 3500\\
+Sleep Medicine & 401 & 20 & 8 & 3360 & 3900\\
+Toxicon & 271 & 7 & 26 & 3300 & 3300\\
+Vaccine & 1016 & 482 & 42 & 2450 & 2950\\
+Veterinary Parasitology & 221 & 17 & 21 & 3200 & 3000\\
+Water Research & 2083 & 187 & 41 & 3750 & 3750\\
+World Neurosurgery & 3441 & 29 & 43 & 2600 & 2240\\
+Resources, Conservation, \& Recycling & 552 & 69 & 24 & 3500 & 3500\\
+\midrule
+Total No. of Articles & 34609 & 1832 & 975 &  & \\
+\bottomrule
+\multicolumn{6}{l}{\rule{0pt}{1em}\textsuperscript{1} OA Mirror title: Biochimie Open}\\
+\multicolumn{6}{l}{\rule{0pt}{1em}\textsuperscript{2} OA Mirror title: Micro and Nano Engineering}\\
+\end{tabular}}
+\end{table*}
+\begin{table*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+
+\caption{\label{tab:Table2}Geographic Diversity of lead authors publishing Open Access (i.e., OA) articles in Mirror and Parent journals vs. subscription-only, non-OA, articles in Parent journals (Psub). The value for Psub is the mean of 1000 bootstrap-generated article collections identical in size and structure to each OA group with which they are being compared (i.e., OA in Mirror, OA in Parent). Single: authors of single-authored articles; First: first authors of co-authored articles. Note that because  Diversity values are sample-size dependent, it is not appropriate to compare values generated for one comparison with those generated for another (e.g., Single author OA articles in Parent Journals with First author OA articles in Mirror journals).}
+\centering
+\resizebox{\linewidth}{!}{
+\fontsize{12}{14}\selectfont
+\begin{tabular}[t]{llrccrcc}
+\toprule
+\multicolumn{2}{c}{ } & \multicolumn{3}{c}{All Countries} & \multicolumn{3}{c}{China \& USA Excluded} \\
+\cmidrule(l{3pt}r{3pt}){3-5} \cmidrule(l{3pt}r{3pt}){6-8}
+Author & OA Source & OA & Psub (mean ± SD) & $\hat{P}$ & OA & Psub (mean ± SD) & $\hat{P}$\\
+\midrule
+Single & Mirror & 11.2 & 14.07 ± 2.58 & 0.15 & 17.0 & 22.55 ± 2.8 & 0.0\\
+ & Parent & 7.5 & 9.87 ± 3.21 & 0.23 & 10.0 & 9.85 ± 3.48 & 0.2\\
+ &  &  &  &  &  &  & \\
+First & Mirror & 15.6 & 9.25 ± 0.69 & 1.00 & 19.9 & 24.69 ± 1.37 & 0.0\\
+ & Parent & 13.3 & 11.63 ± 0.55 & 1.00 & 16.4 & 24.35 ± 0.86 & 0.0\\
+\bottomrule
+\end{tabular}}
+\end{table*}
+\begin{table*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+
+\caption{\label{tab:Table3}Monthly stipends for graduate students in select countries. The value of the stipend in US currency is based on the exchange rate in December 2020.}
+\centering
+\fontsize{12}{14}\selectfont
+\begin{tabular}[t]{lllc}
+\toprule
+Country & Agency & Degree & Stipend (US\$)\\
+\midrule
+Brazil & CNPq$^{1}$ & MS/MA & 294\\
+ &  & PhD & 431\\
+Mexico & CONACYT$^{2}$ & MS/MA & 588\\
+ &  & PhD & 783\\
+India & SERB$^{3}$ & PhD$^{6}$ & 747\\
+ &  & PhD$^{7}$ & 978\\
+Indonesia & RISTEKDIKTI$^{4}$ & MS/MA & 195\\
+South Africa & NRF$^{5}$ & MS/MA & 670\\
+ &  & PhD & 687\\
+\bottomrule
+\multicolumn{4}{l}{\rule{0pt}{1em}\textsuperscript{1} http://cnpq.br/apresentacao13/}\\
+\multicolumn{4}{l}{\rule{0pt}{1em}\textsuperscript{2} https://www.conacyt.gob.mx/index.php/becas-y-posgrados/becas-nacionales}\\
+\multicolumn{4}{l}{\rule{0pt}{1em}\textsuperscript{3} http://www.serb.gov.in/pmfdr.php}\\
+\multicolumn{4}{l}{\rule{0pt}{1em}\textsuperscript{4} https://scholarshiproar.com/knb-scholarship/}\\
+\multicolumn{4}{l}{\rule{0pt}{1em}\textsuperscript{5} https://www.nrf.ac.za}\\
+\multicolumn{4}{l}{\rule{0pt}{1em}\textsuperscript{6} Min. value, Prime Minister’s Doctoral Fellowship}\\
+\multicolumn{4}{l}{\rule{0pt}{1em}\textsuperscript{7} Max. value, Prime Minister’s Doctoral Fellowship}\\
+\end{tabular}
+\end{table*}
+\begin{table*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+
+\caption{\label{tab:Table4}Percentage of articles in open access (OA) Mirror journals whose authors are based in different World Bank Regions. The value for non-OA articles in Parent journals is the mean percentage of 1000 bootstrap-generated samples identical in size and structure to the articles published in Mirror journals. Single: authors of single-authored papers; First: first authors of co-authored papers.}
+\centering
+\fontsize{12}{14}\selectfont
+\begin{tabular}[t]{lllccc}
+\toprule
+Countries & Author & Region & non-OA Parent & Mirror & \$\textbackslash{}widehat\{P\}\$\\
+\midrule
+All Countries & Single & South Asia & 2.98 & 3.48 & 0.72\\
+ &  & North America & 4.55 & 26.96 & 1.00\\
+ &  & Sub-Saharan Africa & 4.86 & 0.87 & 0.00\\
+ &  & Latin America \& Caribbean & 8.73 & 2.61 & 0.01\\
+ &  & Middle East \& North Africa & 14.16 & 5.65 & 0.01\\
+ &  & East Asia \& Pacific & 15.68 & 18.26 & 0.86\\
+ &  & Europe \& Central Asia & 49.06 & 42.17 & 0.02\\
+ &  &  &  &  & \\
+ & First & South Asia & 4.73 & 3.27 & 0.12\\
+ &  & North America & 3.30 & 22.43 & 1.00\\
+ &  & Sub-Saharan Africa & 4.63 & 1.32 & 0.00\\
+ &  & Latin America \& Caribbean & 10.45 & 3.70 & 0.00\\
+ &  & Middle East \& North Africa & 14.62 & 2.38 & 0.00\\
+ &  & East Asia \& Pacific & 17.53 & 20.02 & 0.95\\
+ &  & Europe \& Central Asia & 44.76 & 46.88 & 0.79\\
+\bottomrule
+\end{tabular}
+\end{table*}
+\begin{table*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+
+\caption{\label{tab:Table5}Percentage of articles in open access (OA) mirror journal whose authors are based in countries from different World Bank Lending Groups. The value for non-OA articles in Parent journals is the mean percentage of 1000 bootstrap-generated samples identical in size and structure to the articles published in Mirror journals. Single: authors of single-authored papers; First: first authors of co-authored papers.}
+\centering
+\fontsize{12}{14}\selectfont
+\begin{tabular}[t]{lllccc}
+\toprule
+Countries & Author & Lending Group & non-OA Parent & Mirror & $\hat{P}$\\
+\midrule
+All Countries & Single & Lower-middle & 9.14 & 5.22 & 0\\
+ &  & Upper-middle & 31.36 & 9.57 & 0\\
+ &  & High & 59.24 & 85.22 & 0\\
+ &  &  &  &  & \\
+ & First & Low & 2.38 & 0.51 & 0\\
+ &  & Lower-middle & 13.88 & 4.91 & 0\\
+ &  & Upper-middle & 27.75 & 17.06 & 0\\
+ &  & High & 56.92 & 77.53 & 0\\
+\bottomrule
+\end{tabular}
+\end{table*}
