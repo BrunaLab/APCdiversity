@@ -1,0 +1,195 @@
+---
+title: "Metadata - datasets used in Smith et al. QSS"
+author: "Emilio M. Bruna"
+date: "9/7/2021"
+output: html_document
+---
+
+### stipends.csv
+A csv file with graduate sdtudent stipends for various countries. The data include:  
+
+1. country: the country offering a stipend
+2. degree: the degree supported with that stipend (MA/MS: Master's Degree, PhD: Doctoral Degree)
+3. stipend_national; the value of the stipedn in national currency
+4. stipend_USD: the value of the stipend in US Dollars 
+5. source: the website from which the information was gathered
+6. notes: additional information on the stipend, such as wether it covers health insurance and travel, etc.
+
+
+### CountryData.csv
+The World Bank Region and Income Groups to which individual countries have been assigned.
+
+1. Code: the three letter ISO 3166-1 alpha-3 code for the country 
+2. Region: the World Bank Region Group to which that country has been assigned (see [https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups](https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups)).
+3. IncomeGroup: the World Bank Income Group to which that country has been assigned (see [https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups](https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups)).
+
+
+### NON_WavierCountries.csv
+A csv file listing countries that are NOT eligible for the Elsevier Research4Life program (see [https://www.elsevier.com/about/corporate-responsibility/research4life](https://www.elsevier.com/about/corporate-responsibility/research4life)). The file includes the following data:
+
+1. Code: the three letter ISO 3166-1 alpha-3 code for the country 
+2. Region: the World Bank Region Group to which that country has been assigned (see [https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups](https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups)).
+3. IncomeGroup: the World Bank Income Group to which that country has been assigned (see [https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups](https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups)).
+4. Country: the name of the country
+
+
+### MirrorPairs.csv
+csv file with the data on the Elsevier Mirror and Parent journals used in this study. The file includes the following data:
+
+1. Journal; the name of the journal
+2. JrnlType: wether the journal is Open Access (OA) or subscription based (PW)
+3. APC: the APC charged by the journal (in US Dollars)
+4. pair_key: journals with the same pair_key are a Mirror/Parent pairs
+
+### WaiverCountries.csv  
+
+A csv file with the list of countries elegible for waivers under the Elsevier Research4Life program (see [https://www.elsevier.com/about/corporate-responsibility/research4life](https://www.elsevier.com/about/corporate-responsibility/research4life)). The file includes the following data:
+
+1. Country: the name of the country
+2. WaiverGroup: the waiver group of that country (i.e., APC discount offered) 
+3. Code: the three letter ISO 3166-1 alpha-3 code for the country 
+4. Region: the World Bank Region Group to which that country has been assigned (see [https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups](https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups)).
+5. IncomeGroup: the World Bank Income Group to which that country has been assigned (see [https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups](https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups)).
+
+### div_remove_one_country.csv
+Results of simulations removing one country at a time from the data set to determine how this changed estimates of diversity, richness, and evenness.  
+
+1. Richness: the number of countries in the dataset (should all be 134, because one was removed at a time).
+2. InvSimpsons: Geographic Diversity (Reciprocal of Simpson's Index) after removing articles with first or last authors from this country.
+3. Code: the three letter ISO 3166-1 alpha-3 code for the country being removed
+4. Shannon: Geographic Diversity (Shannon's Index) after removing articles with first or last authors from this country.
+5. Even: Evenness after removing articles with first or last authors from this country.
+6. Code.numeric: The numerical code assigned to each country (equal to the order in which the country was removed)
+7. Change_in_Div: the increase or decrease in Simpson's index from the value when all countries are included. 
+8. above_upper_ci: whether or not (True/False) the diversity index without the country exceeded the upper 95% Confidence Interval of Diversity  
+9. below_lower_ci: whether or not (True/False) the diversity index without the country was below the lower 95% Confidence Interval of Diversity  
+10. Effect on Diversity: None (not significantly effect on diversity), Significant Increase (Exceeded the upper 95% CI), Significant Decrease (below the lower 95% CI).
+
+
+### div_remove_second_country.csv
+
+Results of simulations removing one country at a time from a data set from which articles with first/last authors from China have _already_ been excluded to determine if the removal of additional countries changed estimates of diversity, richness, and evenness.
+
+1. Richness: the number of countries in the dataset (should all be 134, because one was removed at a time).
+2. InvSimpsons: Geographic Diversity (Reciprocal of Simpson's Index) after removing articles with first or last authors from this country.
+3. Code: the three letter ISO 3166-1 alpha-3 code for the country being removed
+4. Shannon: Geographic Diversity (Shannon's Index) after removing articles with first or last authors from this country.
+5. Even: Evenness after removing articles with first or last authors from this country.
+6. Code.numeric: The numerical code assigned to each country (equal to the order in which the country was removed)
+7. Change_in_Div: the increase or decrease in Simpson's index from the value when all countries are included. 
+8. above_upper_ci: whether or not (True/False) the diversity index without the country exceeded the upper 95% Confidence Interval of Diversity  
+9. below_lower_ci: whether or not (True/False) the diversity index without the country was below the lower 95% Confidence Interval of Diversity  
+10. Effect on Diversity: None (not significantly effect on diversity), Significant Increase (Exceeded the upper 95% CI), Significant Decrease (below the lower 95% CI).
+
+
+
+
+
+
+
+
+### all_data_analysis.csv
+
+Processed Web of Science and Scopus records used in analyses.
+
+1. refID: an ID number assigned to each article
+2. db: the database from which the record came:Web of Science (wos) or SCOPUS (scopus) 
+3. package: the R package used to process the data: refsplitr or bibliometrix
+4. DOI: the DOI for the article
+5. pair_key: the pair_key used to identify parent/mirror pairs
+6. Journal: the name of the journal in which an article was published
+7. JrnlType: Journal typeL: Mirror (OA) or Parent (PW)
+8. Year: year an article was published
+9. Authors:  the authors of the article
+10. Title: title of the article
+11. AuthorNum: the location of the authors name on the author list (1: first, 2; second, etc)  
+13. First_Author_Inst: the institution at which the 1st author is based.
+14. First_Author: the first author of the article
+15. author_country_biblio1: "AU1_CO" from package bibliometric ("Country of affiliation for the first author")
+16. author_country_biblio2: "AU_CO" from package bibliometrix ("Country of affiliation for co-authors")
+17. author_country_manual: in cases where the packages couldn't extract an authors  country, we did so manually by referring to the article.
+18. biblio1v2: Comparison of the two methods used to extract countries: TRUE: same author country identified, FALSE: different author countries identified
+19. First_Author_Country: The Country of the First Author, after evaluating and correcting any inconsistencies from the different extraction methods or, for those the packages were unable to extract, identifying manually.
+20. Code: the three letter ISO 3166-1 alpha-3 code for the country 
+21. Region: the World Bank Region Group to which that country has been assigned (see [https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups](https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups)).
+22. IncomeGroup: the World Bank Income Group to which that country has been assigned (see [https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups](https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups)).
+23. ArticleType: Open Access (OA) or subscription (PW). Note that some Parent Journals (PW) publish both OA artciles and subscription-only (PW) articles.  
+24. author: whether the article is 'coauthored' or were written by a single author (solo)
+25. wos_cat1: the primary web of science category to which a journal is assigned by Clarivate
+26. wos_cat2: the secondary web of science category to which a journal is assigned by Clarivate
+27. subcat_1: the subcategory within wos_cat2 to which a journal has been assigned.
+
+
+
+ 
+### BootOAinPW_RichDiv.csv
+
+Diversity and Richness of article collections generated by bootstrapping. This is the results for bootstrapping the OA articles in Parent journals to determine if their diversity is different from that of the subscription-only articles in Parent journals. 
+
+1. Richness: the number of different countries in which first authors were based in that bootstrap run
+2. InvSimp: Geographic Diversity (Reciprocal of Simpson's Index) after removing articles with first or last authors from this country.
+3. Shannon: Geographic Diversity (Shannon's Index) after removing articles with first or last authors from this country.
+4. Even: Evenness after removing articles with first or last authors from this country.
+5. author: whether the article is written by more than one author ('coauthored') or written by a single author (solo)
+6. Dataset: wether the bootstrapping is done with all articles ('All Countries') or excludes those with 1st/Last Authors based in China or the USA  ('CHN & USA excluded')
+7. BootType: OAinPWvPW (comparison of OA articles in Parent journals with subscription-only articles in Parent journals). 
+
+
+### BootOAinPW_Countries.csv
+The country, region, and income group of authors of articles in collections generated by bootstrapping. This is the results for bootstrapping the OA articles in Parent journals to determine if their region and income group is different from that of the subscription-only articles in Parent journals. 
+
+1. Code: the three letter ISO 3166-1 alpha-3 code for the country in which the author is based
+2. n: number of papers from the country
+3. replicate: the bootstarp replicate from which the results came
+4. Region: the World Bank Region Group to which that country has been assigned (see [https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups](https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups))
+5. IncomeGroup: the World Bank Income Group to which that country has been assigned (see [https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups](https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups)).
+6. Country: The Country in which the first author is based
+7. author: whether the article is written by more than one author ('coauthored') or written by a single author (solo)
+8. Dataset: wether the bootstrapping is done with all articles ('All Countries') or excludes those with 1st/Last Authors based in China or the USA  ('CHN & USA excluded')
+9. BootType: OAinPWvPW (comparison of OA articles in Parent journals with subscription-only articles in Parent journals). 
+
+### BootMirror_Countries.csv
+
+The country, region, and income group of authors of articles in collections generated by bootstrapping. This is the results for bootstrapping the articles in Mirror journals (all of which are OA) to determine if their region and income group is different from that of the subscription-only articles in Parent journals.
+
+
+1. Code: the three letter ISO 3166-1 alpha-3 code for the country in which the author is based
+2. n: number of papers from the country
+3. replicate: the bootstrap replicate from which the results came
+4. Region: the World Bank Region Group to which that country has been assigned (see [https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups](https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups))
+5. IncomeGroup: the World Bank Income Group to which that country has been assigned (see [https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups](https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups)).
+6. Country: The Country in which the first author is based
+7. author: whether the article is written by more than one author ('coauthored') or written by a single author (solo)
+8. Dataset: wether the bootstrapping is done with all articles ('All Countries') or excludes those with 1st/Last Authors based in China or the USA  ('CHN & USA excluded')
+9. BootType: MirrorvPW (comparison of OA articles in Parent journals with subscription-only articles in Parent journals). 
+
+
+### BootMirror_RichDiv.csv
+Diversity and Richness of article collections generated by bootstrapping. This is the results for bootstrapping the articles in Mirror journals (all OA) to determine if their diversity is different from that of the subscription-only articles in Parent journals. 
+
+1. Richness: the number of different countries in which first authors were based in that bootstrap run 
+2. InvSimp: Geographic Diversity (Reciprocal of Simpson's Index) after removing articles with first or last authors from this country.
+3. Shannon: Geographic Diversity (Shannon's Index) after removing articles with first or last authors from this country.
+4. Even: Evenness after removing articles with first or last authors from this country.
+5. author: whether the article is written by more than one author ('coauthored') or written by a single author (solo)
+6. Dataset: whether the bootstrapping is done with all articles ('All Countries') or excludes those with 1st/Last Authors based in China or the USA  ('CHN & USA excluded')
+7. BootType: MirrorvPW (comparison of OA articles in Parent journals with subscription-only articles in Parent journals). 
+
+
+
+### MirrorvOAinPW_permutations
+
+Results of permutation tests to compare the  geographic diversity and richness of OA articles in Parent Journals with that of articles in Mirror journals (All OA). 
+
+1. countries: whether the sampling was done from all articles ('all') or from the group without articles written by 1st/Last authors based in China or the USA  ('no_chnusa'). 
+2. rep: replicate of the permutation test
+3. Richness_Mirror: number of 1st author countries in the collection of articles from Mirror journals	
+4. Richness_OAinPW: : number of 1st author countries in the collection of articles from the OA articles in Parent journals	
+5. InvSimp_Mirror: Geographic Diversity (Reciprocal of Simpson's Index) of articles in the collection from Mirror journals	
+6. InvSimp_OAinPW: Geographic Diversity (Reciprocal of Simpson's Index) of articles in the collection of OA articles from Parent journals		
+7. Shannon_Mirror: Geographic Diversity (Shannon's Index) of articles in the collection from Mirror journals		
+8. Shannon_OAinPW: Geographic Diversity (Shannon's Index) of articles in the collection of OA articles from Parent journals		
+9. Even_Mirror: Geographic Evenness of articles in the collection from Mirror journals. 10. Even_OAinPW: Geographic Evenness of articles in the collection of OA articles from Parent journals
+11. DivDiff: difference in Inv. Simpson's Diversity between the collection of articles sampled from  Mirror Journals and sampled from OA Articles in Parent journals
+12. RichDiff: difference in Richness between the collection of articles sampled from  Mirror Journals and sampled from OA Articles in Parent journals
+13. EvenDiff: difference in Evenness between the collection of articles sampled from  Mirror Journals and sampled from OA Articles in Parent journals

@@ -1,0 +1,10 @@
+country,degree,stipend_national,stipend_USD,source,notes
+Brazil,MS/MA,1500,294,http://cnpq.br/apresentacao13/,NA
+Brazil,PhD,2200,431,http://cnpq.br/apresentacao13/,NA
+Mexico,MS/MA,11887,588,https://www.conacyt.gob.mx/index.php/becas-y-posgrados/becas-nacionales,stipend = 4.5 UMA;  monthly UMA2020=MX$$ 2641.15
+Mexico,PhD,15849,783,https://www.conacyt.gob.mx/index.php/becas-y-posgrados/becas-nacionales,stipend = 6 UMA; ;  UMA2020=MX$31693.80
+India,PhD,55000,747,http://www.serb.gov.in/pmfdr.php,NA
+India,PhD,72000,978,http://www.serb.gov.in/pmfdr.php,NA
+Indonesia,MS/MA,2750000,195,https://scholarshiproar.com/knb-scholarship/,",onthly living allowance+health insurance monthly"
+South Africa,MS/MA,9750,670,https://www.nrf.ac.za/sites/default/files/NRF%20Postgraduate%20Scholarships%20Application%20and%20Funding%20Framework%202021.pdf,"includes personal care/living allowance, meal/food allowance, and maximum accomodation allowance"
+South Africa,PhD,10000,687,https://www.nrf.ac.za/sites/default/files/NRF%20Postgraduate%20Scholarships%20Application%20and%20Funding%20Framework%202021.pdf,"includes personal care/living allowance, meal/food allowance, and maximum accomodation allowance"

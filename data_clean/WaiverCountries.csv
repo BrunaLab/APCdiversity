@@ -1,0 +1,126 @@
+Country,WaiverGroup,Code,Region,IncomeGroup
+Afghanistan,GroupA,AFG,South Asia,Low income
+Angola,GroupA,AGO,Sub-Saharan Africa,Lower middle income
+Bangladesh,GroupA,BGD,South Asia,Lower middle income
+Belize,GroupA,BLZ,Latin America & Caribbean,Upper middle income
+Benin,GroupA,BEN,Sub-Saharan Africa,Low income
+Bhutan,GroupA,BTN,South Asia,Lower middle income
+Burkina Faso,GroupA,BFA,Sub-Saharan Africa,Low income
+Burundi,GroupA,BDI,Sub-Saharan Africa,Low income
+Cambodia,GroupA,KHM,East Asia & Pacific,Lower middle income
+Cameroon,GroupA,CMR,Sub-Saharan Africa,Lower middle income
+Cabo Verde,GroupA,CPV,Sub-Saharan Africa,Lower middle income
+Central African Republic,GroupA,CAF,Sub-Saharan Africa,Low income
+Chad,GroupA,TCD,Sub-Saharan Africa,Low income
+Comoros,GroupA,COM,Sub-Saharan Africa,Lower middle income
+Congo,GroupA,COG,Sub-Saharan Africa,Lower middle income
+Ivory Coast,GroupA,CIV,Sub-Saharan Africa,Lower middle income
+Democratic People’s Republic of Korea,GroupA,PRK,East Asia & Pacific,Low income
+Democratic Republic of the Congo,GroupA,COD,Sub-Saharan Africa,Low income
+Djibouti,GroupA,DJI,Middle East & North Africa,Lower middle income
+Equatorial Guinea,GroupA,GNQ,Sub-Saharan Africa,Upper middle income
+Eritrea,GroupA,ERI,Sub-Saharan Africa,Low income
+Eswatini,GroupA,SWZ,Sub-Saharan Africa,Lower middle income
+Ethiopia,GroupA,ETH,Sub-Saharan Africa,Low income
+Gambia,GroupA,GMB,Sub-Saharan Africa,Low income
+Ghana,GroupA,GHA,Sub-Saharan Africa,Lower middle income
+Guinea,GroupA,GIN,Sub-Saharan Africa,Low income
+Guinea-Bissau,GroupA,GNB,Sub-Saharan Africa,Low income
+Haiti,GroupA,HTI,Latin America & Caribbean,Low income
+Kenya,GroupA,KEN,Sub-Saharan Africa,Lower middle income
+Kiribati,GroupA,KIR,East Asia & Pacific,Lower middle income
+Kyrgyzstan,GroupA,KGZ,Europe & Central Asia,Lower middle income
+Lao People’s Democratic Republic,GroupA,LAO,East Asia & Pacific,Lower middle income
+Lesotho,GroupA,LSO,Sub-Saharan Africa,Lower middle income
+Liberia,GroupA,LBR,Sub-Saharan Africa,Low income
+Madagascar,GroupA,MDG,Sub-Saharan Africa,Low income
+Malawi,GroupA,MWI,Sub-Saharan Africa,Low income
+Mali,GroupA,MLI,Sub-Saharan Africa,Low income
+Marshall Islands,GroupA,MHL,East Asia & Pacific,Upper middle income
+Mauritania,GroupA,MRT,Sub-Saharan Africa,Lower middle income
+Federated States of Micronesia,GroupA,FSM,East Asia & Pacific,Lower middle income
+Mozambique,GroupA,MOZ,Sub-Saharan Africa,Low income
+Myanmar,GroupA,MMR,East Asia & Pacific,Lower middle income
+Nepal,GroupA,NPL,South Asia,Low income
+Nicaragua,GroupA,NIC,Latin America & Caribbean,Lower middle income
+Niger,GroupA,NER,Sub-Saharan Africa,Low income
+Papua New Guinea,GroupA,PNG,East Asia & Pacific,Lower middle income
+Republic of Moldova,GroupA,MDA,Europe & Central Asia,Lower middle income
+Rwanda,GroupA,RWA,Sub-Saharan Africa,Low income
+Samoa,GroupA,WSM,East Asia & Pacific,Upper middle income
+Sao Tome and Principe,GroupA,STP,Sub-Saharan Africa,Lower middle income
+Senegal,GroupA,SEN,Sub-Saharan Africa,Lower middle income
+Sierra Leone,GroupA,SLE,Sub-Saharan Africa,Low income
+Solomon Islands,GroupA,SLB,East Asia & Pacific,Lower middle income
+Somalia,GroupA,SOM,Sub-Saharan Africa,Low income
+South Sudan,GroupA,SSD,Sub-Saharan Africa,Low income
+Sudan,GroupA,SDN,Sub-Saharan Africa,Lower middle income
+Syrian Arab Republic,GroupA,SYR,Middle East & North Africa,Low income
+Tajikistan,GroupA,TJK,Europe & Central Asia,Low income
+Timor-Leste,GroupA,TLS,East Asia & Pacific,Lower middle income
+Togo,GroupA,TGO,Sub-Saharan Africa,Low income
+Tokelau,GroupA,TKL,NA,NA
+Tonga,GroupA,TON,East Asia & Pacific,Upper middle income
+Tuvalu,GroupA,TUV,East Asia & Pacific,Upper middle income
+Uganda,GroupA,UGA,Sub-Saharan Africa,Low income
+United Republic of Tanzania,GroupA,TZA,Sub-Saharan Africa,Low income
+Vanuatu,GroupA,VUT,East Asia & Pacific,Lower middle income
+Yemen,GroupA,YEM,Middle East & North Africa,Low income
+Zambia,GroupA,ZMB,Sub-Saharan Africa,Lower middle income
+Zimbabwe,GroupA,ZWE,Sub-Saharan Africa,Lower middle income
+Albania,GroupB,ALB,Europe & Central Asia,Upper middle income
+Algeria,GroupB,DZA,Middle East & North Africa,Upper middle income
+Antigua and Barbuda,GroupB,ATG,Latin America & Caribbean,High income
+Armenia,GroupB,ARM,Europe & Central Asia,Upper middle income
+Azerbaijan,GroupB,AZE,Europe & Central Asia,Upper middle income
+Belarus,GroupB,BLR,Europe & Central Asia,Upper middle income
+Bolivia,GroupB,BOL,Latin America & Caribbean,Lower middle income
+Bosnia and Herzegovina,GroupB,BIH,Europe & Central Asia,Upper middle income
+Botswana,GroupB,BWA,Sub-Saharan Africa,Upper middle income
+Colombia,GroupB,COL,Latin America & Caribbean,Upper middle income
+Cook Islands,GroupB,COK,NA,NA
+Cuba,GroupB,CUB,Latin America & Caribbean,Upper middle income
+Dominica,GroupB,DMA,Latin America & Caribbean,Upper middle income
+Ecuador,GroupB,ECU,Latin America & Caribbean,Upper middle income
+Egypt,GroupB,EGY,Middle East & North Africa,Lower middle income
+El Salvador,GroupB,SLV,Latin America & Caribbean,Lower middle income
+Fiji,GroupB,FJI,East Asia & Pacific,Upper middle income
+Gabon,GroupB,GAB,Sub-Saharan Africa,Upper middle income
+Georgia,GroupB,GEO,Europe & Central Asia,Upper middle income
+Grenada,GroupB,GRD,Latin America & Caribbean,Upper middle income
+Guatemala,GroupB,GTM,Latin America & Caribbean,Upper middle income
+Guyana,GroupB,GUY,Latin America & Caribbean,Upper middle income
+Honduras,GroupB,HND,Latin America & Caribbean,Lower middle income
+Iraq,GroupB,IRQ,Middle East & North Africa,Upper middle income
+Jamaica,GroupB,JAM,Latin America & Caribbean,Upper middle income
+Jordan,GroupB,JOR,Middle East & North Africa,Upper middle income
+Kosovo,GroupB,XKX,Europe & Central Asia,Upper middle income
+Libya,GroupB,LBY,Middle East & North Africa,Upper middle income
+Maldives,GroupB,MDV,South Asia,Upper middle income
+Mauritius,GroupB,MUS,Sub-Saharan Africa,Upper middle income
+Mongolia,GroupB,MNG,East Asia & Pacific,Lower middle income
+Montenegro,GroupB,MNE,Europe & Central Asia,Upper middle income
+Morocco,GroupB,MAR,Middle East & North Africa,Lower middle income
+Namibia,GroupB,NAM,Sub-Saharan Africa,Upper middle income
+Nauru,GroupB,NRU,East Asia & Pacific,Upper middle income
+Nigeria,GroupB,NGA,Sub-Saharan Africa,Lower middle income
+Niue,GroupB,NIU,NA,NA
+North Macedonia,GroupB,MKD,Europe & Central Asia,Upper middle income
+Pakistan,GroupB,PAK,South Asia,Lower middle income
+Palau,GroupB,PLW,East Asia & Pacific,High income
+Paraguay,GroupB,PRY,Latin America & Caribbean,Upper middle income
+Peru,GroupB,PER,Latin America & Caribbean,Upper middle income
+Saint Helena,GroupB,SHN,NA,NA
+Saint Kitts and Nevis,GroupB,KNA,Latin America & Caribbean,High income
+Saint Lucia,GroupB,LCA,Latin America & Caribbean,Upper middle income
+Saint Vincent and the Grenadines,GroupB,VCT,Latin America & Caribbean,Upper middle income
+Serbia,GroupB,SRB,Europe & Central Asia,Upper middle income
+Seychelles,GroupB,SYC,Sub-Saharan Africa,High income
+Sri Lanka,GroupB,LKA,South Asia,Upper middle income
+Suriname,GroupB,SUR,Latin America & Caribbean,Upper middle income
+Tunisia,GroupB,TUN,Middle East & North Africa,Lower middle income
+Ukraine,GroupB,UKR,Europe & Central Asia,Lower middle income
+Uzbekistan,GroupB,UZB,Europe & Central Asia,Lower middle income
+Venezuela,GroupB,VEN,Latin America & Caribbean,Upper middle income
+Vietnam,GroupB,VNM,East Asia & Pacific,Lower middle income
+West Bank and Gaza Strip,GroupB,PSE,Middle East & North Africa,Lower middle income
