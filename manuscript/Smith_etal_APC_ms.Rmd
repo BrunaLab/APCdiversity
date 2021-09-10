@@ -591,7 +591,7 @@ This research was not funded.
 
 # Data Availability
 
-The complete citation records were downloaded from the Web of Science Core Collection and SCOPUS; while the complete original records cannot be made available due to copyright restrictions, a processed version of these records with the additional data needed to reproduce the analyses presented here has been archived at Zenodo **(LINK)**. This archive also includes the version of the R code used to process the raw data, carry out the analyses, and create the figures and tables. The latest version of the code is available on Github **(LINK)**, where one can also make suggestions for improvement.
+The complete citation records were downloaded from the Web of Science Core Collection and SCOPUS; while the complete original records cannot be made available due to copyright restrictions, a processed version of these records with the additional data needed to reproduce the analyses presented here has been archived at Zenodo (https://doi.org/10.5281/zenodo.5500293). This archive also includes the version of the R code used to process the raw data, carry out the analyses on the processed data, and create the figures, tables, and manuscript. Updates to the code will are available on Github (https://github.com/BrunaLab/APCdiversity), where users can also make suggestions for improvement.
 
 \newpage
 
@@ -1220,6 +1220,11 @@ kable(IncomeTable,
 ```{r echo = FALSE, results = 'asis', cache = FALSE}
 papaja::render_appendix('Smith_etal_Appendix_QSSv1.Rmd')
 ```
+
+```{r echo = FALSE, results = 'asis', cache = FALSE}
+papaja::render_appendix('Smith_etal_Appendix_QSSv1.Rmd')
+```
+
 
 ```{r echo = FALSE, results = 'asis', cache = FALSE}
 papaja::render_appendix('Smith_etal_Appendix_QSSv1.Rmd')

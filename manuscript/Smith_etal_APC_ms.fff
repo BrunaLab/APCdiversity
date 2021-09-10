@@ -22,11 +22,21 @@
 \ifnextchar[{\eatarg}{}
 
 
+{\centering \includegraphics{Smith_etal_APC_ms_files/figure-latex/Fig3-1}
+
+}
+
+\caption{Geographic Diversity ($D_2$) of authors publishing N =  975  articles in Mirror journals (dashed line) and 1000 collections of N =  975  non-OA articles in Parent journals (sampled from N =  34400  articles by bootstrapping).}\label{fig:Fig3}
+\end{figure*}
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+
 {\centering \includegraphics{Smith_etal_APC_ms_files/figure-latex/Fig4-1}
 
 }
 
-\caption{Geographic Diversity ($D_2$) of authors publishing N =  975  articles in Mirror journals (dashed line) and 1000 collections of N =  975  non-OA articles in Parent journals (sampled from N =  34400  articles by bootstrapping).}\label{fig:Fig4}
+\caption{Percentage of first authors that are based in different global regions. The dashed line is the value for N =  975  articles in open access (OA) Mirror journals; histograms are values for 1000 identically sized collections of non-OA articles from Parent journals (sampled by bootstrapping from N =  34400  articles). All countries, including the USA and China, are included.}\label{fig:Fig4}
 \end{figure*}
 \begin{figure*}[hbt]
 \ifnextchar[{\eatarg}{}
@@ -36,7 +46,7 @@
 
 }
 
-\caption{Percentage of first authors that are based in different global regions. The dashed line is the value for N =  975  articles in open access (OA) Mirror journals; histograms are values for 1000 identically sized collections of non-OA articles from Parent journals (sampled by bootstrapping from N =  34400  articles). All countries, including the USA and China, are included.}\label{fig:Fig5}
+\caption{Percentage of first authors that are based in different World Bank Lending Groups. The dashed line is the value for N =  975  articles in open access (OA) Mirror journals; histograms are values for 1000 identically sized collections of non-OA articles from Parent journals (sampled by bootstrapping from N =  34400  articles). All countries, including the USA and China, are included.}\label{fig:Fig5}
 \end{figure*}
 \begin{figure*}[hbt]
 \ifnextchar[{\eatarg}{}
@@ -46,7 +56,7 @@
 
 }
 
-\caption{Percentage of first authors that are based in different World Bank Lending Groups. The dashed line is the value for N =  975  articles in open access (OA) Mirror journals; histograms are values for 1000 identically sized collections of non-OA articles from Parent journals (sampled by bootstrapping from N =  34400  articles). All countries, including the USA and China, are included.}\label{fig:Fig6}
+\caption{Percentage of first authors that are based in different Elsevier Waiver Groups. The solid line is the value for N =  975  articles in Mirror journals; histograms are values for 1000 identically sized collections of subscription articles from Parent journals (sampled by bootstrapping from N =  34400  articles).}\label{fig:Fig6}
 \end{figure*}
 \begin{figure*}[hbt]
 \ifnextchar[{\eatarg}{}
@@ -56,15 +66,5 @@
 
 }
 
-\caption{Percentage of first authors that are based in different Elsevier Waiver Groups. The solid line is the value for N =  975  articles in Mirror journals; histograms are values for 1000 identically sized collections of subscription articles from Parent journals (sampled by bootstrapping from N =  34400  articles).}\label{fig:Fig7}
-\end{figure*}
-\begin{figure*}[hbt]
-\ifnextchar[{\eatarg}{}
-
-
-{\centering \includegraphics{Smith_etal_APC_ms_files/figure-latex/Fig8-1}
-
-}
-
-\caption{For the 20 countries publishing the most open access (OA) articles, the number of OA articles published in Mirror Journals vs. OA articles published in Parent journals. Abbreviations: DNK=Denmark, AUT=Austria, NOR=Norway, KOR=South Korea, SWE=Sweden, BEL=Belgium, CHE=Switzerland, ESP=Spain, CAN=Canada, ITA=Italy, DEU=Germany, IND=India, JPN=Japan, BRA=Brazil, AUS=Australia, FRA=France, NLD=Netherlands, GBR=Great Britain, CHN=China, USA=United States of America.)}\label{fig:Fig8}
+\caption{For the 20 countries publishing the most open access (OA) articles, the number of OA articles published in Mirror Journals vs. OA articles published in Parent journals. Abbreviations: DNK=Denmark, AUT=Austria, NOR=Norway, KOR=South Korea, SWE=Sweden, BEL=Belgium, CHE=Switzerland, ESP=Spain, CAN=Canada, ITA=Italy, DEU=Germany, IND=India, JPN=Japan, BRA=Brazil, AUS=Australia, FRA=France, NLD=Netherlands, GBR=Great Britain, CHN=China, USA=United States of America.)}\label{fig:Fig7}
 \end{figure*}
