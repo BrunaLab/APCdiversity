@@ -14,31 +14,6 @@ library(bibliometrix)
 library(stringr)
 
 
-
-
-# load list of journals and mirrors ---------------------------------------
-# MirrorPairs <- read_csv(file = "./data_raw/MirrorPairs.csv")
-# MirrorPairs <- read_csv(file = "./data_clean/MirrorPairs.csv")
-
-# load list of waiver countries -------------------------------------------
-################################################################
-# WaiverCountries<-read_csv(file="./data_raw/ElsevierWaivers.csv")
-# # add to the waiver
-# WaiverCountries$Code<-countrycode(WaiverCountries$Country,
-#                                   "country.name",
-#                                   "iso3c", warn = TRUE)
-#
-# left_join(WaiverCountries, CountryData,by="Code")
-#
-# # Note: Kosovo is not listed as an ISO standard country. 'XKX' is the unofficial code
-# # used by the European Commission and others until Kosovo is assigned an ISO code.
-# WaiverCountries$Code[WaiverCountries$Country=="Kosovo"]<-"XKX"
-# WaiverCountries<- WaiverCountries %>% select(-notes)
-# # save the df as .csv file in "data_clean" folder
-# write.csv(WaiverCountries,"./data_clean/WaiverCountries.csv", row.names = FALSE)
-# # remove from the environment
-
-
 # load SCOPUS and WOS data ------------------------------------------------
 WOS <- read_csv("./output/WOS_july2020.csv")
 WOS <- select(WOS, -X1)
@@ -235,15 +210,7 @@ all_data_AuGeo$AU_CO <- NULL
 all_data_AuGeo <- as_tibble(all_data_AuGeo)
 all_data_AuGeo <- all_data_AuGeo %>%
   select(refID, author_order_AU_CO = author_order, author_country_AU_CO = author_country)
-#
-# all_data_AuGeo<-all_data_AuGeo %>%
-#   select(refID,author_order,author_country)
 
-
-# setdiff(all_data_AuGeo$refID,AuthorFirst_scopus$refID)
-
-# write_csv(all_data_AuGeo, "./data_clean/all_data_AuGeo.csv")
-# all_data_AuGeo<-read_csv("./data_clean/all_data_AuGeo.csv")
 colnames(AuthorFirst_scopus)
 colnames(all_data_AuGeo)
 scopus_all_authors <- inner_join(AuthorFirst_scopus, all_data_AuGeo, by = "refID")
@@ -409,12 +376,6 @@ with_country<-all_first_summary %>%
   ungroup() %>% 
   summarize(sum(n))
 no_country[1,2]/with_country[1,1]*100
-# 4.435 in 1st 2021 why diff?
-# 2.23? now 2nd
-# 1.37% missing country
-
-# write_csv(all_data, "./output/all_data.csv")
-# write.csv(all_first_summary,"./output/all_first_summary.csv", row.names = FALSE)
 
 
 
@@ -438,41 +399,6 @@ first_missing_wos <- all_first_missing_code %>%
 first_missing_wos <- all_data %>%
   filter(DI %in% first_missing_wos$DI) %>%
   filter(author_order == 1)
-
-# summary(all_first_missing_code$first_au_comparison)
-
-# # colnames(AllData_AuGeo)
-# # first_missing_scopus<-all_data_AuGeo %>% filter(DI %in% all_first_missing_code$DI) %>% arrange(DI)
-# # first_missing_wos<-wos_data %>% filter(DI %in% all_first_missing_code$DI) %>% arrange(DI,author_order)
-#
-# # The countries of all authors of an article are in one cell.
-# # this section splits them into multiple columns, then converts
-# # the df from wide to long form.
-# tempDF<- as.data.frame(str_split(first_missing_scopus$AU_CO, ";", simplify = TRUE))
-# tempDF <- tempDF %>% mutate_all(na_if,"")  #replace the blanks with NA
-# # Need to do this next step or 'gather' won't work properly
-# tempDF <- data.frame(lapply(tempDF, as.character), stringsAsFactors=FALSE)
-# #bind the new dataframe of countries in wide form to original
-# first_missing_scopus<-cbind(first_missing_scopus,tempDF)
-# rm(tempDF) #remove the tempdf from environment
-# # gather into long form
-# colnames(first_missing_scopus)
-# first_missing_scopus<-first_missing_scopus %>%
-#   gather(author_order,author_country,V1:ncol(first_missing_scopus))
-# # remove the 'V' from cells in author column
-# # This also adds the order of authors for each paper
-# first_missing_scopus$author_order<-gsub("V","",first_missing_scopus$author_order)
-# first_missing_scopus$author_order<-as.numeric(first_missing_scopus$author_order)
-# # head(AllData,10)
-# # remove the NA rows of country column
-# first_missing_scopus<-first_missing_scopus %>%  drop_na("author_country")
-# # organize the df by article, with authors in order from 1...N
-# first_missing_scopus<-first_missing_scopus %>% arrange(DI,TI,author_order)
-# first_missing_scopus$DI<-as.factor(first_missing_scopus$DI)
-# # delete the column with all countries in a single cell
-# first_missing_scopus$AU_CO<-NULL
-# write_csv(first_missing_scopus, "./data_clean/first_missing_scopus.csv")
-# write_csv(first_missing_wos, "./data_clean/first_missing_wos.csv")
 
 # are all the countries for an article the same?
 authors_from_same <- all_data %>%
@@ -761,17 +687,6 @@ all_data_analysis$ArticleType <- all_data_analysis$JrnlType
 # save the csv
 write_csv(all_data_analysis, "./output/data_noOAinPW.csv")
 write_csv(OA_in_PW, "./output/data_OAinPW.csv")
-# all_data_analysis<-read_csv("./data_clean/all_data_analysis.csv")
-# OA_in_PW<-read_csv("./data_clean/OA_in_PW.csv")
-
-# rm(list = ls(all.names = TRUE)) #will clear all objects includes hidden objects.
-
-
-# These are the OA articles that were published in PW journals
-# they are NOT in the AllData file - that file includes ONLY
-# PW articles in PW journals
-# OA_in_PW<-read_csv(file="./output/data_OAinPW.csv")
-# OA_in_PW<-ungroup(OA_in_PW)
 
 
 # load the rest of the data, bind to the OA in PW
@@ -906,21 +821,4 @@ AllData<-write_csv(AllData, "./data_clean/all_data_analysis.csv")
 
 
 rm(CountryData,RsrchAreas,all_first,all_data,all_data_analysis)
-# ################################################################
-# # Change column names of Mirror Pairs and save csv to 'data_clean'
-# ################################################################
-# MirrorPairs <- MirrorPairs %>%
-#   select(pair_key, Journal = SO, JrnlType = journal_cat, APC = apc, waiver) %>%
-#   filter(pair_key > 0) %>%
-#   arrange(pair_key, JrnlType)
-# 
-# # save the df as .csv file in "data_clean" folder
-# write_csv(MirrorPairs, "./data_clean/MirrorPairs.csv")
-# # remove from the environment
-
-
-##############################################################
-# END 30 NOV
-##############################################################
-
 

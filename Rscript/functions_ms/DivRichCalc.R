@@ -1,18 +1,5 @@
 DivRichCalc <- function(DataSet, AuPosition, JrnlType, ArticleType) {
 
-  # sole_NOCHNUSA<-read_csv("./data_clean/one_author_pubsNOCHNUSA.csv",col_types = cols())
-  # coauthor_NOCHNUSA<-read_csv("./data_clean/coauthor_pubsNOCHNUSA.csv",col_types = cols())
-  # sole_ALL<-read_csv("./data_clean/sole_author_pubs_ALL_first_author.csv",col_types = cols())
-  # coauthor_ALL<-read_csv("./data_clean/coauthor_pubs_ALL_first_author.csv",col_types = cols())
-  # DataSet<-OA_paper_pool
-  # AuPosition<-"author_first"
-  # ArticleType<-"PW"
-  # DataSet<-OAinPW_sample
-  # AuPosition<-"author_first"
-  # ArticleType<-"OA"
-  # ArticleType<-"OAinPW"
-  # JrnlType<-"both"
-
   vars <- list(DataSet, AuPosition, ArticleType)
   ArticleType <- as.character(vars[3])
   AuPosition <- as.character(vars[2])

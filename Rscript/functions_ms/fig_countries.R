@@ -101,11 +101,7 @@ fig_countries <- function(DataSet, AuPosition, JrnlType, ArticleType, cutoff) {
     sep = " ", collapse = NULL
   )
   
-  # lst.common.authors$Code <- 
-  # paste(lst.common.authors$n_countries,lst.common.authors$IncomeGroup,
-  # "income countries", sep = " ", collapse = NULL)
-  # lst.common.authors$Code<-gsub("income countries","",lst.common.authors$Code)
-  
+
   lst.common.authors$IncomeGroup <- ordered(lst.common.authors$IncomeGroup,
     levels = c(
       "Low",

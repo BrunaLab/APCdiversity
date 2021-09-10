@@ -1,8 +1,5 @@
 samplePW<-function(PW_papers,n) {
   
-  # foo<-as.data.frame(Prep_for_samplePW[3])
-  # foo$n==n
-  
   # n
   n<-unlist(n)
   n<-as.data.frame(n)
@@ -36,10 +33,3 @@ samplePW<-function(PW_papers,n) {
   return(PWsampling)
 
 }
-# 
-# foo<-PW_papers %>% group_by(pair_key) %>% summarise(n=n_distinct(refID))
-# foo2<-full_join(foo,n)
-# 
-# foo$n
-# foo$n>n
-# view(foo)

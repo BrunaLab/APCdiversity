@@ -4,16 +4,7 @@ DivRichCalcSummaryTable_sampled<-function(Dataset,
                                           SubsampledPW.results_First_NOUSACHN,
                                           ArticleType){
   
-  # browser()
-  # SubsampledPW.results_First<-BootPW_CoAll[1],
-  # SubsampledPW.results_First_NOUSACHN<- BootPW_CoNoUSACHN[1]
-  # ArticleType<-"OAinPW"
-  # AuPosition<-"author_first"
-  # ArticleType<-"OA"
-  # DataSet2<-first_NOCHNUSA
-  # DataSet<-first_ALL
-  # AuPosition<-"author_first"
-  # ArticleType<-"OAinPW"
+  
   vars<-list(Dataset,
              Dataset2,
              SubsampledPW.results_First,
@@ -78,23 +69,6 @@ DivRichCalcSummaryTable_sampled<-function(Dataset,
                   OA_invSimp_first=V2)
   DivMetricsPubsPooled_OA_noCHNorUSA<-as.data.frame(DivMetricsPubsPooled_OA_noCHNorUSA)
   DivMetricsPubsPooled_OA_noCHNorUSA
-  #######################################################################
-  
-  #######################################################################
-# WHY DIDN';T THE CALC OF CI WORK USING FORMULA?
-    # #Function to calculate confidence intervals
-  # z_star_95 <- qnorm(0.975)
-  # 
-  # lower_ci <- function(mean, sd, n, z_star_95){
-  #   lower_ci <- mean - z_star_95 * (sd / sqrt(n))
-  # }
-  # upper_ci <- function(mean, sd, n, z_star_95){
-  #   upper_ci <- mean + z_star_95 * (sd / sqrt(n))
-  # }
-  # 
-  # # mutate(lower_ci = lower_ci(PW_avg_richness, SD_avg_richness, count,z_star_95),
-  # #        upper_ci = upper_ci(SD_avg_richness, SD_avg_richness, count,z_star_95))
-  # https://rpubs.com/maulikpatel/212123
   #######################################################################
   
   PW_sampled<-SubPW_First

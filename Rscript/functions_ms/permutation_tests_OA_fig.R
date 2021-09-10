@@ -285,20 +285,7 @@ p1<-
     
     coord_cartesian(clip="off")
   
-  #   coord_cartesian(clip="off")+
-  # geom_segment(data = subset(filter(figure_values, Difference == "Diversity")),
-  #              aes(x = ObsDiff , y = 0, xend = ObsDiff, yend = 1100), 
-  #              colour = "red",linetype="solid")+
-  #   geom_text(data = subset(filter(figure_values, Difference == "Diversity")),
-  #             aes(x=ObsDiff, y=1150, label=(paste("Observed",as.character(ObsDiff),sep=" == "))), 
-  #             parse=TRUE,size=2)+
-  #   geom_segment(data = subset(filter(figure_values, Difference == "Richness")),
-  #                aes(x = ObsDiff , y = 0, xend = ObsDiff, yend = 1100), 
-  #                colour = "red",linetype="solid")+
-  #   geom_text(data = subset(filter(figure_values, Difference == "Richness")),
-  #             aes(x=ObsDiff, y=1150, label=(paste("Observed",as.character(ObsDiff),sep=" == "))), 
-  #             parse=TRUE,size=2)
-  
+
   p1<-p1+
     theme_classic()+ 
     theme(

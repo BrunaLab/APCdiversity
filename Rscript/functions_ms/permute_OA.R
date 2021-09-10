@@ -2,11 +2,9 @@ permute_OA<-function(OA_paper_pool,n,sampling_type) {
   # sampling_type<-"perm"
   
   OA_paper_pool<-as.data.frame(OA_paper_pool)
-  # n<-unlist(n)
-  # n<-as.data.frame(n)
-  # n<-n$n
-  # 
-  #TODO: INSERT OSMEWTHING HERE TO CHECK IF THE pair_keys are in both and iof enoough n if not tell you
+ 
+  
+  #TODO: INSERT OSMEWTHING HERE TO CHECK IF THE pair_keys are in both and if enough n if not tell you
   
   if ((sampling_type=="perm")==TRUE) {
     OA_sample<-OA_paper_pool %>% 

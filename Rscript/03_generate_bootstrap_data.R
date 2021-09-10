@@ -189,18 +189,4 @@ summary(as.factor(BootMirror_Countries$Dataset))
 
 write_csv(BootMirror_RichDiv, "./data_clean/BootMirror_RichDiv.csv")
 write_csv(BootMirror_Countries,'./data_clean/BootMirror_Countries.csv')
-# Boot_RichDiv<-read_csv("./output/Boot_RichDiv.csv")
-# Boot_Countries<-read_csv("./output/Boot_Countries.csv")
 
-
-
-
-## Data from permutation test results 
-# source("./Rscript/functions_ms/permutation_tests_OA.R")
-# permutation_tests_OA(AllData)
-
-# summary(boot_results_countries)
-# write.csv(Boot_Countries, "./data_clean/Boot_Countries.csv", row.names = FALSE)
-# # Boot_Countries<-read_csv("./output/Boot_Countries.csv")
-# write.csv(NoReplacePW_RichDiv,'./data_clean/Boot_RichDiv.csv',row.names = FALSE)
-# # Boot_RichDiv<-read_csv("./output/Boot_RichDiv.csv")

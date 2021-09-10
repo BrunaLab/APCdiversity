@@ -10,9 +10,7 @@ fig_a5 <- function(DataSet, AuPosition) {
   DataSet$IncomeGroup <- ordered(DataSet$IncomeGroup,
                                  levels = c("High", "Upper middle", 
                                             "Lower middle", "Low"))
-  # levels(DataSet$IncomeGroup)
-  # DataSet<-AllData
-  # AuPosition<-"author_first"
+
   if ((AuPosition == "author_first") == TRUE) {
     first_author_income_cats <- as.data.frame(DataSet) %>%
       filter(AuthorNum == 1) %>%

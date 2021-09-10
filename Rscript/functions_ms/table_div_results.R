@@ -6,84 +6,6 @@ table_div_results <- function(sole_ALL, sole_NOCHNUSA, first_ALL, first_NOCHNUSA
 
   library(tidyverse)
 
-  # OA - Both Mirror and Parent pooled---------------------------------------
-  #
-  #   source("./Rscript/functions/DivRichCalc.R")
-  #   OAdiv_first_ALL_OApool<-DivRichCalc(first_ALL,"author_first","both","OA")
-  #   OAdiv_first_ALL_OApool<-as.numeric(OAdiv_first_ALL_OApool[2])
-  #   OArich_first_ALL_OApool<-DivRichCalc(first_ALL,"author_first","both","OA")
-  #   OArich_first_ALL_OApool<-as.numeric(OArich_first_ALL_OApool[1])
-  #   OAeven_first_ALL_OApool<-DivRichCalc(first_ALL,"author_first","both","OA")
-  #   OAeven_first_ALL_OApool<-as.numeric(OAeven_first_ALL_OApool[5])
-  #
-  #   OAdiv_first_NOCHNUSA_OApool<-DivRichCalc(first_NOCHNUSA,"author_first","both","OA")
-  #   OAdiv_first_NOCHNUSA_OApool<-as.numeric(OAdiv_first_NOCHNUSA_OApool[2])
-  #   OArich_first_NOCHNUSA_OApool<-DivRichCalc(first_NOCHNUSA,"author_first","both","OA")
-  #   OArich_first_NOCHNUSA_OApool<-as.numeric(OArich_first_NOCHNUSA_OApool[1])
-  #   OAeven_first_NOCHNUSA_OApool<-DivRichCalc(first_NOCHNUSA,"author_first","both","OA")
-  #   OAeven_first_NOCHNUSA_OApool<-as.numeric(OAeven_first_NOCHNUSA_OApool[5])
-  #
-  #
-  #   OAdiv_sole_ALL_OApool<-DivRichCalc(sole_ALL,"author_first","both","OA")
-  #   OAdiv_sole_ALL_OApool<-as.numeric(OAdiv_sole_ALL_OApool[2])
-  #   OArich_sole_ALL_OApool<-DivRichCalc(sole_ALL,"author_first","both","OA")
-  #   OArich_sole_ALL_OApool<-as.numeric(OArich_sole_ALL_OApool[1])
-  #   OAeven_sole_ALL_OApool<-DivRichCalc(sole_ALL,"author_first","both","OA")
-  #   OAeven_sole_ALL_OApool<-as.numeric(OAeven_sole_ALL_OApool[5])
-  #
-  #
-  #   OAdiv_sole_NOCHNUSA_OApool<-DivRichCalc(sole_NOCHNUSA,"author_first","both","OA")
-  #   OAdiv_sole_NOCHNUSA_OApool<-as.numeric(OAdiv_sole_NOCHNUSA_OApool[2])
-  #   OArich_sole_NOCHNUSA_OApool<-DivRichCalc(sole_NOCHNUSA,"author_first","both","OA")
-  #   OArich_sole_NOCHNUSA_OApool<-as.numeric(OArich_sole_NOCHNUSA_OApool[1])
-  #   OAeven_sole_NOCHNUSA_OApool<-DivRichCalc(sole_NOCHNUSA,"author_first","both","OA")
-  #   OAeven_sole_NOCHNUSA_OApool<-as.numeric(OAeven_sole_NOCHNUSA_OApool[5])
-  #
-  #
-  #
-  #   author<-c(rep("First",2),rep("Single",2))
-  #   Dataset<-rep(c("All Countries","Without China & USA"),2)
-  #   # OA_articleType<-c(rep("allOA",4),rep("mirror",4),rep("OAinPW",4))
-  #   OA_articleType<-c(rep("allOA",4))
-  #
-  #   OA_Diversity<-data.frame("OA"=c(OAdiv_first_ALL_OApool,
-  #                   OAdiv_first_NOCHNUSA_OApool,
-  #                   OAdiv_sole_ALL_OApool,
-  #                   OAdiv_sole_NOCHNUSA_OApool),
-  #                   "Author"=author,
-  #                   "Dataset"=Dataset)
-  #
-  #   OA_Richness<-data.frame("OA"=c(OArich_first_ALL_OApool,
-  #                  OArich_first_NOCHNUSA_OApool,
-  #                  OArich_sole_ALL_OApool,
-  #                  OArich_sole_NOCHNUSA_OApool),
-  #                  "Author"=author,
-  #                  "Dataset"=Dataset)
-  #
-  #
-  #
-  #     OA_Evenness<-data.frame("OA"=c(OAeven_first_ALL_OApool,
-  #                                    OAeven_first_NOCHNUSA_OApool,
-  #                                    OAeven_sole_ALL_OApool,
-  #                                    OAeven_sole_NOCHNUSA_OApool),
-  #                             "Author"=author,
-  #                             "Dataset"=Dataset)
-  #
-  #     OA_Richness$OA <- round(OA_Richness$OA,0)
-  #     OA_Evenness$OA <- round(OA_Evenness$OA,2)
-  #     OA_Diversity$OA <- round(OA_Diversity$OA,1)
-  #
-  #   Observed<-bind_rows(OA_Richness,OA_Diversity,OA_Evenness)
-  #   Observed$Metric=c(rep("Richness",4),rep("Diversity",4),rep("Evenness",4))
-  #
-  #   Observed<-Observed %>%
-  #     select(Metric,Author,Dataset,OA) %>%
-  #     arrange(desc(Metric),Dataset,desc(Author))
-  #   Observed<-pivot_wider(Observed,names_from=Dataset,values_from = c(OA))
-  #
-  #
-  #   Observed_both_OA<-Observed
-  #   Observed_both_OA$OA_jrnl<-"both"
   # OA - Mirror -------------------------------------------------------------
 
   OAdiv_first_ALL_OApool <- DivRichCalc(first_ALL, "author_first", "OA", "OA")
@@ -278,44 +200,6 @@ table_div_results <- function(sole_ALL, sole_NOCHNUSA, first_ALL, first_NOCHNUSA
 
   Observed_parent_OA <- Observed
   Observed_parent_OA$OA_jrnl <- "parent"
-
-
-
-  # Bootstrap Values both----------------------------------------------------
-
-  # Div_means<-Boot_RichDiv %>%
-  #   select(InvSimp,author,Dataset) %>%
-  #   group_by(author,Dataset) %>%
-  #   summarise(mean=mean(InvSimp),
-  #             SD=sd(InvSimp))
-  # Div_means$metric<-"Diversity"
-  #
-  #
-  # Rich_means<-Boot_RichDiv %>%
-  #   select(Richness,author,Dataset) %>%
-  #   group_by(author,Dataset) %>%
-  #   summarise(mean=mean(Richness),
-  #             SD=sd(Richness))
-  # Rich_means$metric<-"Richness"
-  #
-  # Even_means<-Boot_RichDiv %>%
-  #   select(Even,author,Dataset) %>%
-  #   group_by(author,Dataset) %>%
-  #   summarise(mean=mean(Even),
-  #             SD=sd(Even))
-  # Even_means$metric<-"Evenness"
-  #
-  #
-  #
-  # means<-bind_rows(Rich_means,Div_means,Even_means)
-  # means$author<-gsub("author_first","First",means$author)
-  # means$author<-gsub("solo","Single",means$author)
-  # means$Dataset<-gsub("CHN & USA excluded","Without China & USA",means$Dataset)
-  # means<-means %>%
-  #   select(metric,author,Dataset,mean,SD) %>%
-  #   dplyr::rename("Author"="author","Metric"="metric")
-  # means<-pivot_wider(means,names_from=Dataset,values_from = c(mean,SD))
-
 
   # bootstrap values mirror -------------------------------------------------
 

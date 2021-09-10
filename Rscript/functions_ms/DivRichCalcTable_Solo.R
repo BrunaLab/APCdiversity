@@ -1,24 +1,11 @@
-# DivRichCalcTable_Solo<-function(one_author_pubs_ALL,
-#                                 one_author_pubsNOCHNUSA,
-#                                 SubsampledPW.results_Solo,
-#                                 SubsampledPW.results_Solo_NoUSACHN){
-# 
-  DivRichCalcTable_Solo<-function(sole_ALL,
+DivRichCalcTable_Solo<-function(sole_ALL,
                                   sole_NOCHNUSA,
                                   SubsampledPW.results_Solo,
                                   SubsampledPW.results_Solo_NoUSACHN,
                                   ArticleType){
     
 
-  # browser()
-    # 
-    
-  #   SubsampledPW.results_Solo<-BootPW_SoloAll[1]
-  #   SubsampledPW.results_Solo_NoUSACHN<-BootPW_SoloNoUSACHN[1]
-  #   # ArticleType<-"OA"
-    #   # ArticleType<-"OAinPW"
-  # # DataSet1<-sole_ALL
-  # DataSet2<-sole_NOCHNUSA
+ 
   vars<-list(sole_ALL,
              sole_NOCHNUSA,
              SubsampledPW.results_Solo,
@@ -186,13 +173,7 @@
               count = n(),
               CIlow=quantile(InvSimp, alpha/2),
               CIhigh=quantile(InvSimp, 1-alpha/2))
-  
-  # boot_out<-as.matrix(boot_out)
-  # d<-quantile(boot_out, c(0.025, 0.975))
-  # xbar<-mean(boot_out)
-  # ci = xbar - c(d[2], d[1])
-  # cat('Confidence interval: ',ci, '\n')
-  # 
+
   PW_Diversity_noUSACHN$SD_avg_richness<-round(PW_Diversity_noUSACHN$SD_avg_richness,1)
   PW_Diversity_noUSACHN$PW_avg_richness<-round(PW_Diversity_noUSACHN$PW_avg_richness,1)
   PW_Diversity_noUSACHN$CIlow<-round(PW_Diversity_noUSACHN$CIlow,1)

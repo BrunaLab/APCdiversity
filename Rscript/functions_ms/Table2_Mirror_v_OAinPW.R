@@ -244,12 +244,7 @@ Table2_Mirror_v_OAinPW<-function(AllData,
               CIlow=quantile(InvSimp, alpha/2),
               CIhigh=quantile(InvSimp, 1-alpha/2))
   
-  # boot_out<-as.matrix(boot_out)
-  # d<-quantile(boot_out, c(0.025, 0.975))
-  # xbar<-mean(boot_out)
-  # ci = xbar - c(d[2], d[1])
-  # cat('Confidence interval: ',ci, '\n')
-  # 
+
   OAinPW_Diversity_noUSACHN$SD_avg_richness<-round(OAinPW_Diversity_noUSACHN$SD_avg_richness,1)
   OAinPW_Diversity_noUSACHN$OAinPW_avg_richness<-round(OAinPW_Diversity_noUSACHN$OAinPW_avg_richness,1)
   OAinPW_Diversity_noUSACHN$CIlow<-round(OAinPW_Diversity_noUSACHN$CIlow,1)

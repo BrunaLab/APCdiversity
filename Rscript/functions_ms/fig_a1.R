@@ -113,14 +113,10 @@ fig_a1 <- function(AllData) {
     # geom_text(size = 3, position = position_stack(vjust = 0.5))+
     xlab("Country") +
     ylab("Percentage of Articles") +
-    # scale_fill_brewer(palette = "Greys")+
-    # "#F7FBFF" "#DEEBF7" "#C6DBEF" "#9ECAE1" "#6BAED6" "#4292C6" "#2171B5" "#084594"
-    # scale_fill_manual(values=c("#2171B5","#6BAED6","#BDD7E7","#EFF3FF"),
-    # scale_fill_manual(values=c("#F7FBFF","#C6DBEF","#6BAED6","#084594"),
+   
     scale_fill_manual(
       values = c("#F7FBFF", "#C6DBEF", "#6BAED6", "#084594"),
-      # scale_fill_manual(values=c("#222C61","#7E82AC","#AFB8D9","#C7C5D5"),
-      # scale_fill_manual(values=c("#19245C","#626FA3","#98A2D9","#26378F"),
+
       name = "National Income Category",
       breaks = c("High", "Upper-middle", "Lower-middle", "Low"), drop = FALSE
     ) +
@@ -128,8 +124,7 @@ fig_a1 <- function(AllData) {
     coord_flip()
   AppFig1 <- AppFig1 +
     theme_classic() +
-    # labs(title = “Main title”, subtitle = “My subtitle”, caption = title_text)+
-    # labs(title = title_text,size=10)+
+
     theme(
       axis.text.x = element_text(size = 8),
       axis.text.y = element_text(size = 8),

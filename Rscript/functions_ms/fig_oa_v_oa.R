@@ -74,19 +74,6 @@ fig_oa_v_oa <- function(AllData, n_countries) {
 
   
   
-  # for stacked percent bar chart
-  # plot_data2 <- plot_data %>% 
-  #   select(Code, perc_pw, perc_oa, IncomeGroup) %>% 
-  #   pivot_longer(perc_pw:perc_oa, names_to = "Income", values_to = "perc") %>% 
-  #   pivot_wider(names_from = Code, values_from = perc)
-  # # ggplot(plot_data2, aes(fill=IncomeGroup, y=IncomeGroup, x=Code)) + 
-  # #   geom_bar(position="fill", stat="identity")
-  # ggplot(plot_data2, aes(x = reorder(Code,-perc), y = perc, fill = Income)) +
-  #   geom_col(position = "fill")
-  
-  
-  
-  
   color.labels <- c("Low" = "#084594", "Lower-middle" = "#4292C6",
                     "Upper-middle" = "#9ECAE1", "High" = "#F7FBFF")
 
@@ -109,30 +96,15 @@ fig_oa_v_oa <- function(AllData, n_countries) {
       position = position_dodge(width = 0.2)
     ) +
     geom_abline(intercept = 0, slope = 1,lty="dashed")+
-    # geom_hline(
-    #   yintercept = 50,
-    #   color = "darkgray",
-    #   size = 1.5,
-    #   linetype = "dashed"
-    # ) +
-    # geom_vline(
-    #   xintercept = 50,
-    #   color = "darkgray",
-    #   size = 1.5,
-    #   linetype = "dashed"
-    # ) +
+    
+    
     scale_fill_manual(
       values = c("#F7FBFF", "#9ECAE1", "#4292C6", "#084594"),
       name = "National Income Category",
       breaks = c("High", "Upper-middle", "Lower-middle", "Low")
     ) +
-    # this would be for percentage
-    # scale_x_continuous(limits = c(0, 50), 
-    #                    breaks = seq(0, 50, by = 10),
-    #                    expand = c(0, 0.1)) +
-    # scale_y_continuous(limits = c(50, 100),
-    #                    breaks = seq(50, 100, by = 10),
-    #                    expand = c(0, 0.1))
+   
+    
     scale_x_continuous(limits = c(0, 350), 
                      breaks = seq(0, 350, by = 25),
                      expand = c(0, 0.1)) +

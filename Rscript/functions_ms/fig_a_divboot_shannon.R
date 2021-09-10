@@ -81,72 +81,33 @@ fig_a_divboot_shannon <- function(BootMirror_RichDiv,
     geom_hline((aes(yintercept = -Inf)), color = "black") +
     geom_vline((aes(xintercept = -Inf)), color = "black") +
     coord_cartesian(clip = "off") +
-    # ylim(0,170)+
-    # median OF BOOTSTRAP
-    # geom_segment(data = subset(filter(figure_values, author == "author_first" & Dataset == "All Countries")),
-    #              aes(x = mean_Div, y = 0, xend = mean_Div, yend = yALL_Div), linetype="solid")+
-    # geom_text(data = subset(filter(figure_values, author == "author_first" & Dataset == "All Countries")),
-    #           aes(x=mean_Div-0.15, y=yALL_Div+15, label=(paste("PW['mean']",as.character(mean_Div),sep=" == "))),
-    #           parse=TRUE,size=2)+
-    #
-    # OA Value
+    
     geom_segment(
       data = subset(filter(figure_values, author == "author_first" & Dataset == "All Countries")),
       aes(x = OA_Div, y = 0, xend = OA_Div, yend = yALL_Div),
       colour = "red", linetype = "solid"
     ) +
-    # geom_text(data = subset(filter(figure_values,author == "author_first" & Dataset == "All Countries")),
-    #           aes(x=OA_Div, y=yALL_Div+15, label=(paste("OA",as.character(OA_Div),sep=" == "))),
-    #           parse=TRUE,color="red", size=2)+
-    # MEAN OF BOOTSTRAP
-    # geom_segment(data = subset(filter(figure_values,author == "solo" & Dataset == "All Countries")),
-    #              aes(x = mean_Div, y = 0, xend = mean_Div, yend = yALL_Div), linetype="solid")+
-    # geom_text(data = subset(filter(figure_values,author == "solo" & Dataset == "All Countries")),
-    #           aes(x=mean_Div+0.15, y=yALL_Div+15, label=(paste("PW['mean']",as.character(mean_Div),sep=" == "))),
-    #           parse=TRUE,size=2)+
-    # OA Value
+   
 
     geom_segment(
       data = subset(filter(figure_values, author == "solo" & Dataset == "All Countries")),
       aes(x = OA_Div, y = 0, xend = OA_Div, yend = ySolo_Div),
       colour = "red", linetype = "solid"
     ) +
-    # geom_text(data = subset(filter(figure_values,author == "solo" & Dataset == "All Countries")),
-    #           aes(x=OA_Div, y=ySolo_Div+15, label=(paste("OA",as.character(OA_Div),sep=" == "))),
-    #           parse=TRUE,color="red", size=2)+
-
-    # MEAN OF BOOTSTRAP
-    # geom_segment(data = subset(filter(figure_values,author == "author_first" & Dataset == "Without China & USA")),
-    #              aes(x = mean_Div, y = 0, xend = mean_Div, yend = yWO_Div), linetype="solid")+
-    # geom_text(data = subset(filter(figure_values,author == "author_first" & Dataset == "Without China & USA")),
-    #           aes(x=mean_Div+0.15, y=yWO_Div+15, label=(paste("PW['mean']",as.character(mean_Div),sep=" == "))),
-    #           parse=TRUE,size=2)+
-
-    # OA Value
+    
+    
     geom_segment(
       data = subset(filter(figure_values, author == "author_first" & Dataset == "CHN & USA excluded")),
       aes(x = OA_Div, y = 0, xend = OA_Div, yend = yWO_Div),
       colour = "red", linetype = "solid"
     ) +
-    # geom_text(data = subset(filter(figure_values,author == "author_first" & Dataset == "CHN & USA excluded")),
-    #           aes(x=OA_Div, y=yWO_Div+15, label=(paste("OA",as.character(OA_Div),sep=" == "))),
-    #           parse=TRUE,color="red", size=2)+
-    # MEAN OF BOOTSTRAP
-    # geom_segment(data = subset(filter(figure_values,author == "solo" & Dataset == "Without China & USA")),
-    #              aes(x = mean_Div, y = 0, xend = mean_Div, yend = yWO_Div), linetype="solid")+
-    # geom_text(data = subset(filter(figure_values,author == "solo" & Dataset == "Without China & USA")),
-    #           aes(x=mean_Div+0.15, y=yWO_Div+15, label=(paste("PW['mean']",as.character(mean_Div),sep=" == "))),
-    #           parse=TRUE,size=2)+
-
-    # OA Value
+   
     geom_segment(
       data = subset(filter(figure_values, author == "solo" & Dataset == "CHN & USA excluded")),
       aes(x = OA_Div, y = 0, xend = OA_Div, yend = ySolo_Div),
       colour = "red", linetype = "solid"
     ) +
-    # geom_text(data = subset(filter(figure_values,author == "solo" & Dataset == "CHN & USA excluded")),
-    #           aes(x=OA_Div, y=ySolo_Div+15, label=(paste("OA",as.character(OA_Div),sep=" == "))),
-    #           parse=TRUE,color="red", size=2)+
+
     guides(fill = guide_legend("Journal\nCategory")) +
     xlab("Geographic Diversity (Shannon Index)") +
     ylab("Frequency")

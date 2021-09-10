@@ -100,29 +100,6 @@ SubsampledPW.results_First
 # EACH RUN
 ########################################
 
-# 
-# # Use the AllData df to get the basic info on each country (code, region, etc)
-# CountryInfo<-AllData %>% 
-#   select(First_Author_Country,Region,IncomeGroup,Code) %>% 
-#   group_by(Code) %>% 
-#   slice(1)
-# # head(CountryInfo,10)
-# 
-# 
-# Countries<-bind_rows(Countries)
-# Countries<-bind_cols(Countries,replicate)
-# Subsampled_Countries<-as.data.frame(Countries)
-# # str(Subsampled_Countries)
-# Subsampled_Countries<-Subsampled_Countries %>% 
-#   inner_join(CountryInfo,Subsampled_Countries,by="Code") 
-# # head(Subsampled_Countries,10)
-# Subsampled_Countries$IncomeGroup<-as.factor(Subsampled_Countries$IncomeGroup) 
-# Subsampled_Countries$Region<-as.factor(Subsampled_Countries$Region) 
-# Subsampled_Countries$Code<-as.factor(Subsampled_Countries$Code) 
-# Subsampled_Countries$Country<-as.factor(Subsampled_Countries$First_Author_Country) 
-# Subsampled_Countries$author<-AuPosition
-
-
 CountryInfo<-read_csv("./data_clean/CountryData.csv")
 Countries<-bind_rows(Countries)
 Countries<-bind_cols(Countries,replicate)
@@ -137,9 +114,6 @@ Subsampled_Countries$Code<-as.factor(Subsampled_Countries$Code)
 library(countrycode)
 Subsampled_Countries$Country<-countrycode(Subsampled_Countries$Code,origin = 'iso3c',destination ="country.name")
 Subsampled_Countries$author<-AuPosition
-
-
-
 
 SubsampledPW.results_First$Dataset<-deparse(substitute(Dataset)) #adds the name of the dataset (All Data or No China USA as chr)
 SubsampledPW.results_First$Dataset<-gsub("AllData_noUSAorCHN","Without CHN & USA",SubsampledPW.results_First$Dataset)

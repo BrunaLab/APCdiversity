@@ -116,16 +116,6 @@ fig_div_boot <- function(Boot_RichDiv, sole_ALL,
   ySolo_Div <- 460
   author.labels <- c(author_first = "First Authors", solo = "Single Authors")
 
-  # as.factor(bootstrap_results$Dataset)
-  # as.factor(bootstrap_results$author)
-  #
-
-
-  # Boot_RichDiv$Dataset<-gsub("China & USA excluded", "Without China & USA",Boot_RichDiv$Dataset)
-  # figure_values$Dataset<-gsub("China & USA excluded", "Without China & USA",figure_values$Dataset)
-  # bootstrap_results$OA_group<-gsub("OA", "PW",bootstrap_results$OA_group)
-
-
   figure_values$author <- as.factor(figure_values$author)
 
   #
@@ -170,21 +160,8 @@ fig_div_boot <- function(Boot_RichDiv, sole_ALL,
     xlab("Geographic Diversity, D (Reciprocal of Simpson's Index)") +
     labs(x = "Geographic Diversity", y = "Frequency") +
     coord_cartesian(clip = "off") +
-    # ylim(0,170)+
-    # median OF BOOTSTRAP
-    # geom_segment(data = subset(filter(figure_values, author == "author_first" & Dataset == "All Countries" & ArticleCat=="PW")),
-    #              aes(x = mean_Div, y = 0, xend = mean_Div, yend = yALL_Div), linetype="solid")+
-    # geom_text(data = subset(filter(figure_values, author == "author_first" & Dataset == "All Countries" & ArticleCat=="PW")),
-    #           aes(x=mean_Div-1.8, y=yALL_Div+15, label=(paste("PW['mean']",as.character(mean_Div),sep=" == "))),
-    #           parse=TRUE,size=2)+
-    #
-    # geom_segment(data = subset(filter(figure_values, author == "author_first" & Dataset == "All Countries" & ArticleCat=="OAinPW")),
-    #              aes(x = mean_Div, y = 0, xend = mean_Div, yend = yALL_Div-35), linetype="solid")+
-    # geom_text(data = subset(filter(figure_values, author == "author_first" & Dataset == "All Countries" & ArticleCat=="OAinPW")),
-    #           aes(x=mean_Div-1.8, y=yALL_Div-20, label=(paste("PW-Open['mean']",as.character(mean_Div),sep=" == "))),
-    #           parse=TRUE,size=2)+
-
-    # OA Value - MIRROR
+   
+    
     geom_segment(
       data = subset(filter(figure_values, 
                            author == "author_first" & 
@@ -193,38 +170,8 @@ fig_div_boot <- function(Boot_RichDiv, sole_ALL,
       aes(x = OA_Div, y = 0, xend = OA_Div, yend = yALL_Div),
       colour = "red", linetype = "dashed"
     ) +
-    # geom_text(data = subset(filter(figure_values,author == "author_first" & Dataset == "All Countries" & ArticleCat2=="OA-mirror")),
-    #           aes(x=OA_Div+0, y=yALL_Div+25, label=(paste("Mirror",as.character(OA_Div),sep=" == "))),
-    #           parse=TRUE,color="red", size=2)+
-    # geom_text(data = subset(filter(figure_values,author == "author_first" & Dataset == "All Countries" & ArticleCat2=="OA-mirror")),
-    #           aes(x=OA_Div+0, y=yALL_Div+25, label="Mirror"),
-    #           parse=TRUE,color="red", size=2)+
-
-
-    # geom_segment(data = subset(filter(figure_values,author == "author_first" & Dataset == "All Countries" & ArticleCat2=="Parent")),
-    #              aes(x = OA_Div , y = 0, xend = OA_Div, yend = yALL_Div-100),
-    #              colour = "blue")+
-    # # geom_text(data = subset(filter(figure_values,author == "author_first" & Dataset == "All Countries" & ArticleCat2=="Parent")),
-    # #           aes(x=OA_Div+0, y=yALL_Div-100+25, label=(paste("Parent-OA",as.character(OA_Div),sep=" == "))),
-    # #           parse=TRUE,color="blue", size=2)+
-    # geom_text(data = subset(filter(figure_values,author == "author_first" & Dataset == "All Countries" & ArticleCat2=="Parent")),
-    #           aes(x=OA_Div+1.5, y=yALL_Div-100+25, label="Parent"),
-    #           parse=TRUE,color="blue", size=2)+
-
-
-    # MEAN OF BOOTSTRAP
-    # geom_segment(data = subset(filter(figure_values,author == "solo" & Dataset == "All Countries" & ArticleCat2=="PW" & ArticleCat2=="PW")),
-    #              aes(x = mean_Div, y = 0, xend = mean_Div, yend = yALL_Div), linetype="solid")+
-    # geom_text(data = subset(filter(figure_values,author == "solo" & Dataset == "All Countries" & ArticleCat2=="PW" & ArticleCat2=="PW")),
-    #           aes(x=mean_Div+2.5, y=yALL_Div+0, label=(paste("PW['mean']",as.character(mean_Div),sep=" == "))),
-    #           parse=TRUE,size=2)+
-    #
-    # geom_segment(data = subset(filter(figure_values,author == "solo" & Dataset == "All Countries" & ArticleCat2=="OAinPW")),
-    #              aes(x = mean_Div, y = 0, xend = mean_Div, yend = yALL_Div-50), linetype="solid")+
-    # geom_text(data = subset(filter(figure_values,author == "solo" & Dataset == "All Countries" & ArticleCat2=="OAinPW")),
-    #           aes(x=mean_Div+2, y=yALL_Div-40, label=(paste("PW-Open['mean']",as.character(mean_Div),sep=" == "))),
-    #           parse=TRUE,size=2)+
-    # OA Value
+  
+    
     geom_segment(
       data = subset(filter(figure_values, author == "solo" &
                              Dataset == "All Countries" &
@@ -232,37 +179,8 @@ fig_div_boot <- function(Boot_RichDiv, sole_ALL,
       aes(x = OA_Div, y = 0, xend = OA_Div, yend = ySolo_Div),
       colour = "red", linetype = "dashed"
     ) +
-    # geom_text(data = subset(filter(figure_values,author == "solo" & Dataset == "All Countries" & ArticleCat2=="OA-mirror")),
-    #           aes(x=OA_Div-0, y=ySolo_Div+25, label=(paste("OA",as.character(OA_Div),sep=" == "))),
-    #           parse=TRUE,color="red", size=2)+
-    # geom_text(data = subset(filter(figure_values,author == "solo" & Dataset == "All Countries" & ArticleCat2=="OA-mirror")),
-    #           aes(x=OA_Div-0, y=ySolo_Div+25, label="Mirror"),
-    #           parse=TRUE,color="red",size=2)+
-
-
-    # geom_segment(data = subset(filter(figure_values,author == "solo" & Dataset == "All Countries" & ArticleCat2=="Parent")),
-    #              aes(x = OA_Div , y = 0, xend = OA_Div, yend = yALL_Div-100),
-    #              colour = "blue")+
-    # # geom_text(data = subset(filter(figure_values,author == "solo" & Dataset == "All Countries" & ArticleCat2=="Parent")),
-    # #           aes(x=OA_Div+0, y=yALL_Div-100+25, label=(paste("Parent-OA",as.character(OA_Div),sep=" == "))),
-    # #           parse=TRUE,color="blue", size=2)+
-    # geom_text(data = subset(filter(figure_values,author == "solo" & Dataset == "All Countries" & ArticleCat2=="Parent")),
-    #           aes(x=OA_Div+0, y=yALL_Div-100+25, label="Parent"),
-    #           parse=TRUE,color="blue", size=2)+
-    # MEAN OF BOOTSTRAP
-    # geom_segment(data = subset(filter(figure_values,author == "author_first" & Dataset == "China & USA excluded" & ArticleCat2=="PW")),
-    #              aes(x = mean_Div, y = 0, xend = mean_Div, yend = yWO_Div), linetype="solid")+
-    # geom_text(data = subset(filter(figure_values,author == "author_first" & Dataset == "China & USA excluded" & ArticleCat2=="PW")),
-    #           aes(x=mean_Div+0, y=yWO_Div+20, label=(paste("PW['mean']",as.character(mean_Div),sep=" == "))),
-    #           parse=TRUE,size=2)+
-
-    # geom_segment(data = subset(filter(figure_values,author == "author_first" & Dataset == "China & USA excluded" & ArticleCat2=="OAinPW")),
-    #              aes(x = mean_Div, y = 0, xend = mean_Div, yend = yWO_Div-25), linetype="solid")+
-    # geom_text(data = subset(filter(figure_values,author == "author_first" & Dataset == "China & USA excluded" & ArticleCat2=="OAinPW")),
-    #           aes(x=mean_Div+3.5, y=yWO_Div-15, label=(paste("PW-Open['mean']",as.character(mean_Div),sep=" == "))),
-    #           parse=TRUE,size=2)+
-    #
-    # OA Value
+  
+    
     geom_segment(
       data = subset(filter(figure_values, author == "author_first" & 
                              Dataset == "China & USA excluded" & 
@@ -270,38 +188,8 @@ fig_div_boot <- function(Boot_RichDiv, sole_ALL,
       aes(x = OA_Div, y = 0, xend = OA_Div, yend = yWO_Div),
       colour = "red", linetype = "dashed"
     ) +
-    # geom_text(data = subset(filter(figure_values,author == "author_first" & Dataset == "China & USA excluded" & ArticleCat2=="OA-mirror")),
-    #           aes(x=OA_Div-0, y=yWO_Div+25, label=(paste("OA",as.character(OA_Div),sep=" == "))),
-    #           parse=TRUE,color="red", size=2)+
-    # geom_text(data = subset(filter(figure_values,author == "author_first" & Dataset == "China & USA excluded" & ArticleCat2=="OA-mirror")),
-    #           aes(x=OA_Div-0, y=yWO_Div+25, label="Mirror"),
-    #           parse=TRUE,color="red", size=2)+
-    #
-
-    #
-    # geom_segment(data = subset(filter(figure_values,author == "author_first" & Dataset == "China & USA excluded" & ArticleCat2=="Parent")),
-    #              aes(x = OA_Div , y = 0, xend = OA_Div, yend = yALL_Div-100),
-    #              colour = "blue")+
-    # # geom_text(data = subset(filter(figure_values,author == "author_first" & Dataset == "China & USA excluded" & ArticleCat2=="Parent")),
-    # #           aes(x=OA_Div+0, y=yALL_Div-100+25, label=(paste("Parent-OA",as.character(OA_Div),sep=" == "))),
-    # #           parse=TRUE,color="blue", size=2)+
-    # geom_text(data = subset(filter(figure_values,author == "author_first" & Dataset == "China & USA excluded" & ArticleCat2=="Parent")),
-    #           aes(x=OA_Div-1, y=yALL_Div-100+25, label="Parent"),
-    #           parse=TRUE,color="blue", size=2)+
-    # MEAN OF BOOTSTRAP
-    # geom_segment(data = subset(filter(figure_values,author == "solo" & Dataset == "China & USA excluded" & ArticleCat2=="PW")),
-    #              aes(x = mean_Div, y = 0, xend = mean_Div, yend = yWO_Div-10), linetype="solid")+
-    # geom_text(data = subset(filter(figure_values,author == "solo" & Dataset == "China & USA excluded" & ArticleCat2=="PW")),
-    #           aes(x=mean_Div-0, y=yWO_Div+15, label=(paste("PW['mean']",as.character(mean_Div),sep=" == "))),
-    #           parse=TRUE,size=2)+
-    #
-    # geom_segment(data = subset(filter(figure_values,author == "solo" & Dataset == "China & USA excluded" & ArticleCat2=="OAinPW")),
-    #              aes(x = mean_Div, y = 0, xend = mean_Div, yend = yWO_Div-10), linetype="solid")+
-    # geom_text(data = subset(filter(figure_values,author == "solo" & Dataset == "China & USA excluded" & ArticleCat2=="OAinPW")),
-    #           aes(x=mean_Div+1.5, y=yWO_Div+15, label=(paste("PW-Open['mean']",as.character(mean_Div),sep=" == "))),
-    #           parse=TRUE,size=2)+
-    #
-    # OA Value
+  
+    
     geom_segment(
       data = subset(filter(figure_values, author == "solo" &
                              Dataset == "China & USA excluded" & 
@@ -309,25 +197,8 @@ fig_div_boot <- function(Boot_RichDiv, sole_ALL,
       aes(x = OA_Div, y = 0, xend = OA_Div, yend = ySolo_Div - 10),
       colour = "red", linetype = "dashed"
     )
-  # geom_text(data = subset(filter(figure_values,author == "solo" & Dataset == "China & USA excluded" & ArticleCat2=="OA-mirror")),
-  #           aes(x=OA_Div-0, y=ySolo_Div+25, label=(paste("OA",as.character(OA_Div),sep=" == "))),
-  #           parse=TRUE,color="red", size=2)+
-  # geom_text(data = subset(filter(figure_values,author == "solo" & Dataset == "China & USA excluded" & ArticleCat2=="OA-mirror")),
-  #           aes(x=OA_Div-0, y=ySolo_Div+25, label="Mirror"),
-  #           parse=TRUE,color="red", size=2)+
-
-
-
-  # geom_segment(data = subset(filter(figure_values,author == "solo" & Dataset == "China & USA excluded" & ArticleCat2=="Parent")),
-  #              aes(x = OA_Div , y = 0, xend = OA_Div, yend = yALL_Div-100),
-  #              colour = "blue")+
-  # # geom_text(data = subset(filter(figure_values,author == "solo" & Dataset == "China & USA excluded" & ArticleCat2=="Parent")),
-  # #           aes(x=OA_Div+0, y=yALL_Div-100+25, label=(paste("Parent-OA",as.character(OA_Div),sep=" == "))),
-  # #           parse=TRUE,color="blue", size=2)+
-  # geom_text(data = subset(filter(figure_values,author == "solo" & Dataset == "China & USA excluded" & ArticleCat2=="Parent")),
-  #           aes(x=OA_Div+0, y=yALL_Div-100+25, label="Parent"),
-  #           parse=TRUE,color="blue", size=2)
-
+ 
+  
   pDiv <- pDiv +
     theme_classic() +
     theme(
@@ -354,217 +225,7 @@ fig_div_boot <- function(Boot_RichDiv, sole_ALL,
                     tag_pool = facet_labels, vjust = -1)
   pDiv
 
-
-  #
-  #
-  #
-  #
-  # ##################################################################################
-  # # DIVERISTY
-  # ############################################################################
-  #  n_boot<-Boot_RichDiv %>%
-  #   group_by(author,Dataset) %>%
-  #   summarize(n=n())
-  # boot_runs<-max(as.numeric(n_boot$n))
-  #
-  # figure_values<-ungroup(figure_values)
-  # P_Hat<-figure_values
-  # P_Hat$P_Hat<-NA
-  # P_Hat$JrnlType<-NULL
-  # ##########
-  # # P-HAT for All countries, coauthored, PW
-  # crit<-figure_values %>%
-  #   filter(Dataset=="All Countries") %>%
-  #   filter(author=="author_first") %>%
-  #   filter(ArticleCat=="PW") %>%
-  #   select(OA_Div)
-  #
-  # perc<-Boot_RichDiv %>%
-  #   filter(Dataset=="All Countries") %>%
-  #   filter(author=="author_first") %>%
-  #   filter(ArticleCat=="PW") %>%
-  #   ungroup() %>%
-  #   tally(InvSimp<crit$OA_Div) %>%
-  #   mutate(perc_belowOA = n/boot_runs)
-  # perc_belowOA<-perc$perc_belowOA
-  # perc_belowOA
-  #
-  # P_Hat$P_Hat[P_Hat$author=="author_first" &
-  #               P_Hat$Dataset=="All Countries"&
-  #               P_Hat$ArticleCat=="PW"]<-perc_belowOA
-  # ###########
-  #
-  #
-  # ##########
-  # # # P-HAT without USA CHN, coauthored, PW
-  # crit<-figure_values %>%
-  #   filter(Dataset=="China & USA excluded") %>%
-  #   filter(author=="author_first") %>%
-  #   filter(ArticleCat=="PW") %>%
-  #   select(OA_Div)
-  #
-  # perc<-Boot_RichDiv %>%
-  #   filter(Dataset=="China & USA excluded") %>%
-  #   filter(author=="author_first") %>%
-  #   filter(ArticleCat=="PW") %>%
-  #   ungroup() %>%
-  #   tally(InvSimp<crit$OA_Div) %>%
-  #   mutate(perc_belowOA = n/boot_runs)
-  # perc_belowOA<-perc$perc_belowOA
-  # perc_belowOA
-  #
-  # P_Hat$P_Hat[P_Hat$author=="author_first" &
-  #               P_Hat$Dataset=="China & USA excluded" &
-  #               P_Hat$ArticleCat=="PW"]<-perc_belowOA
-  # ###########
-  #
-  # ##########
-  # # # P-HAT All countries, coauthored, PW
-  # crit<-figure_values %>%
-  #   filter(Dataset=="All Countries") %>%
-  #   filter(author=="solo") %>%
-  #   filter(ArticleCat=="PW") %>%
-  #   select(OA_Div)
-  #
-  # perc<-Boot_RichDiv %>%
-  #   filter(Dataset=="All Countries") %>%
-  #   filter(author=="solo") %>%
-  #   filter(ArticleCat=="PW") %>%
-  #   ungroup() %>%
-  #   tally(InvSimp<crit$OA_Div) %>%
-  #   mutate(perc_belowOA = n/boot_runs)
-  # perc_belowOA<-perc$perc_belowOA
-  # perc_belowOA
-  #
-  # P_Hat$P_Hat[P_Hat$author=="solo" &
-  #               P_Hat$Dataset=="All Countries" &
-  #               P_Hat$ArticleCat=="PW"]<-perc_belowOA
-  # ###########
-  #
-  #
-  # ##########
-  # # # P-HAT without USA CHN, coauthored, PW
-  # crit<-figure_values %>%
-  #   filter(Dataset=="China & USA excluded") %>%
-  #   filter(author=="solo") %>%
-  #   filter(ArticleCat=="PW") %>%
-  #   select(OA_Div)
-  #
-  # perc<-Boot_RichDiv %>%
-  #   filter(Dataset=="China & USA excluded") %>%
-  #   filter(author=="solo") %>%
-  #   filter(ArticleCat=="PW") %>%
-  #   ungroup() %>%
-  #   tally(InvSimp<crit$OA_Div) %>%
-  #   mutate(perc_belowOA = n/boot_runs)
-  # perc_belowOA<-perc$perc_belowOA
-  # perc_belowOA
-  #
-  # P_Hat$P_Hat[P_Hat$author=="solo" &
-  #               P_Hat$Dataset=="China & USA excluded" &
-  #               P_Hat$ArticleCat=="PW"]<-perc_belowOA
-  #
-  # P_Hat<-P_Hat %>% arrange(Dataset,desc(author))
-  #
-  # #########
-  # #
-  # # ##########
-  # # # P-HAT for All countries, coauthored, OAinPW
-  # # crit<-figure_values %>%
-  # #   filter(Dataset=="All Countries") %>%
-  # #   filter(author=="author_first") %>%
-  # #   filter(ArticleCat=="OAinPW") %>%
-  # #   select(OA_Div)
-  # #
-  # # perc<-Boot_RichDiv %>%
-  # #   filter(Dataset=="All Countries") %>%
-  # #   filter(author=="author_first") %>%
-  # #   filter(ArticleCat=="OAinPW") %>%
-  # #   ungroup() %>%
-  # #   tally(InvSimp<crit$OA_Div) %>%
-  # #   mutate(perc_belowOA = n/boot_runs)
-  # # perc_belowOA<-perc$perc_belowOA
-  # # perc_belowOA
-  # #
-  # # P_Hat$P_Hat[P_Hat$author=="author_first" &
-  # #               P_Hat$Dataset=="All Countries"&
-  # #               P_Hat$ArticleCat=="OAinPW"]<-perc_belowOA
-  # # ###########
-  # #
-  # #
-  # # ##########
-  # # # # P-HAT without USA CHN, coauthored, OAinPW
-  # # crit<-figure_values %>%
-  # #   filter(Dataset=="China & USA excluded") %>%
-  # #   filter(author=="author_first") %>%
-  # #   filter(ArticleCat=="OAinPW") %>%
-  # #   select(OA_Div)
-  # #
-  # # perc<-Boot_RichDiv %>%
-  # #   filter(Dataset=="China & USA excluded") %>%
-  # #   filter(author=="author_first") %>%
-  # #   filter(ArticleCat=="OAinPW") %>%
-  # #   ungroup() %>%
-  # #   tally(InvSimp<crit$OA_Div) %>%
-  # #   mutate(perc_belowOA = n/boot_runs)
-  # # perc_belowOA<-perc$perc_belowOA
-  # # perc_belowOA
-  # #
-  # # P_Hat$P_Hat[P_Hat$author=="author_first" &
-  # #               P_Hat$Dataset=="China & USA excluded" &
-  # #               P_Hat$ArticleCat=="OAinPW"]<-perc_belowOA
-  # # ###########
-  # #
-  # # ##########
-  # # # # P-HAT All countries, coauthored, OAinPW
-  # # crit<-figure_values %>%
-  # #   filter(Dataset=="All Countries") %>%
-  # #   filter(author=="solo") %>%
-  # #   filter(ArticleCat=="OAinPW") %>%
-  # #   select(OA_Div)
-  # #
-  # # perc<-Boot_RichDiv %>%
-  # #   filter(Dataset=="All Countries") %>%
-  # #   filter(author=="solo") %>%
-  # #   filter(ArticleCat=="OAinPW") %>%
-  # #   ungroup() %>%
-  # #   tally(InvSimp<crit$OA_Div) %>%
-  # #   mutate(perc_belowOA = n/boot_runs)
-  # # perc_belowOA<-perc$perc_belowOA
-  # # perc_belowOA
-  # #
-  # # P_Hat$P_Hat[P_Hat$author=="solo" &
-  # #               P_Hat$Dataset=="All Countries" &
-  # #               P_Hat$ArticleCat=="OAinPW"]<-perc_belowOA
-  # # ###########
-  # #
-  # #
-  # # ##########
-  # # # # P-HAT without USA CHN, coauthored, OAinPW
-  # # crit<-figure_values %>%
-  # #   filter(Dataset=="China & USA excluded") %>%
-  # #   filter(author=="solo") %>%
-  # #   filter(ArticleCat=="OAinPW") %>%
-  # #   select(OA_Div)
-  # #
-  # # perc<-Boot_RichDiv %>%
-  # #   filter(Dataset=="China & USA excluded") %>%
-  # #   filter(author=="solo") %>%
-  # #   filter(ArticleCat=="OAinPW") %>%
-  # #   ungroup() %>%
-  # #   tally(InvSimp<crit$OA_Div) %>%
-  # #   mutate(perc_belowOA = n/boot_runs)
-  # # perc_belowOA<-perc$perc_belowOA
-  # # perc_belowOA
-  # #
-  # # P_Hat$P_Hat[P_Hat$author=="solo" &
-  # #               P_Hat$Dataset=="China & USA excluded" &
-  # #               P_Hat$ArticleCat=="OAinPW"]<-perc_belowOA
-  # #
-  # P_Hat<-P_Hat %>% arrange(Dataset,desc(author))
-  #
-  # #########
-  #
+  
   return(pDiv)
   # return(list(pDiv,P_Hat))
 }
