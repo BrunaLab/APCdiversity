@@ -1,13 +1,116 @@
+---
+title: "Supplement to Smith et al.: Assessing the effect of article processing charges on the geographic diversity of authors using Elsevier's 'Mirror Journal' system"
+author: "A. C. Smith, L. Merz, J. B. Borden, C. K. Gulick, A. R. Kshirsagar, and E. M. Bruna"
+email: embruna@ufl.edu
+web: www.BrunaLab.org
+github: embruna
+twitter: BrunaLab
+phone: "(352) 846-0634"
+# date: "`r format(Sys.time(), '%B %Y')`"
+geometry: margin=1in
+# tables: true
+# fontawesome: yes
+header-includes:
+- \usepackage{fancyhdr}
+- \pagestyle{fancy}
+- \fancyfoot{} # remove page number bottom of the page
+- \fancyhead[L]{APCs and Author Diversity (Supplement)}
+- \fancyhead[R]{p. \thepage}
+- \usepackage{setspace}
+- \usepackage{parskip} 
+- \usepackage{pdflscape}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
+
+- \usepackage{caption}                            
+- \DeclareCaptionLabelFormat{Sformat}{#1 S#2}     
+- \captionsetup[table]{labelformat=Sformat}  
+- \captionsetup[figure]{labelformat=Sformat}  
+  
+output:
+   pdf_document: default
+   html_document:
+   df_print: paged
+   toc: true
+
+---
 
 
-```{r FigA1,fig.align='center',fig.cap=paste("Percentage of lead authors (i..e, first and single-authors) based in different countries; Parent and Mirror journals combined. Numbers adjacent to bars are the number of articles with lead authors based in that country."), message = FALSE,warning=FALSE}
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE,message=FALSE,warning=FALSE)
+library(tidyverse)
+library(gridExtra)
+library(kableExtra)
+library(here)
+library(egg)
+# library(citr)
+```
+
+
+```{r load_data, cached=TRUE}
+knitr::opts_chunk$set(echo = FALSE)
+
+# MirrorPairs <- read_csv(here("data_clean", "MirrorPairs.csv"))
+# WaiverCountries <- read_csv(here("data_clean","WaiverCountries.csv"))
+AllData <- read_csv(here("data_clean","all_data_analysis.csv"))
+
+
+# df of single author pubs (all countries)
+single_ALL <- AllData %>%
+  filter(author == "solo") %>%
+  mutate(Dataset = "All Countries") %>%
+  drop_na("Code")
+# n_distinct(single_ALL$refID)
+
+# df of coauthored pubs (all countries)
+first_ALL <- AllData %>%
+  filter(author == "coauthored") %>%
+  filter(AuthorNum == 1) %>%
+  mutate(author = "author_first")
+
+# df of single author pubs (no first authors from CHN or USA)
+single_NOCHNUSA <- AllData %>%
+  filter(author == "solo") %>%
+  filter(Code != "CHN") %>%
+  filter(Code != "USA") %>%
+  mutate(Dataset = "CHN & USA excluded")
+
+# df of coauthored pubs (no first authors from CHN or USA)
+first_NOCHNUSA <- AllData %>%
+  filter(author == "coauthored") %>%
+  filter(AuthorNum == 1) %>%
+  filter(Code != "CHN") %>%
+  filter(Code != "USA") %>%
+  mutate(Dataset = "CHN & USA excluded") %>%
+  mutate(author = "author_first")
+
+# Load Bootstrap Runs - OA in Mirror Journals
+BootMirror_RichDiv <- read_csv(here("data_clean","BootMirror_RichDiv.csv"))
+
+
+NumbArticles_JrnlType <- AllData %>%
+  group_by(JrnlType, ArticleType) %>%
+  summarize(n = n_distinct(refID))
+n_OA <- as.numeric(NumbArticles_JrnlType[1, 3])
+n_OAinPW <- as.numeric(NumbArticles_JrnlType[2, 3])
+n_PW <- as.numeric(NumbArticles_JrnlType[3, 3])
+Total_pubs <- sum(NumbArticles_JrnlType$n)
+
+insert_custom1 <- n_OA
+insert_custom2 <- n_PW
+insert_custom3 <- n_OAinPW
+```
+
+\newpage
+```{r FigS1,fig.align='center',fig.cap=paste("Percentage of lead authors (i..e, first and single-authors) based in different countries; Parent and Mirror journals combined. Numbers adjacent to bars are the number of articles with lead authors based in that country."), message = FALSE,warning=FALSE}
 
 source("./Rscript/functions_ms/fig_a1.R")
-tiff("./manuscript/figs_final/fig_a1", units="cm", width=15, height=15, res=700)
+# tiff("./manuscript/figs_final/fig_a1", units="cm", width=15, height=15, res=700)
 
 fig_a1(AllData)
 
-dev.off()
+# dev.off()
 ```
 
 ```{=tex}
@@ -15,17 +118,17 @@ dev.off()
 \blandscape
 ```
 
-```{r FigA2,echo=FALSE, message = FALSE,warning=FALSE, fig.align='center',fig.cap=paste("The effect on $D_{2}$ of excluding authors from individual countries (B) The effect on $D_{2}$ of excluding authors from individual countries after having first removed China."),fig.height = 16,fig.width=24}
+```{r FigS2,echo=FALSE, message = FALSE,warning=FALSE, fig.align='center',fig.cap=paste("The effect on $D_{2}$ of excluding authors from individual countries (B) The effect on $D_{2}$ of excluding authors from individual countries after having first removed China."),fig.height = 16,fig.width=24}
 source("./Rscript/functions_ms/fig_a_country_removal_div.R")
 removal <- fig_a_country_removal_div()
 p1 <- removal[[1]]
 p2 <- removal[[2]]
 
-tiff("./manuscript/figs_final/fig_a2", units="cm", width=60, height=25, res=700)
+# tiff("./manuscript/figs_final/fig_a2", units="cm", width=60, height=25, res=700)
 
 grid.arrange(p1, p2, ncol = 1)
 
-dev.off()
+# dev.off()
 ```
 
 ```{=tex}
@@ -33,7 +136,7 @@ dev.off()
 \newpage
 ```
 
-```{r FigA3, echo=FALSE, message = FALSE,warning=FALSE, fig.align='center', fig.cap=paste("Results of permutation tests comparing author Diversity, Richness, and Evenness of open access articles published in Parent and Mirror journals. The line indicates the observed difference between the two populations, while the bars represent the frequency in 5000 permutations of the difference between two groups identical in size and structure to the observed collections but to which articles were assigned at random without replacement. Results are shown for analyses including all countries (A-C) and when excluding articles by first- and single-authors based in China or the USA (D-F). Note also that these analyses were conducted by pooling first- and single-author articles within each journal type; we were unable to do permutation tests comparing by authorship category (e.g., single-author in Mirror vs. Parent, first-author in Mirror vs. Parent) because several journals had no articles in one of the categories; alternative attempts to test for differences using bootstrapping did not suggest there were significant differences in diversity when comparing by category."), fig.fullwidth=TRUE,message = FALSE,warning=FALSE}
+```{r FigS3, echo=FALSE, message = FALSE,warning=FALSE, fig.align='center', fig.cap=paste("Results of permutation tests comparing author Diversity, Richness, and Evenness of open access articles published in Parent and Mirror journals. The line indicates the observed difference between the two populations, while the bars represent the frequency in 5000 permutations of the difference between two groups identical in size and structure to the observed collections but to which articles were assigned at random without replacement. Results are shown for analyses including all countries (A-C) and when excluding articles by first- and single-authors based in China or the USA (D-F). Note also that these analyses were conducted by pooling first- and single-author articles within each journal type; we were unable to do permutation tests comparing by authorship category (e.g., single-author in Mirror vs. Parent, first-author in Mirror vs. Parent) because several journals had no articles in one of the categories; alternative attempts to test for differences using bootstrapping did not suggest there were significant differences in diversity when comparing by category."), fig.fullwidth=TRUE,message = FALSE,warning=FALSE}
 
 knitr::opts_knit$set(eval.after = "fig.cap")
 source("./Rscript/functions_ms/permutation_tests_OA_fig.R")
@@ -42,19 +145,19 @@ AllData <- read_csv("./data_clean/all_data_analysis.csv")
 Perm_test <- permutation_tests_OA_fig(All_boots_wide, AllData)
 P_FIG <- Perm_test[[1]]
 
-tiff("./manuscript/figs_final/fig_a3", units="cm", width=20, height=15, res=700)
+# tiff("./manuscript/figs_final/fig_a3", units="cm", width=20, height=15, res=700)
 
 P_FIG
 
-dev.off()
+# dev.off()
 ```
 
 
-```{r FigA4,fig.align='center', fig.cap=paste("Author Geographic Diversity (Shannon's Index) for N = ", insert_custom1, " articles in Mirror journals (solid line) and 1000 identically sized collections generated by selecting an identical number of non-open access articles in Parent journals by bootstrapping from the pool of N = ",insert_custom2, " total articles. Results are shown for analyses including all countries (A, C) and when excluding artciles by first- and single-authors based in China or the USA (B, D)."), fig.fullwidth=TRUE,message = FALSE,warning=FALSE}
+```{r FigS4,fig.align='center', fig.cap=paste("Author Geographic Diversity (Shannon's Index) for N = ", insert_custom1, " articles in Mirror journals (solid line) and 1000 identically sized collections generated by selecting an identical number of non-open access articles in Parent journals by bootstrapping from the pool of N = ",insert_custom2, " total articles. Results are shown for analyses including all countries (A, C) and when excluding artciles by first- and single-authors based in China or the USA (B, D)."), fig.fullwidth=TRUE,message = FALSE,warning=FALSE}
 
 source("./Rscript/functions_ms/fig_a_divboot_shannon.R")
 
-tiff("./manuscript/figs_final/fig_a4", units="cm", width=15, height=15, res=700)
+# tiff("./manuscript/figs_final/fig_a4", units="cm", width=15, height=15, res=700)
 
 fig_a_divboot_shannon(
   BootMirror_RichDiv,
@@ -64,18 +167,18 @@ fig_a_divboot_shannon(
   first_NOCHNUSA
 )
 
-dev.off()
+# dev.off()
 ```
 
-```{r FigA5,fig.align='center', fig.cap=paste("Proportion of lead authors based in different World Bank Lending Groups when pooling all of the (A) N = ", insert_custom1, " articles in open access (OA) Mirror journals, (B) N =  ",insert_custom3, " OA articles in Parent journals, and (C) N =  ",insert_custom2, " non-OA articles in Parent journals."),fig.fullwidth=TRUE,fig.height = 18,fig.width=16, message = FALSE,warning=FALSE}
+```{r FigS5,fig.align='center', fig.cap=paste("Proportion of lead authors based in different World Bank Lending Groups when pooling all of the (A) N = ", insert_custom1, " articles in open access (OA) Mirror journals, (B) N =  ",insert_custom3, " OA articles in Parent journals, and (C) N =  ",insert_custom2, " non-OA articles in Parent journals."),fig.fullwidth=TRUE,fig.height = 18,fig.width=16, message = FALSE,warning=FALSE}
 source("./Rscript/functions_ms/fig_a5.R")
 
-tiff("./manuscript/figs_final/fig_a5", units="cm", width=30, height=40, res=700)
+# tiff("./manuscript/figs_final/fig_a5", units="cm", width=30, height=40, res=700)
 
 fig_a5(AllData, "author_first")
 
 
-dev.off()
+# dev.off()
 ```
 
 ```{=tex}
@@ -83,7 +186,7 @@ dev.off()
 \blandscape
 ```
 
-```{r TableA1, echo=FALSE,message = FALSE,warning=FALSE}
+```{r TableS1, echo=FALSE,message = FALSE,warning=FALSE}
 WaiverCountries <- read_csv("./data_clean/WaiverCountries.csv")
 NON_WavierCountries <- read_csv("./data_clean/NON_WavierCountries.csv")
 
@@ -256,8 +359,8 @@ kable(waiver_table3,
 ```
 
 \elandscape
-
-```{r TableA2, echo=FALSE,message = FALSE,warning=FALSE}
+\newpage
+```{r TableS2, echo=FALSE,message = FALSE,warning=FALSE}
 PermTable <- Perm_test[2]
 PermTable <- as.data.frame(PermTable)
 
@@ -302,14 +405,14 @@ kable(PermTable,
   kable_styling(
     bootstrap_options = c("hover"),
     full_width = F,
-    latex_options = "scale_down",
+    latex_options = c("scale_down","hold_position"),
     font_size = 12,
     position = "center"
   )
 ```
-
-
-```{r TableA3, echo=FALSE,message = FALSE,warning=FALSE}
+\pagebreak
+\newpage
+```{r TableS3, echo=FALSE,message = FALSE,warning=FALSE}
 source("./Rscript/functions_ms/table_div_results.R")
 Table2 <- table_div_results(
   single_ALL,
@@ -400,18 +503,16 @@ kable(Table2,
 ) %>%
   kable_styling(
     bootstrap_options = c("hover"),
-    # full_width = F,
-    latex_options = c("scale_down"),
-    # latex_options = c("hold_position"),
+    # full_width = T,
+    latex_options = c("scale_down","hold_position"),
     font_size = 12,
     position = "center"
   ) %>%
   add_header_above(c(" " = 3, "All Countries" = 3, "China & USA Excluded" = 3))
 ```
 
-
-
-```{r TableA4, echo=FALSE,message = FALSE,warning=FALSE}
+\newpage
+```{r TableS4, echo=FALSE,message = FALSE,warning=FALSE}
 Articles_JrnlxAuthor <- AllData %>%
   group_by(author, ArticleType,JrnlType) %>%
   filter(AuthorNum == 1) %>%
@@ -426,40 +527,40 @@ Articles_JrnlxAuthor_noCHNUSA <- AllData %>%
   summarize(n2 = n_distinct(refID))
 # sum(Articles_JrnlxAuthor_noCHNUSA$n)
 
-TableA4 <- left_join(Articles_JrnlxAuthor,Articles_JrnlxAuthor_noCHNUSA) %>% 
+TableS4 <- left_join(Articles_JrnlxAuthor,Articles_JrnlxAuthor_noCHNUSA) %>% 
   mutate(ArticleCategory=paste(ArticleType,JrnlType,sep=""), .before=2) %>% 
   ungroup() %>% 
   select(-ArticleType,-JrnlType)
 
-TableA4 <- dplyr::rename(TableA4,
+TableS4 <- dplyr::rename(TableS4,
                          Author=author,
                          AllCountries = n1, 
                          ChinaUSAexcluded = n2) 
 
 
-TableA4$Author <- gsub("coauthored","Coauthored", TableA4$Author)
-TableA4$Author <- gsub("solo","Single Author", TableA4$Author)
-TableA4$ArticleCategory <- gsub("OAOA","OA - Mirror", TableA4$ArticleCategory)
-TableA4$ArticleCategory <- gsub("OAPW","OA in Parent", TableA4$ArticleCategory)
-TableA4$ArticleCategory <- gsub("PWPW","non-OA in Parent", TableA4$ArticleCategory)
-TableA4[2, 1] <- ""
-TableA4[3, 1] <- ""
-TableA4[5, 1] <- ""
-TableA4[6, 1] <- ""
+TableS4$Author <- gsub("coauthored","Coauthored", TableS4$Author)
+TableS4$Author <- gsub("solo","Single Author", TableS4$Author)
+TableS4$ArticleCategory <- gsub("OAOA","OA - Mirror", TableS4$ArticleCategory)
+TableS4$ArticleCategory <- gsub("OAPW","OA in Parent", TableS4$ArticleCategory)
+TableS4$ArticleCategory <- gsub("PWPW","non-OA in Parent", TableS4$ArticleCategory)
+TableS4[2, 1] <- ""
+TableS4[3, 1] <- ""
+TableS4[5, 1] <- ""
+TableS4[6, 1] <- ""
 
-Totals <- c("","",sum(TableA4$AllCountries),sum(TableA4$ChinaUSAexcluded))
+Totals <- c("","",sum(TableS4$AllCountries),sum(TableS4$ChinaUSAexcluded))
 
-TableA4 <- rbind(TableA4,Totals)
-colnames(TableA4) <- c(
+TableS4 <- rbind(TableS4,Totals)
+colnames(TableS4) <- c(
   "Author",
   "Category",
   "All Countries",
   "China and USA Excluded"
   )
 
-# TableA4
+# TableS4
 # 
-kable(TableA4,
+kable(TableS4,
   # digits = 2,
   format = "latex",
   align = "llcc",
