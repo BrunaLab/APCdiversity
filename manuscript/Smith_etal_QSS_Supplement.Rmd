@@ -27,11 +27,12 @@ header-includes:
 - \captionsetup[table]{labelformat=Sformat}  
 - \captionsetup[figure]{labelformat=Sformat}  
   
-output:
-   pdf_document: default
-   html_document:
-   df_print: paged
-   toc: true
+output: 
+  pdf_document:
+    keep_tex: true
+   # html_document:
+   # df_print: paged
+   # toc: true
 
 ---
 
